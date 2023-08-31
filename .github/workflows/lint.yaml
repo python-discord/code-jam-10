@@ -1,17 +1,9 @@
-# GitHub Action Workflow enforcing our code style.
-
 name: Lint
 
-# Trigger the workflow on both push (to the main repository, on the main branch)
-# and pull requests (against the main repository, but from any repo, from any branch).
 on:
   push:
-    branches:
-      - main
   pull_request:
 
-# Brand new concurrency setting! This ensures that not more than one run can be triggered for the same commit.
-# It is useful for pull requests coming from the main repository since both triggers will match.
 concurrency: lint-${{ github.sha }}
 
 jobs:
@@ -20,13 +12,13 @@ jobs:
     env:
       PYTHON_VERSION: "3.11"
     steps:
-      - name: Check out repository
+      - name: Check out repository.
         uses: actions/checkout@v3
 
-      - name: Set up Python ${{ env.PYTHON_VERSION }}
+      - name: Set up Python ${{ env.PYTHON_VERSION }}.
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Run pre-commit hooks
+      - name: Run pre-commit hooks.
         uses: pre-commit/action@v3.0.0
