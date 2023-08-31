@@ -1,0 +1,2 @@
+# This file contains all the dependencies required to run the project.
+# Don't forget to pin your dependencies!
