@@ -1,7 +1,11 @@
-[tool.black]
-line-length = 119
-
 [tool.ruff]
+select = ["E", "F", "W", "I", "N", "RUF"]
+src = ["src"]
+line-length = 119
+target-version = "py311"
+fix = true
+
+[tool.black]
 line-length = 119
 
 [tool.pyright]
