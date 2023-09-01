@@ -1,4 +1,4 @@
-import backend  # noqa F401
+import backend as backend  # noqa: F401
 
 
 def load(file_path):
