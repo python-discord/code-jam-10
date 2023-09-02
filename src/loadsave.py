@@ -1,14 +1,14 @@
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 
-from backend import PaintingColors
+from backend import TypingColors
 
 
 def load(file_path):
     """Returns the backend object created from loading image in file path."""
     img = Image.open(file_path)
     metadata = img.text
-    object = PaintingColors(img.convert("RGBA"))
+    object = TypingColors(img.convert("RGBA"))
     decoded_text = ""
     for char, (r, g, b) in metadata.items():  # importing pallete from metadata
         object.pallete[char] = (ord(r), ord(g), ord(b), 255)
@@ -32,7 +32,7 @@ def save(object, file_path="Untitled.png"):
 
 
 # testing
-# obj = PaintingColors()
+# obj = TypingColors()
 # loremipsum = '''"But I must explain to you how all this mistaken idea of
 # denouncing pleasure and praising pain was born and I will give you a complete
 # account of the system, and expound the actual teachings of the great explorer
