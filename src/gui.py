@@ -3,25 +3,33 @@ import PySimpleGUI as sg
 import backend as backend  # noqa: F401
 import loadsave  # noqa: F401
 
-# create gui, somehow take in loaded object with init function
-# or start with blank canvas by default
+# TODO
+DEMO_PNG = ".\\assets\\demo.png"
 
-sg.theme('DarkAmber')   # Add a touch of color
-# All the stuff inside your window.
-layout = [[sg.Text('Some text on Row 1')],
-          [sg.Text('Enter something on Row 2'), sg.InputText()],
-          [sg.Text('Enter something on Row 2'), sg.InputText()],
-          [sg.Button('Ok'), sg.Button('Cancel')]]
+WIN_W, WIN_H = (800, 600)
+
+
+layout = [
+    [
+        sg.Column([
+            [sg.Multiline(key="text", enable_events=True, size=(WIN_W // 2, WIN_H), font=('Consolas', 16))]
+        ], element_justification='center', size=(WIN_W // 2, WIN_H),),
+        sg.Column([
+            [sg.Image(DEMO_PNG)]
+        ], element_justification='center', size=(WIN_W // 2, WIN_H))
+    ]
+]
 
 
 # Create the Window
-window = sg.Window('Window Title', layout)
+window = sg.Window('Pixel Studio', layout, resizable=True, finalize=True, size=(WIN_W, WIN_H))
 
 # Event Loop to process "events" and get the "values" of the inputs
 while True:
     event, values = window.read()
-    if event == sg.WIN_CLOSED or event == 'Cancel':  # if user closes window or clicks cancel
+    if event == sg.WIN_CLOSED:  # if user closes window or clicks cancel
         break
-    print('You entered ', values)
+
+    print('You entered ', values['text'])
 
 window.close()
