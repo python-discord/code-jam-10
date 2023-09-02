@@ -25,6 +25,8 @@ jobs:
       # Checks out the repository in the current folder.
       - name: Checks out repository
         uses: actions/checkout@v3
+          with:
+            ref: fix-poetry-issue
 
       # Set up the right version of Python
       - name: Set up Python ${{ env.PYTHON_VERSION }}
