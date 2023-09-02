@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 
-def avg_greyscale(img: Image) -> None:
+def avg_greyscale(img: Image.Image) -> None:
     """
     Calculates average greyscale or luminance value of an input image
 
@@ -18,7 +18,7 @@ def avg_greyscale(img: Image) -> None:
     return np.average(np_img.reshape(w * h))
 
 
-def img_to_ascii(img: Image, cols: int, scale: float, dens: int) -> List[str]:
+def img_to_ascii(img: Image.Image, cols: int, scale: float, dens: int) -> List[str]:
     """
     Given Image and dims (rows, cols) returns an m*n list of Images
 
@@ -72,7 +72,7 @@ def img_to_ascii(img: Image, cols: int, scale: float, dens: int) -> List[str]:
     return ascii_
 
 
-def ascii_to_img(ascii_text_file, output_dest) -> None:
+def ascii_to_img(ascii_text_file:str, output_dest:str) -> None:
     """
     Creates image file from ascii text file
     """
