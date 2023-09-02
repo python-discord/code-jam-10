@@ -25,7 +25,6 @@ def img_to_ascii(img, cols, scale, dens):
     :param dens: greyscale density level
     :return: ascii text generated from input image
     """
-
     # The amount of text to white space in each of these character determines the greyscale value
     greyscale_strs = [
         "@%#*+=-:. ",  # 10 characters,

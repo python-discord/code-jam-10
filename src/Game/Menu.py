@@ -1,6 +1,4 @@
-"""
-Menu Window
-"""
+"""Menu Window"""
 
 import arcade
 import arcade.gui
@@ -8,12 +6,18 @@ from src.Utils import Constants
 
 
 class Quit(arcade.gui.UIFlatButton):
+    """TODO flake8"""
+
     def on_click(self, event: arcade.gui.UIOnClickEvent) -> None:
+        """TODO flake8"""
         arcade.exit()
 
 
 class MenuWindow(arcade.Window):
+    """TODO flake8"""
+
     def __init__(self) -> None:
+        """TODO flake8"""
         super().__init__(800, 600, Constants.title, resizable=True)
         self.manager = arcade.gui.UIManager()
         self.manager.enable()
@@ -44,13 +48,16 @@ class MenuWindow(arcade.Window):
         )
 
     def on_click_start(self, event: arcade.gui.UIOnClickEvent) -> None:
+        """TODO flake8"""
         # TODO: Add functionality
         print("Start:", event)
 
     def on_click_setting(self, event: arcade.gui.UIOnClickEvent) -> None:
+        """TODO flake8"""
         # TODO: Add functionality
         print("Start:", event)
 
     def on_draw(self) -> None:
+        """TODO flake8"""
         self.clear()
         self.manager.draw()
