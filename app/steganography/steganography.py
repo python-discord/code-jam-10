@@ -1,7 +1,7 @@
 from functools import cached_property
 from pathlib import Path
+from typing import Protocol
 
-import byteutils
 import cv2
 
 
@@ -10,7 +10,7 @@ class Image:
 
     def __init__(self, filename: Path):
         self.__filename = filename
-        self.__image = cv2.imread(str(filename))
+        self.__image = cv2.imread(str(filename), flags=cv2.IMREAD_UNCHANGED)
 
     def __iter__(self):
         return iter(self.image)
@@ -49,52 +49,55 @@ class Image:
         return cv2.imwrite(str(file), self.image)
 
 
-def _encode(text: str, img: Image) -> Image:
-    """Encode the text in the image.
+class Steganography(Protocol):
+    """Steganography Interface"""
 
-    Args:
-        text (str): text to encode in the image
-        img (Image): Image to encode the text in
+    def encode(self, text: str, img: Image) -> Image:
+        """Encode the text into the image
 
-    Raises:
-        ValueError: If the input text cannot be encoded in the image.
+        Args:
+            text (str): Text to encode
+            img (Image): Image to encode text in
 
-    Returns:
-        Image: Image that has the given text encoded in it
-    """
-    bytes_input = text.encode()
+        Returns:
+            Image: Image with the given text encoded
+        """
+        ...
 
-    if not img.can_encode(bytes_input):
-        raise ValueError("Input text exceeds the maximum bytes that can be encoded")
+    def decode(self, img: Image) -> str:
+        """Decode the text from the image
 
-    bits = byteutils.iter_bits(bytes_input)
-    for row in img:
-        for pixel in row:
-            for idx, channel in enumerate(pixel):
-                try:
-                    bit = next(bits)
-                    if bool(bit):
-                        print(f"{channel} | {bit} = {channel | bool(bit)}")
-                        pixel[idx] = channel | bool(bit)
-                    else:
-                        print(f"{channel} & {bit} = {channel & bool(bit)}")
-                        pixel[idx] = channel & bool(bit)
-                except StopIteration:
-                    return img
+        Args:
+            img (Image): Image to decode text from
+
+        Returns:
+            str: Text decoded from the image
+        """
+        ...
 
 
-def encode(text: str, infile: Path, outfile: Path):
-    """Encode the text in the infile and save it to outfile.
+def encode(text: str, infile: Path, outfile: Path, algorithm: Steganography):
+    """Encode the text in the infile using the given steganography algorithm and save it to outfile.
 
     Args:
         text (str): Text to encode
         infile (Path): File to encode the text in
         outfile (Path): File to save the image with the encoded text
+        algorithm (Steganography): Steganography algorithm to use
     """
     img = Image(infile)
-    img = _encode(text, img)
+    img = algorithm.encode(text, img)
     img.save(outfile)
 
 
-if __name__ == "__main__":
-    encode("hello", Path("car.jpg"), Path("out.jpg"))
+def decode(file: Path, algorithm: Steganography) -> str:
+    """Decode the text in the file using the given steganography algorithm
+
+    Args:
+        file (Path): File to decode
+        algorithm (Steganography): Steganography algorithm to use
+
+    Returns:
+        str: decoded message
+    """
+    return algorithm.decode(Image(file))
