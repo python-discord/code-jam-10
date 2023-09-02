@@ -1,4 +1,5 @@
 # TODO: support newlines
+import io
 from difflib import ndiff
 from random import randrange
 
@@ -11,7 +12,7 @@ class TypingColors:
     def __init__(self, img=None):
         self.text = ""
         if img is None:  # start blank
-            self.size = (25, 50)
+            self.size = (30, 45)
             self.canvas = Image.new("RGBA", self.size, (0, 0, 0, 0))
         else:
             self.size = img.size
@@ -46,17 +47,18 @@ class TypingColors:
         to_insert = []
 
         # loop through ndiff to get needed changes
-        for pos, diff in enumerate(ndiff(self.text, text)):
+        pos = 0
+        for diff in ndiff(self.text, text):
             operation, char = diff[0], diff[-1]
-            if operation in ('+', ' '):
+            if operation in '+ ':  # add/replace char
                 to_insert.append([pos, char])
-            else:
+            else:  # remove char, decrease pos
                 to_remove.append([pos, char])
+                pos -= 1
+            pos += 1
 
         for pos, char in to_remove:
-            for n, (ipos, _) in enumerate(to_insert):
-                if ipos >= pos:  # shift insert left
-                    to_insert[n][0] -= 1
+            self.canvas_drawer.point(self._idx2coord(pos), (0, 0, 0, 0))
 
         for pos, char in to_insert:
             color = self._pallete_check(char)
@@ -69,9 +71,16 @@ class TypingColors:
 
         self.text = text  # update old to new text
 
+    def img_scaled(self, size=(390, 585)):  # size around half the gui window
+        """Returns scaled PNG bytes of image for GUI"""
+        bio = io.BytesIO()
+        self.canvas.resize(size, Image.BOX).save(bio, format='PNG')
+        return bio.getvalue()
+
 # for testing
-# from PIL import ImageShow
 # test = TypingColors()
 # while True:
-#     test.update(input("> "))
-#     ImageShow.show(test.canvas)
+#     test.update(input("\n> "))
+#     dat = test.canvas.getdata()
+#     for i in range(len(test.text)+2):
+#         print(dat[i][:3],end='')
