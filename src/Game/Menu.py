@@ -8,12 +8,12 @@ from src.Utils import Constants
 
 
 class Quit(arcade.gui.UIFlatButton):
-    def on_click(self, event: arcade.gui.UIOnClickEvent):
+    def on_click(self, event: arcade.gui.UIOnClickEvent) -> None:
         arcade.exit()
 
 
 class MenuWindow(arcade.Window):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(800, 600, Constants.title, resizable=True)
         self.manager = arcade.gui.UIManager()
         self.manager.enable()
@@ -43,14 +43,14 @@ class MenuWindow(arcade.Window):
                 child=self.v_box)
         )
 
-    def on_click_start(self, event: arcade.gui.UIOnClickEvent):
+    def on_click_start(self, event: arcade.gui.UIOnClickEvent) -> None:
         # TODO: Add functionality
         print("Start:", event)
 
-    def on_click_setting(self, event: arcade.gui.UIOnClickEvent):
+    def on_click_setting(self, event: arcade.gui.UIOnClickEvent) -> None:
         # TODO: Add functionality
         print("Start:", event)
 
-    def on_draw(self):
+    def on_draw(self) -> None:
         self.clear()
         self.manager.draw()
