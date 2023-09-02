@@ -1,6 +1,4 @@
-"""
-Run File
-"""
+"""Run File"""
 
 import arcade
 from Game import Menu
