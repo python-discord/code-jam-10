@@ -1,10 +1,12 @@
 import argparse
+import random
+from typing import List
 
 import numpy as np
 from PIL import Image, ImageDraw
 
 
-def avg_greyscale(img: Image):
+def avg_greyscale(img: Image) -> None:
     """
     Calculates average greyscale or luminance value of an input image
 
@@ -16,7 +18,7 @@ def avg_greyscale(img: Image):
     return np.average(np_img.reshape(w * h))
 
 
-def img_to_ascii(img: Image, cols, scale, dens):
+def img_to_ascii(img: Image, cols: int, scale: float, dens: int) -> List[str]:
     """
     Given Image and dims (rows, cols) returns an m*n list of Images
 
@@ -70,11 +72,9 @@ def img_to_ascii(img: Image, cols, scale, dens):
     return ascii_
 
 
-def ascii_to_img(ascii_text_file, output_dest):
+def ascii_to_img(ascii_text_file, output_dest) -> None:
     """
     Creates image file from ascii text file
-
-    :return: generated ascii image
     """
     with open(ascii_text_file, "r") as file:
         ascii_text = file.read()
@@ -95,14 +95,29 @@ def ascii_to_img(ascii_text_file, output_dest):
     img.save(output_dest, "png")
 
 
-def seed_secret(secret):
-    pass
+def seed_secret(ascii_file: str, secret: str) -> None:
+    """
+    Insert the secret phrase randomly somewhere in the ascii file
+    """
+    with open(ascii_file, "r") as file:
+        lines = file.readlines()
+
+    random_line = random.randint(0, len(lines) - 1)
+
+    line_length = len(lines[random_line])
+    secret_length = len(secret)
+
+    if secret_length > line_length:
+        raise ValueError("The secret phrase is longer than the width of the ascii art generated.")
+    position = random.randint(0, line_length - secret_length - 1)
+    lines[random_line] = "".join([lines[random_line][0:position], secret, lines[random_line][position + secret_length :]])
+
+    with open(ascii_file, "w") as file:
+        file.writelines(lines)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Converts input image into ascii art and saves the resulting text back into image (.png)"
-    )
+    parser = argparse.ArgumentParser(description="Converts input image into ascii art and saves the resulting text back into image (.png)")
     parser.add_argument("--input", dest="input", required=True, help="Input image")
     parser.add_argument(
         "--secret",
@@ -150,5 +165,5 @@ if __name__ == "__main__":
     with open(args.ascii_file, "w") as f:
         for r in img_to_ascii(args.input, int(args.cols), float(args.scale), int(args.dens)):
             f.write(r + "\n")
-    seed_secret(args.secret)
+    seed_secret(args.ascii_file, args.secret)
     ascii_to_img(args.ascii_file, args.output)
