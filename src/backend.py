@@ -1,3 +1,4 @@
+# TODO: support newlines
 from difflib import ndiff
 from random import randrange
 
@@ -7,11 +8,15 @@ from PIL import Image, ImageDraw
 class PaintingColors:
     """The main backend object."""
 
-    def __init__(self):
+    def __init__(self, img=None):
         self.text = ""
-        self.size = (85, 110)
+        if img is None:  # start blank
+            self.size = (25, 50)
+            self.canvas = Image.new("RGBA", self.size, (0, 0, 0, 0))
+        else:
+            self.size = img.size
+            self.canvas = img
         self.width, self.height = self.size
-        self.canvas = Image.new("RGBA", self.size, (0, 0, 0, 0))
         self.canvas_drawer = ImageDraw.Draw(self.canvas)
         self.pallete = {}  # maps characters to colours
 
