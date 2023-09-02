@@ -72,10 +72,8 @@ def img_to_ascii(img: Image.Image, cols: int, scale: float, dens: int) -> List[s
     return ascii_
 
 
-def ascii_to_img(ascii_text_file:str, output_dest:str) -> None:
-    """
-    Creates image file from ascii text file
-    """
+def ascii_to_img(ascii_text_file: str, output_dest: str) -> None:
+    """Creates image file from ascii text file"""
     with open(ascii_text_file, "r") as file:
         ascii_text = file.read()
 
@@ -95,29 +93,40 @@ def ascii_to_img(ascii_text_file:str, output_dest:str) -> None:
     img.save(output_dest, "png")
 
 
-def seed_secret(ascii_file: str, secret: str) -> None:
-    """
-    Insert the secret phrase randomly somewhere in the ascii file
-    """
+def seed_secret(ascii_file: str, secret: str, binary: bool) -> None:
+    """Insert the secret phrase randomly somewhere in the ascii file"""
     with open(ascii_file, "r") as file:
         lines = file.readlines()
 
     random_line = random.randint(0, len(lines) - 1)
 
+    # Convert to binary representation if chosen 'insane mode'
+    if binary:
+        secret = "".join(map(bin, bytearray(secret, "utf8")))
+
     line_length = len(lines[random_line])
     secret_length = len(secret)
 
-    if secret_length > line_length:
-        raise ValueError("The secret phrase is longer than the width of the ascii art generated.")
+    # Raise error if the secret is longer than 10th of the entire ascii art
+    if secret_length > (line_length * len(lines) // 10):
+        raise ValueError("The secret phrase is too long to be hidden in this ascii art.")
+
+    # Replace the ascii art with secret message on randomly selected place
+    # TODO if secret is longer than the line length, overflow to the next line.
+    # If there is no next line, shift the random line by -1 to make room
     position = random.randint(0, line_length - secret_length - 1)
-    lines[random_line] = "".join([lines[random_line][0:position], secret, lines[random_line][position + secret_length :]])
+    lines[random_line] = (
+        "".join([lines[random_line][0:position], secret, lines[random_line][position + secret_length:]])
+    )
 
     with open(ascii_file, "w") as file:
         file.writelines(lines)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Converts input image into ascii art and saves the resulting text back into image (.png)")
+    parser = argparse.ArgumentParser(
+        description="Converts input image into ascii art and saves the resulting text back into image (.png)"
+    )
     parser.add_argument("--input", dest="input", required=True, help="Input image")
     parser.add_argument(
         "--secret",
@@ -160,10 +169,19 @@ if __name__ == "__main__":
         default=2,
         help="Resolution of greyscale (0: Low, 1: Medium, 2: High (Default))",
     )
+    parser.add_argument(
+        "--insane-mode",
+        dest="insane_mode",
+        required=False,
+        action="store_true",
+        help="Hides secret phrase in binary string!!!",
+    )
     args = parser.parse_args()
 
     with open(args.ascii_file, "w") as f:
         for r in img_to_ascii(args.input, int(args.cols), float(args.scale), int(args.dens)):
             f.write(r + "\n")
-    seed_secret(args.ascii_file, args.secret)
+    seed_secret(args.ascii_file, args.secret, args.insane_mode)
     ascii_to_img(args.ascii_file, args.output)
+
+    # TODO Next step: generate image with words instead of random characters
