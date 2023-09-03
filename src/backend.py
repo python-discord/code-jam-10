@@ -43,11 +43,13 @@ class TypingColors:
     def update(self, text):
         """Makes changes to the image from the new text"""
         insertions = {}  # stores pixels to be inserted, process deletions first
-        old_len, new_len = len(self.text), len(text)
-        original_pos = pos = 0  # index counter
+
+        # preprocess new text
+        text = ''.join([i+(' '*(self.width-len(i))) for i in text.split('\n')]).rstrip()
 
         # loop through ndiff to get needed changes
-        for diff in ndiff(self.text, text):
+        pos = 0
+        for original_pos, diff in enumerate(ndiff(self.text, text)):
             operation, char = diff[0], diff[-1]
             # can't use modified text length here
             original_char = self.text[pos] if pos < len(self.text) else None
@@ -55,12 +57,6 @@ class TypingColors:
             if operation == '-':  # remove char (make it transparent again)
                 self.canvas_drawer.point(self._idx2coord(pos), (0, 0, 0, 0))
                 pos -= 1  # shift the rest of the pixels left
-            elif char == '\n':  # deal with newlines, move to next line
-                increment_nextrow = self.width - pos % self.width - 1
-                pos += increment_nextrow
-                original_pos += increment_nextrow
-                old_len += increment_nextrow
-                new_len += increment_nextrow
             elif operation == '+':  # add char
                 insertions[pos] = char
             elif original_pos != pos or original_char != char:
@@ -68,7 +64,6 @@ class TypingColors:
                 insertions[pos] = char
 
             # move to next pixel to process
-            original_pos += 1
             pos += 1
 
         for pos, char in insertions.items():  # process inserts/replaces
@@ -77,7 +72,7 @@ class TypingColors:
 
         # remove pixels out of updated text range
         # if text is longer than new text
-        for pos in range(new_len, old_len):
+        for pos in range(len(text), len(self.text)):
             self.canvas_drawer.point(self._idx2coord(pos), (0, 0, 0, 0))
 
         self.text = text  # update old to new text
