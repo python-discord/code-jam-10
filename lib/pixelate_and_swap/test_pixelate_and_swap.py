@@ -1,5 +1,5 @@
-import os
 import unittest
+from pathlib import Path
 
 from PIL import Image
 
@@ -15,11 +15,11 @@ class TestPixelate(unittest.TestCase):
 
         :return: None
         """
-        # Get the directory of the current script.
-        script_dir = os.path.dirname(os.path.abspath(__file__))
+        # Get the directory of the current script using pathlib.
+        script_dir = Path(__file__).parent
 
-        # Construct a relative path to the image file.
-        image_path = os.path.join(script_dir, "dahlias.jpg")
+        # Construct a relative path to the image file using pathlib.
+        image_path = script_dir / "dahlias.jpg"
 
         image = Image.open(image_path)
 
