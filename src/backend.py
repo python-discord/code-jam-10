@@ -1,15 +1,14 @@
 # TODO: support newlines
-import io
+import io, string
 from difflib import ndiff
-from random import randrange
+from random import choices
 
 from PIL import Image, ImageDraw
-
 
 class TypingColors:
     """The main backend object."""
 
-    def __init__(self, img=None):
+    def __init__(self, key=None, img=None):
         self.text = ""
         if img is None:  # start blank
             self.size = (30, 45)
@@ -19,7 +18,13 @@ class TypingColors:
             self.canvas = img
         self.width, self.height = self.size
         self.canvas_drawer = ImageDraw.Draw(self.canvas)
-        self.pallete = {}  # maps characters to colours
+        self.palette = {}  # maps characters to colours
+        self.key = self._generate_key(key if key else ''.join(choices(string.printable, k=16))) # The encryption key/code for the image
+
+    def _generate_key(self, s:str="", byteorder='little'):
+        if s == "": raise ValueError("String for encryption cannot be empty")
+        self.key = int.from_bytes(s.encode(), byteorder) # or big
+        return self.key
 
     def _idx2coord(self, idx):
         """
@@ -29,15 +34,21 @@ class TypingColors:
         """
         return [idx % self.width, idx // self.width]
 
-    def _pallete_check(self, char):
-        """Returns the mapped colour to the char"""
-        if char == ' ':
-            color = (0, 0, 0, 0)  # transparent whitespace
-        elif char not in self.pallete:  # adding to the pallete
-            color = (randrange(256), randrange(256), randrange(256), 255)
-            self.pallete[char] = color
+    def _palette_check(self, char:str):
+        """Generates a palette of colors based on the key"""
+        if char == " ": # transparent whitespace
+            color = (0, 0, 0, 0,)
+        elif char not in self.palette: # adding to palette
+            val = self.key + (string.printable.index(char)*10)
+            sub = 255 + string.printable.index(char) # Making colors more distinctive
+            r = val % sub
+            g = (val // 255) % sub
+            b = ((val // 255) // 255) % sub
+            color = (r, g, b, 255)
+            self.palette[char] = color
         else:  # character already exists
-            color = self.pallete[char]
+            color = self.palette[char]
+        print(color)
         return color
 
     def update(self, text):
@@ -67,7 +78,7 @@ class TypingColors:
             pos += 1
 
         for pos, char in insertions.items():  # process inserts/replaces
-            color = self._pallete_check(char)
+            color = self._palette_check(char)
             self.canvas_drawer.point(self._idx2coord(pos), color)
 
         # remove pixels out of updated text range
