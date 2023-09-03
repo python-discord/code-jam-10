@@ -8,7 +8,7 @@ on:
   push:
     branches:
       - main
-  pull_request_target:
+  pull_request:
 # Brand new concurrency setting! This ensures that not more than one run can be triggered for the same commit.
 # It is useful for pull requests coming from the main repository since both triggers will match.
 concurrency: lint-${{ github.sha }}
@@ -25,6 +25,8 @@ jobs:
       # Checks out the repository in the current folder.
       - name: Checks out repository
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
 
       # Set up the right version of Python
       - name: Set up Python ${{ env.PYTHON_VERSION }}
