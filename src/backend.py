@@ -27,7 +27,7 @@ class TypingColors:
 
         Example: 200 => X: 30, Y: 2
         """
-        return (idx % self.width, idx // self.width)
+        return [idx % self.width, idx // self.width]
 
     def _pallete_check(self, char):
         """Returns the mapped colour to the char"""
@@ -42,24 +42,34 @@ class TypingColors:
 
     def update(self, text):
         """Makes changes to the image from the new text"""
-        # stores all pixels needed to be inserted
-        # deletions need to be processed first
-        insertions = {}
+        insertions = {}  # stores pixels to be inserted, process deletions first
+        old_len, new_len = len(self.text), len(text)
+        original_pos = pos = 0  # index counter
 
         # loop through ndiff to get needed changes
-        pos = 0
-        for original_pos, diff in enumerate(ndiff(self.text, text)):
+        for diff in ndiff(self.text, text):
             operation, char = diff[0], diff[-1]
+            # can't use modified text length here
             original_char = self.text[pos] if pos < len(self.text) else None
-            if operation == '+':  # add char
-                insertions[pos] = char
-            elif operation == '-':  # remove char (make it transparent again)
+
+            if operation == '-':  # remove char (make it transparent again)
                 self.canvas_drawer.point(self._idx2coord(pos), (0, 0, 0, 0))
                 pos -= 1  # shift the rest of the pixels left
-            elif original_pos != pos or original_char != char:
-                # shift left if char removed before and replace if char is different
+            elif char == '\n':  # deal with newlines, move to next line
+                increment_nextrow = self.width - pos % self.width - 1
+                pos += increment_nextrow
+                original_pos += increment_nextrow
+                old_len += increment_nextrow
+                new_len += increment_nextrow
+            elif operation == '+':  # add char
                 insertions[pos] = char
-            pos += 1  # move to next pixel to process
+            elif original_pos != pos or original_char != char:
+                # shift left if removed before/replace if char is different
+                insertions[pos] = char
+
+            # move to next pixel to process
+            original_pos += 1
+            pos += 1
 
         for pos, char in insertions.items():  # process inserts/replaces
             color = self._pallete_check(char)
@@ -67,7 +77,7 @@ class TypingColors:
 
         # remove pixels out of updated text range
         # if text is longer than new text
-        for pos in range(len(text), len(self.text)):
+        for pos in range(new_len, old_len):
             self.canvas_drawer.point(self._idx2coord(pos), (0, 0, 0, 0))
 
         self.text = text  # update old to new text
