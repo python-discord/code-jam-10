@@ -1,27 +1,27 @@
 # Digital Shadows
 
-**Digital Shadows** transports players into the enthralling depths of the digital realm, bridging the gap 
-between the online world and palpable real-world locations, ranging from underground hacker dens and 
+**Digital Shadows** transports players into the enthralling depths of the digital realm, bridging the gap
+between the online world and palpable real-world locations, ranging from underground hacker dens and
 abandoned warehouses to fortified safehouses.
 
-In the game's opening cinematic, the narrative unfolds on a screen shrouded in darkness, gradually 
-illuminated by cascading lines of mysterious code. As the climax of this digital downpour is reached, 
-players are introduced to the central character: Eclipse is a master hacker known only by this codename. 
-An encrypted message demands Eclipse's attention within a dimly lit enclave, awash with the glow of myriad screens: 
+In the game's opening cinematic, the narrative unfolds on a screen shrouded in darkness, gradually
+illuminated by cascading lines of mysterious code. As the climax of this digital downpour is reached,
+players are introduced to the central character: Eclipse is a master hacker known only by this codename.
+An encrypted message demands Eclipse's attention within a dimly lit enclave, awash with the glow of myriad screens:
 "They're making a move. The web is tightening. Need your skills."
 
-Eclipse's enigmatic past reveals a hacker who once operated on the digital periphery. Their trajectory 
-dramatically shifts upon being recruited by an elite international cybersecurity group. But lurking in 
-the backdrop is the game's menacing antagonist: "The Silent Hand," a sinister terrorist collective skilled 
+Eclipse's enigmatic past reveals a hacker who once operated on the digital periphery. Their trajectory
+dramatically shifts upon being recruited by an elite international cybersecurity group. But lurking in
+the backdrop is the game's menacing antagonist: "The Silent Hand," a sinister terrorist collective skilled
 in wielding advanced digital tools to sow real-world chaos.
 
-Embarking on the Digital Shadows journey, players are tasked with deciphering a complex array of digital 
-puzzles. Every riddle unraveled delves deeper into the dark web, uncloaking encrypted data and unwinding 
-layers of secretive communication. Successive solutions unravel the plots and expose the identities of 
+Embarking on the Digital Shadows journey, players are tasked with deciphering a complex array of digital
+puzzles. Every riddle unraveled delves deeper into the dark web, uncloaking encrypted data and unwinding
+layers of secretive communication. Successive solutions unravel the plots and expose the identities of
 the shadowy faction, drawing Eclipse ever closer to thwarting "The Silent Hand."
 
-Dive deep into this entwining of shadows, where the boundaries between the digital and tangible blur, and 
-every decision could reveal a hidden secret or set off an unseen trap. Brace yourself, for in this world, 
+Dive deep into this entwining of shadows, where the boundaries between the digital and tangible blur, and
+every decision could reveal a hidden secret or set off an unseen trap. Brace yourself, for in this world,
 shadows are always vigilant.
 
 
