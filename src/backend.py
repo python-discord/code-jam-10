@@ -23,8 +23,7 @@ class TypingColors:
 
     def _generate_key(self, s:str="", byteorder='little'):
         if s == "": raise ValueError("String for encryption cannot be empty")
-        self.key = int.from_bytes(s.encode(), byteorder) # or big
-        return self.key
+        return int.from_bytes(s.encode(), byteorder) # or big
 
     def _idx2coord(self, idx):
         """
@@ -48,7 +47,6 @@ class TypingColors:
             self.palette[char] = color
         else:  # character already exists
             color = self.palette[char]
-        print(color)
         return color
 
     def update(self, text):
