@@ -3,33 +3,26 @@ from math import ceil, sqrt
 from PIL import Image
 
 
+def bytes_to_colors(sequence: bytes):
+    iterator = iter(sequence)
+    for byte in iterator:
+        yield (byte << 0) + (next(iterator, 0) << 8) + (next(iterator, 0) << 16)
+
+
 def encode(source: bytes) -> Image.Image:
     size = ceil(sqrt(ceil(len(source) / 3)))
     image = Image.new("RGB", (size, size))
-    x = 0
-    y = 0
-    iterator = iter(source)
-
-    for byte in iterator:
-        image.putpixel((x, y), (byte, next(iterator, 0), next(iterator, 0)))
-        x += 1
-        if x >= size:
-            x = 0
-            y += 1
-
+    # putdata expects a sequence of integers, so we convert the colors to integers.
+    colors = list(bytes_to_colors(source))
+    image.putdata(colors)
     return image
 
 
-def decode(source: Image.Image) -> bytes:
-    size = source.size[0]
-    output = bytearray()
-
-    for y in range(size):
-        for x in range(size):
-            pixel = source.getpixel((x, y))
-            output.extend(pixel)
-
-    return bytes(output)
+def decode(image: Image.Image) -> bytes:
+    # getdata returns tuples of (r, g, b) values in RGB mode.
+    colors = image.getdata()
+    source = [value for color in colors for value in color]
+    return bytes(source)
 
 
 if __name__ == "__main__":
