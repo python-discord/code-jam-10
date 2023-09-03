@@ -41,13 +41,11 @@ def avg_greyscale(img: Image.Image) -> float:
     return np.average(np_img.reshape(w * h))
 
 
-def img_to_ascii(img: Image.Image, cols: int, scale: float, dens: int) -> List[str]:
+def img_to_ascii(img: Image.Image, dens: int) -> List[str]:
     """
     Given Image and dims (rows, cols) returns an m*n list of Images
 
     :param img: input image file
-    :param cols: number of columns
-    :param scale: aspect ratio scale
     :param dens: greyscale density level
     :return: ascii text generated from input image
     """
@@ -61,15 +59,12 @@ def img_to_ascii(img: Image.Image, cols: int, scale: float, dens: int) -> List[s
     # Convert to grayscale (L stands for luminance)
     gs_img = img.convert("L")
     gs_img_w, gs_img_h = gs_img.size[0], gs_img.size[1]
+    cols = int(gs_img_w // 10)  # 1/10th of the cropped square
+    scale = 0.39  # Aspect ratio of monospace characters
 
     w = gs_img_w / cols  # tile width
     h = w / scale  # tile height
     rows = int(gs_img_h / h)  # Number of rows of text
-
-    # Input image size validation
-    # TODO put this near the arg parser
-    if gs_img_w < cols or gs_img_h < rows:
-        raise ValueError("Image not big enough for specified number of columns.")
 
     # Generate ascii art
     ascii_ = []
@@ -103,7 +98,6 @@ def ascii_to_img(ascii_text_file_path: str, output_dest_path: str, coordinates: 
     """
     with open(ascii_text_file_path, "r") as file:
         ascii_text = file.read()
-
     img_w, img_h = (coordinates[2] - coordinates[0], coordinates[3] - coordinates[1])
     img = Image.new("L", (img_w, img_h), "white")
 
@@ -140,13 +134,6 @@ def seed_secret(ascii_file_path: str, secret: str, binary_mode: bool) -> None:
     line_length = len(lines[random_line])
     secret_length = len(secret)
 
-    # Raise error if the secret is longer than 10th of the entire ascii art
-    if secret_length > (line_length * len(lines) // 10):
-        raise ValueError("The secret phrase is too long to be hidden in this ascii art.")
-
-    # Replace the ascii art with secret message on randomly selected place
-    # TODO if secret is longer than the line length, overflow to the next line.
-    # If there is no next line, shift the random line by -1 to make room
     position = random.randint(0, line_length - secret_length - 1)
     lines[random_line] = (
         "".join([lines[random_line][0:position], secret, lines[random_line][position + secret_length:]])
@@ -166,13 +153,6 @@ if __name__ == "__main__":
         dest="secret",
         required=True,
         help="Secret phrase to hide in the ascii art",
-    )
-    parser.add_argument(
-        "--ascii-file",
-        dest="ascii_file",
-        required=False,
-        default="ascii.txt",
-        help="Output location for generated ascii text file",
     )
     parser.add_argument(
         "--output",
@@ -197,13 +177,22 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     input_img, coordinates = prepare_input(args.input)
-    scale = 0.39  # Aspect ratio of monospace characters
-    cols = int((coordinates[2] - coordinates[0]) // 10)  # 1/10 th of the square cropped image
 
-    with open(args.ascii_file, "w") as f:
-        for row in img_to_ascii(input_img, cols, scale, int(args.dens)):
+    # Input image size validation
+    input_img_w, input_img_h = input_img.size
+    if input_img_w < 1000 or input_img_h < 1000:
+        raise ValueError("Please provide an image size bigger than 1000x1000!")
+
+    # Secret length validation
+    if len(args.secret) > input_img_w // 100:
+        raise ValueError("The secret phrase provided is too long to be hidden in this image size.")
+
+    ascii_file_path = "ascii.txt"
+
+    with open(ascii_file_path, "w") as f:
+        for row in img_to_ascii(input_img, int(args.dens)):
             f.write(row + "\n")
-    seed_secret(args.ascii_file, args.secret, args.insane_mode)
-    output_img = ascii_to_img(args.ascii_file, args.output, coordinates)
-    output_img.resize(input_img.size)
+    seed_secret(ascii_file_path, args.secret, args.insane_mode)
+    output_img = ascii_to_img(ascii_file_path, args.output, coordinates)
+    output_img = output_img.resize(input_img.size)
     output_img.save(args.output)
