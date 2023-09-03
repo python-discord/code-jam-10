@@ -12,18 +12,34 @@ menu_layout = [
     ['File', ['New', 'Open', 'Save', 'Save As', '---', 'Exit']]
 ]
 
+left_side = [
+    [sg.Sizer(WIN_W / 2, 0)],
+    [sg.Text('> New file <', font=('Consolas', 10), key='KEY-FILENAME')],
+    [sg.Multiline(
+        key="KEY-USER-INPUT",
+        enable_events=True,
+        size=(15, WIN_H // 25),
+        font=('Consolas', 16),
+        rstrip=False,
+        expand_x=True,
+        expand_y=True
+    )]
+]
+
+right_side = [
+    [sg.Sizer(WIN_W / 2, 0)],
+    [sg.Image(key="KEY-OUT-IMG")],
+]
+
 layout = [
     [sg.Menu(menu_layout)],
     [
-        sg.Column([
-            [sg.Text('> New file <', font=('Consolas', 10), size=(WIN_W, 1), key='KEY-FILENAME')],
-            [sg.Multiline(key="KEY-USER-INPUT", enable_events=True, size=(30, WIN_H // (25)), font=('Consolas', 16))]
-        ], element_justification='center', size=(WIN_W // 2, WIN_H),),
+        sg.Column(left_side, element_justification='center', size=(WIN_W // 2, WIN_H)),
         sg.VSeperator(),
-        sg.Column([
-            [sg.Image(key="KEY-OUT-IMG")]
-        ], element_justification='center', size=(WIN_W // 2, WIN_H))
-    ]
+        sg.Column(right_side, element_justification='center', size=(WIN_W // 2, WIN_H))
+    ],
+    # TODO Show word count and size of image here...
+    [sg.StatusBar("Hello World !")]
 ]
 
 
@@ -41,17 +57,14 @@ class Gui:
         self.UPDATE_FLAG = False
 
         self.file = None  # Opened files
-        self.update_next = False  # Force update image next frame after open/new
 
         # Creates the window
         self.window = sg.Window('Pixel Studio',
                                 layout,
                                 resizable=True,
                                 finalize=True,
-                                margins=(0, 0),
                                 size=(WIN_W, WIN_H),
                                 return_keyboard_events=True)
-        self.window["KEY-USER-INPUT"].expand(True, True, True)
 
     def update_img(self, value):
         """Updates Generated Image
@@ -72,10 +85,6 @@ class Gui:
 
             user_input = values['KEY-USER-INPUT']
 
-            if self.update_next:
-                self.update_img(user_input)
-                self.update_next = False
-
             if event == '__TIMEOUT__':
                 if self.UPDATE_FLAG:
                     self.UPDATE_FLAG = False
@@ -95,15 +104,20 @@ class Gui:
             # '$letter:$code' are used to implement `ctrl + $letter` shortcuts
 
             if event in ('New', 'n:78'):
-                file = None
+                self.file = None
                 new_file(self.window)
-                self.update_next = True
+                self.UPDATE_FLAG = True
             elif event in ('Open', 'o:79'):
-                file = open_file(self.window)
-                self.update_next = True
+                self.file = open_file(self.window)
+                self.UPDATE_FLAG = True
             elif event in ('Save', 's:83'):
-                save_file(self.window, file, user_input)
+                save_file(self.window, self.file, user_input)
             elif event in ('Save As',):
-                file = save_file_as(self.window, user_input)
+                self.file = save_file_as(self.window, user_input)
 
         self.window.close()
+
+# Testing
+# if __name__ == "__main__":
+#     gui = Gui(backend.TypingColors())
+#     gui.run()
