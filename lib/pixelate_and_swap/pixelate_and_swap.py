@@ -49,17 +49,29 @@ def swap_colors(img: Image.Image, color1: tuple, color2: tuple) -> Image.Image:
     """
     Swap two colors in an image.
 
-    :param img: PIL Image
-    :param color1: tuple representing the first color
-    :param color2: tuple representing the second color
-    :return: PIL Image with swapped colors
+    :param img: PIL Image instance.
+    :param color1: A tuple representing the first RGB color.
+    :param color2: A tuple representing the second RGB color.
+    :return: A new PIL Image instance with color1 swapped to color2 and vice versa.
     """
+
+    # Convert the PIL image to a numpy array. This allows for easier and faster
+    # pixel-wise manipulation.
     img_array = np.array(img)
 
+    # Create a mask for pixels matching color1. This will be a boolean array with
+    # the same shape as the image where pixels that match color1 are marked as True.
     mask1 = (img_array == color1).all(-1)
+
+    # Similarly, create a mask for pixels matching color2.
     mask2 = (img_array == color2).all(-1)
 
+    # Use the masks to swap the colors. For pixels that match the mask1 (originally color1),
+    # set their value to color2.
     img_array[mask1] = color2
+
+    # Similarly, for pixels that match mask2 (originally color2), set their value to color1.
     img_array[mask2] = color1
 
+    # Convert the numpy array with swapped colors back to a PIL Image and return it.
     return Image.fromarray(img_array)
