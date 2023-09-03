@@ -69,7 +69,7 @@ class MainWindow(QMainWindow):
             # Display Z-Index
             control_tabs.setCurrentIndex(self.level)
 
-            return padding
+        return padding
 
     def create_image_widget(self, img_source: str) -> QLabel:
         """
