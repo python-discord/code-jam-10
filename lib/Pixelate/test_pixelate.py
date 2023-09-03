@@ -1,9 +1,18 @@
 import unittest
-from Pixelate import pixelate_and_group_colors_sampled, swap_colors
+
 from PIL import Image
+from Pixelate import pixelate_and_group_colors_sampled, swap_colors
+
 
 class TestPixelate(unittest.TestCase):
-    def test_pixelate_and_group_colors_sampled(self):
+    """Test cases for Pixelate.py"""
+
+    def test_pixelate_and_group_colors_sampled(self) -> None:
+        """
+        Test that the number of colors in an image after pixelation is less than the number of colors before pixelation
+
+        :return: None
+        """
         image = Image.open("dahlias.jpg")
         # Count the number of colors in the image before pixelation
         colors_before = len(set(image.getdata()))
@@ -18,7 +27,12 @@ class TestPixelate(unittest.TestCase):
         assert colors_before > colors_after
         assert colors_before != colors_after
 
-    def test_swap_colors(self):
+    def test_swap_colors(self) -> None:
+        """
+        Test that the number of white pixels after swapping is equal to the number of black pixels before swapping
+
+        :return: None
+        """
         # Create a test image
         test_image = Image.new("RGB", (100, 100), "white")
         # Count the number of white and black pixels in the image
