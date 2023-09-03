@@ -12,12 +12,33 @@ class MainWindow(QMainWindow):
     """Main Window"""
 
     def __init__(self) -> None:
-        super(MainWindow, self).__init__()
+        super().__init__()
+        self.level = 1
+        self.init_ui()
 
+    def init_ui(self) -> None:
+        """
+        Initialize the User Interface
+
+        :return: None
+        """
         self.setWindowTitle("CodeJam Async Aggregators")
         img_source = 'Images/sample.png'
-        level = 1
 
+        layout = self.create_main_layout(img_source)
+
+        widget = QWidget()
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
+
+    def create_main_layout(self, img_source: str) -> QGridLayout:
+        """
+        Create the main layout of the application
+
+        :param img_source:
+        :return: padding
+        """
+        # Layouts
         padding = QGridLayout()
         body = QVBoxLayout()
         display_panel = QHBoxLayout()
@@ -28,63 +49,64 @@ class MainWindow(QMainWindow):
         # Padding
         padding.addWidget(QLabel(), 0, 3)
         padding.addWidget(QLabel(), 3, 0)
-
         padding.addLayout(body, 2, 2)
 
         # Main displays (image + filter controls)
         body.addLayout(display_panel)
+        display_panel.addWidget(self.create_image_widget(img_source))
+        display_panel.addLayout(control_tabs)
 
-        # Image
+        control_tabs.addWidget(self.create_control_panel())
+
+        # Dock and filters
+        body.addLayout(dock)
+        dock.addLayout(filter_layout)
+        dock.addWidget(QLineEdit('Secret Code'))
+
+        for _ in range(5):
+            filter_layout.addWidget(QPushButton())
+
+            # Display Z-Index
+            control_tabs.setCurrentIndex(self.level)
+
+            return padding
+
+    def create_image_widget(self, img_source: str) -> QLabel:
+        """
+        Create the image widget
+
+        :param img_source:
+        :return: image widget
+        """
         img = QLabel(self)
         image = QPixmap(img_source).scaled(400, 400, Qt.AspectRatioMode.KeepAspectRatio)
-
         img.setPixmap(image)
         img.setObjectName("image")
         img.setProperty("id", "image-display")
-        display_panel.addWidget(img)
 
-        display_panel.addLayout(control_tabs)
+        return img
 
-        # Control panel
+    def create_control_panel(self) -> QWidget:
+        """
+        Create the control panel
+
+        :return: control panel
+        """
         container = QWidget()
-
-        # Layer Stack (z-index)
         img_diff = QVBoxLayout(container)
 
-        control_tabs.addWidget(container)
-
-        # Image Differencing (Example)
         img_diff.addWidget(QLabel('Image Differencing'))
         img_diff.addWidget(QLabel('X'))
         img_diff.addWidget(QSlider(Qt.Orientation.Horizontal))
         img_diff.addWidget(QLabel('Y'))
         img_diff.addWidget(QSlider(Qt.Orientation.Horizontal))
 
-        body.addLayout(dock)
-        dock.addLayout(filter_layout)
-
-        # Submit
-        dock.addWidget(QLineEdit('Secret Code'))
-
-        # Filters buttons (located on the dock)
-        filter_layout.addWidget(QPushButton())
-        filter_layout.addWidget(QPushButton())
-        filter_layout.addWidget(QPushButton())
-        filter_layout.addWidget(QPushButton())
-        filter_layout.addWidget(QPushButton())
-
-        # Display Z-Index
-        control_tabs.setCurrentIndex(level)
-
-        widget = QWidget()
-        widget.setLayout(padding)
-        self.setCentralWidget(widget)
+        return container
 
 
 # Driver Code
-app = QApplication(sys.argv)
-
-window = MainWindow()
-window.show()
-
-app.exec()
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
