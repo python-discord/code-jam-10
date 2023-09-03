@@ -54,7 +54,6 @@ def swap_colors(img: Image.Image, color1: tuple, color2: tuple) -> Image.Image:
     :param color2: A tuple representing the second RGB color.
     :return: A new PIL Image instance with color1 swapped to color2 and vice versa.
     """
-
     # Convert the PIL image to a numpy array. This allows for easier and faster
     # pixel-wise manipulation.
     img_array = np.array(img)

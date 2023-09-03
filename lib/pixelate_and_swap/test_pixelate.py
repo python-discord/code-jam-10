@@ -1,7 +1,10 @@
 import unittest
 
 from PIL import Image
-from lib.pixelate_and_swap.pixelate_and_swap import pixelate_and_group_colors_sampled, swap_colors
+
+from lib.pixelate_and_swap.pixelate_and_swap import (
+    pixelate_and_group_colors_sampled, swap_colors
+)
 
 
 class TestPixelate(unittest.TestCase):
