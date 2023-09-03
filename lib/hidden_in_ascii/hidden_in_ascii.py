@@ -1,7 +1,7 @@
 import argparse
 import random
-from typing import List, Tuple
 from pathlib import Path
+from typing import List, Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw
