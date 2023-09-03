@@ -39,6 +39,10 @@ class TestPixelate(unittest.TestCase):
         assert colors_before != colors_after
         assert colors_after == 8
 
+
+class TestSwap(unittest.TestCase):
+    """Test cases for pixelate_and_swap.py"""
+
     def test_swap_colors(self) -> None:
         """
         Test that the number of white pixels after swapping is equal to the number of black pixels before swapping
