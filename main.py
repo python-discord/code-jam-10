@@ -1,27 +1,17 @@
 import sys
+
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import (
-    QApplication,
-    QHBoxLayout,
-    QLabel,
-    QMainWindow,
-    QStackedLayout,
-    QVBoxLayout,
-    QWidget,
-    QGridLayout,
-    QLineEdit,
-    QPushButton,
-    QSlider,
+    QApplication, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QMainWindow,
+    QPushButton, QSlider, QStackedLayout, QVBoxLayout, QWidget
 )
 
 
 class MainWindow(QMainWindow):
-    """
-    Main Window
-    """
+    """Main Window"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super(MainWindow, self).__init__()
 
         self.setWindowTitle("CodeJam Async Aggregators")
