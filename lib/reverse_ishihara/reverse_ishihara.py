@@ -19,43 +19,46 @@ def reverse_ishihara(image: Image.Image, message: str = None,
     :return: PIL Image object
     """
     draw = ImageDraw.Draw(image)
-    width, height = image.size
 
     # Draw the message using dots if provided
     if message:
-        msg_font_size = int(height * 0.5)
-        # Use a font to generate a temporary image with the text
         font_path = "MontserratRegular-BWBEl.ttf"  # Point to a TTF or OTF font file on your machine
-        font = ImageFont.truetype(font_path, msg_font_size)
+        font = ImageFont.truetype(font_path, int(image.height * 0.5))
 
-        text_width, text_height = draw.textsize(message, font=font)
+        left, top, right, bottom = font.getbbox(message)
+        text_width, text_height = right - left, bottom - top
+
         text_img = Image.new('1', (text_width, text_height), color='white')
         text_draw = ImageDraw.Draw(text_img)
-        text_draw.text((0, 0), message, fill='black', font=font)
+        text_draw.text((-left, -top), message, fill='black', font=font)  # Notice the negative offsets
 
         dot_density_for_text = 0.001  # This determines the density of the dots. Adjust as needed (0 to 1).
+
+        center_x_offset = (image.width - text_width) // 2
+        center_y_offset = (image.height - text_height) // 2
 
         # For each black pixel in the text image, draw a dot on the main image
         for y in range(text_height):
             for x in range(text_width):
                 if text_img.getpixel((x, y)) == 0 and random.random() < dot_density_for_text:
-                    # Adjust these lines to position the text at the top-left
-                    center_x = x
-                    center_y = y
+                    # Adjust these lines to position the text at the center
+                    center_x = x + center_x_offset
+                    center_y = y + center_y_offset
                     draw.ellipse([(center_x - dot_radius, center_y - dot_radius),
                                   (center_x + dot_radius, center_y + dot_radius)], fill=color_blind_color)
 
     # Add noise
-    num_noise_dots = int(noise_density * width * height)
+    num_noise_dots = int(noise_density * image.width * image.height)
     for _ in range(num_noise_dots):
-        x = random.randint(0 + dot_radius, width - 1 - dot_radius)
-        y = random.randint(0 + dot_radius, height - 1 - dot_radius)
+        x = random.randint(0 + dot_radius, image.width - 1 - dot_radius)
+        y = random.randint(0 + dot_radius, image.height - 1 - dot_radius)
         draw.ellipse([(x - dot_radius, y - dot_radius), (x + dot_radius, y + dot_radius)], fill=noise_color)
 
     return image
 
-
 # Create a function to reverse a reverse Ishihara image
+
+
 def unmask_reverse_ishihara(image: Image.Image) -> Image.Image:
     """
     Reverse a reverse Ishihara image to reveal the hidden message.
