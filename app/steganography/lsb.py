@@ -1,5 +1,4 @@
-import byteutils
-
+from .. import byteutils
 from .steganography import Image, Steganography
 
 EOM = "$$$"
@@ -60,7 +59,5 @@ class Lsb(Steganography):
                     if bit_idx == 7:
                         text += chr(char)
                         char = 0
-                        if len(text) == 5:
-                            return text
                         if text.endswith(EOM):
                             return text[: -len(EOM)]
