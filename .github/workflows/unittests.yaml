@@ -1,0 +1,41 @@
+# GitHub Action Workflow running unittests.
+
+name: Run Unittests
+
+# Specifies when the workflow should be run. In this case, it's triggered for every push and pull request.
+on: [push]
+
+jobs:
+  build:
+
+    # Specifies the type of runner the job will run on. "ubuntu-latest" refers to the latest available version of Ubuntu.
+    runs-on: ubuntu-latest
+
+    # A list of steps that will be run as part of the "build" job.
+    steps:
+      # Checks out the repository in the current folder.
+      - name: Checks out repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      # Set up the right version of Python
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # Installs Poetry - a tool for dependency management in Python.
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+
+      # Installs the dependencies for the project using Poetry.
+      # This will use the pyproject.toml and poetry.lock files from your repository.
+      - name: Install dependencies with Poetry
+        run: |
+          poetry install
+
+      # Runs the unittests using the virtual environment managed by Poetry.
+      - name: Run tests
+        run: poetry run python -m unittest discover  # Adjust the command if you have a specific way to run your tests.
