@@ -3,7 +3,7 @@
 name: Run Unittests
 
 # Specifies when the workflow should be run. In this case, it's triggered for every push and pull request.
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
