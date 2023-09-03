@@ -8,14 +8,6 @@ from menu import new_file, open_file, save_file, save_file_as
 
 WIN_W, WIN_H = (800, 600)
 
-# To delay invoking image updation when the user is continuously typing
-last_time = 0
-interval = 0.6
-UPDATE_FLAG = False
-
-# Opened Files
-file = None
-
 menu_layout = [
     ['File', ['New', 'Open', 'Save', 'Save As', '---', 'Exit']]
 ]
@@ -35,68 +27,83 @@ layout = [
 ]
 
 
-typingColors = backend.TypingColors()
+class Gui:
+    """Main GUI class to interact with the backend"""
 
-# Create the Window
-window = sg.Window('Pixel Studio',
-                   layout,
-                   resizable=True,
-                   finalize=True,
-                   margins=(0, 0),
-                   size=(WIN_W, WIN_H),
-                   return_keyboard_events=True)
+    def __init__(self, typingColors):
+        """Initializes variables and window"""
+        # stores the backend class
+        self.typingColors = typingColors
 
-window["KEY-USER-INPUT"].expand(True, True, True)
+        # To delay invoking image updation when the user is continuously typing
+        self.last_time = 0
+        self.interval = 0.6
+        self.UPDATE_FLAG = False
 
+        self.file = None  # Opened files
+        self.update_next = False  # Force update image next frame after open/new
 
-def update_img(value):
-    """Updates Generated Image
+        # Creates the window
+        self.window = sg.Window('Pixel Studio',
+                                layout,
+                                resizable=True,
+                                finalize=True,
+                                margins=(0, 0),
+                                size=(WIN_W, WIN_H),
+                                return_keyboard_events=True)
+        self.window["KEY-USER-INPUT"].expand(True, True, True)
 
-    Args:
-        value (str): user input
-    """
-    typingColors.update(value)
-    img_data = typingColors.img_scaled()
-    window["KEY-OUT-IMG"].update(data=img_data)
+    def update_img(self, value):
+        """Updates Generated Image
 
+        Args:
+            value (str): user input
+        """
+        self.typingColors.update(value)
+        img_data = self.typingColors.img_scaled()
+        self.window["KEY-OUT-IMG"].update(data=img_data)
 
-# Event Loop to process "events" and get the "values" of the inputs
-while True:
-    event, values = window.read(timeout=100)
-    if event == sg.WIN_CLOSED:  # if user closes window or clicks cancel
-        break
+    def run(self):
+        """Main loop to process events"""
+        while True:
+            event, values = self.window.read(timeout=100)
+            if event == sg.WIN_CLOSED:  # if user closes window or clicks cancel
+                break
 
-    user_input = values['KEY-USER-INPUT']
+            user_input = values['KEY-USER-INPUT']
 
-    if event == '__TIMEOUT__':
-        if UPDATE_FLAG:
-            UPDATE_FLAG = False
-            update_img(user_input)
-        continue
+            if self.update_next:
+                self.update_img(user_input)
+                self.update_next = False
 
-    if event == "KEY-USER-INPUT":
-        if time.time() - last_time < interval:
-            # Dont Update the Image if the user is continuously typing
-            UPDATE_FLAG = True
-        else:
-            update_img(user_input)
+            if event == '__TIMEOUT__':
+                if self.UPDATE_FLAG:
+                    self.UPDATE_FLAG = False
+                    self.update_img(user_input)
+                continue
 
-        last_time = time.time()
+            if event == "KEY-USER-INPUT":
+                if time.time() - self.last_time < self.interval:
+                    # Dont Update the Image if the user is continuously typing
+                    self.UPDATE_FLAG = True
+                else:
+                    self.update_img(user_input)
 
-    # Menu Events
-    # '$letter:$code' are used to implement `ctrl + $letter` shortcuts
+                self.last_time = time.time()
 
-    if event in ('New', 'n:78'):
-        file = None
-        new_file(window, file)
-        update_img(user_input)
-    if event in ('Open', 'o:79'):
-        file = open_file(window)
-        update_img(user_input)
-    if event in ('Save', 's:83'):
-        save_file(window, file, user_input)
-    if event in ('Save As',):
-        file = save_file_as(window, user_input)
+            # Menu Events
+            # '$letter:$code' are used to implement `ctrl + $letter` shortcuts
 
+            if event in ('New', 'n:78'):
+                file = None
+                new_file(self.window)
+                self.update_next = True
+            elif event in ('Open', 'o:79'):
+                file = open_file(self.window)
+                self.update_next = True
+            elif event in ('Save', 's:83'):
+                save_file(self.window, file, user_input)
+            elif event in ('Save As',):
+                file = save_file_as(self.window, user_input)
 
-window.close()
+        self.window.close()

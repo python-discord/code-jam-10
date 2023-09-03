@@ -42,30 +42,31 @@ class TypingColors:
 
     def update(self, text):
         """Makes changes to the image from the new text"""
-        # stores all pixels needed to be changed in list of (index, char)
-        to_remove = []
-        to_insert = []
+        # stores all pixels needed to be inserted
+        # deletions need to be processed first
+        insertions = {}
 
         # loop through ndiff to get needed changes
         pos = 0
-        for diff in ndiff(self.text, text):
+        for original_pos, diff in enumerate(ndiff(self.text, text)):
             operation, char = diff[0], diff[-1]
-            if operation in '+ ':  # add/replace char
-                to_insert.append([pos, char])
-            else:  # remove char, decrease pos
-                to_remove.append([pos, char])
-                pos -= 1
-            pos += 1
+            original_char = self.text[pos] if pos < len(self.text) else None
+            if operation == '+':  # add char
+                insertions[pos] = char
+            elif operation == '-':  # remove char (make it transparent again)
+                self.canvas_drawer.point(self._idx2coord(pos), (0, 0, 0, 0))
+                pos -= 1  # shift the rest of the pixels left
+            elif original_pos != pos or original_char != char:
+                # shift left if char removed before and replace if char is different
+                insertions[pos] = char
+            pos += 1  # move to next pixel to process
 
-        for pos, char in to_remove:
-            self.canvas_drawer.point(self._idx2coord(pos), (0, 0, 0, 0))
-
-        for pos, char in to_insert:
+        for pos, char in insertions.items():  # process inserts/replaces
             color = self._pallete_check(char)
             self.canvas_drawer.point(self._idx2coord(pos), color)
 
         # remove pixels out of updated text range
-        # if updated text is longer than old text
+        # if text is longer than new text
         for pos in range(len(text), len(self.text)):
             self.canvas_drawer.point(self._idx2coord(pos), (0, 0, 0, 0))
 
@@ -76,11 +77,3 @@ class TypingColors:
         bio = io.BytesIO()
         self.canvas.resize(size, Image.BOX).save(bio, format='PNG')
         return bio.getvalue()
-
-# for testing
-# test = TypingColors()
-# while True:
-#     test.update(input("\n> "))
-#     dat = test.canvas.getdata()
-#     for i in range(len(test.text)+2):
-#         print(dat[i][:3],end='')

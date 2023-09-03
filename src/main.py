@@ -1,10 +1,14 @@
-import sys  # noqa: F401
+import sys
 
-import backend as backend  # noqa: F401
-import gui as gui  # noqa: F401
-import loadsave  # noqa: F401
+import loadsave
+from backend import TypingColors
+from gui import Gui
 
-# load file based on sys args
-# create new canvas in backend if nonexist
+if len(sys.argv) > 1:  # load file based on sys args
+    typingColors = loadsave.load(sys.argv[-1])
+else:  # create new canvas in backend if nonexist
+    typingColors = TypingColors()
 
 # run gui with canvas
+gui = Gui(typingColors)
+gui.run()
