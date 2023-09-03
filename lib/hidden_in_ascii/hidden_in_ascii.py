@@ -1,12 +1,13 @@
 import argparse
 import random
 from typing import List, Tuple
+from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageDraw
 
 
-def prepare_input(img_path: str) -> Tuple[Image.Image, List[int]]:
+def prepare_input(img_path: Path) -> Tuple[Image.Image, List[int]]:
     """
     Prepare the input image by center cropping into a square
 
@@ -87,7 +88,7 @@ def img_to_ascii(img: Image.Image, dens: int) -> List[str]:
     return ascii_
 
 
-def ascii_to_img(ascii_text_file_path: str, output_dest_path: str, coordinates: List[int]) -> Image.Image:
+def ascii_to_img(ascii_text_file_path: Path, output_dest_path: Path, coordinates: List[int]) -> Image.Image:
     """
     Creates image file from ascii text file
 
@@ -113,7 +114,7 @@ def ascii_to_img(ascii_text_file_path: str, output_dest_path: str, coordinates: 
     return img
 
 
-def seed_secret(ascii_file_path: str, secret: str, binary_mode: bool) -> None:
+def seed_secret(ascii_file_path: Path, secret: str, binary_mode: bool) -> None:
     """
     Insert the secret phrase randomly somewhere in the ascii file
 
@@ -176,7 +177,7 @@ if __name__ == "__main__":
         help="Hides secret phrase in binary string!!!",
     )
     args = parser.parse_args()
-    input_img, coordinates = prepare_input(args.input)
+    input_img, coordinates = prepare_input(Path(args.input))
 
     # Input image size validation
     input_img_w, input_img_h = input_img.size
@@ -187,12 +188,12 @@ if __name__ == "__main__":
     if len(args.secret) > input_img_w // 100:
         raise ValueError("The secret phrase provided is too long to be hidden in this image size.")
 
-    ascii_file_path = "ascii.txt"
+    ascii_file_path = Path("ascii.txt")
 
     with open(ascii_file_path, "w") as f:
         for row in img_to_ascii(input_img, int(args.dens)):
             f.write(row + "\n")
     seed_secret(ascii_file_path, args.secret, args.insane_mode)
-    output_img = ascii_to_img(ascii_file_path, args.output, coordinates)
+    output_img = ascii_to_img(ascii_file_path, Path(args.output), coordinates)
     output_img = output_img.resize(input_img.size)
     output_img.save(args.output)
