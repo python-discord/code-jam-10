@@ -1,9 +1,32 @@
 import argparse
 import random
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw
+
+
+def prepare_input(img_path: str) -> Tuple[Image.Image, List[int]]:
+    """
+    Prepare the input image by center cropping into a square
+
+    :param img_path: input image file path
+    :return: Tuple of cropped input Image and the coordinates of the cropped area
+    """
+    img = Image.open(img_path)
+
+    # Calculate the square size
+    width, height = img.size
+    size = min(width, height)
+
+    # Calculate the coordinates for cropping
+    left = (width - size) // 2
+    top = (height - size) // 2
+    right = (width + size) // 2
+    bottom = (height + size) // 2
+
+    # Crop the image to a square
+    return img.crop((left, top, right, bottom)), [left, top, right, bottom]
 
 
 def avg_greyscale(img: Image.Image) -> float:
@@ -18,13 +41,11 @@ def avg_greyscale(img: Image.Image) -> float:
     return np.average(np_img.reshape(w * h))
 
 
-def img_to_ascii(img: Image.Image, cols: int, scale: float, dens: int) -> List[str]:
+def img_to_ascii(img: Image.Image, dens: int) -> List[str]:
     """
     Given Image and dims (rows, cols) returns an m*n list of Images
 
     :param img: input image file
-    :param cols: number of columns
-    :param scale: aspect ratio scale
     :param dens: greyscale density level
     :return: ascii text generated from input image
     """
@@ -36,20 +57,14 @@ def img_to_ascii(img: Image.Image, cols: int, scale: float, dens: int) -> List[s
     ]
 
     # Convert to grayscale (L stands for luminance)
-    gs_img = Image.open(img).convert("L")
+    gs_img = img.convert("L")
     gs_img_w, gs_img_h = gs_img.size[0], gs_img.size[1]
+    cols = int(gs_img_w // 10)  # 1/10th of the cropped square
+    scale = 0.39  # Aspect ratio of monospace characters
 
     w = gs_img_w / cols  # tile width
     h = w / scale  # tile height
     rows = int(gs_img_h / h)  # Number of rows of text
-
-    print(f"Original image size: {gs_img_w} x {gs_img_h}")
-    print(f"Output ascii size: {w} x {h}")
-    print(f"Output cols & rows: {cols} x {rows}")
-
-    # Input image size validation
-    if gs_img_w < cols or gs_img_h < rows:
-        raise ValueError("Image not big enough for specified number of columns.")
 
     # Generate ascii art
     ascii_ = []
@@ -72,13 +87,19 @@ def img_to_ascii(img: Image.Image, cols: int, scale: float, dens: int) -> List[s
     return ascii_
 
 
-def ascii_to_img(ascii_text_file: str, output_dest: str) -> None:
-    """Creates image file from ascii text file"""
-    with open(ascii_text_file, "r") as file:
-        ascii_text = file.read()
+def ascii_to_img(ascii_text_file_path: str, output_dest_path: str, coordinates: List[int]) -> Image.Image:
+    """
+    Creates image file from ascii text file
 
-    img_w, img_h = (750, 750)
-    img = Image.new("RGBA", (img_w, img_h), "white")
+    :param ascii_text_file_path: ascii text file path
+    :param output_dest_path: output destination file path
+    :param coordinates: coordinates used to crop the original image
+    :return: Generated image from converting ascii text into PNG
+    """
+    with open(ascii_text_file_path, "r") as file:
+        ascii_text = file.read()
+    img_w, img_h = (coordinates[2] - coordinates[0], coordinates[3] - coordinates[1])
+    img = Image.new("L", (img_w, img_h), "white")
 
     # Draw text to image
     draw = ImageDraw.Draw(img)
@@ -86,40 +107,39 @@ def ascii_to_img(ascii_text_file: str, output_dest: str) -> None:
     left, top, right, bottom = bbox
     w = right - left
     h = bottom - top
+    draw.text((0, 0), ascii_text, fill="black")
+    img = img.crop((0, 0, w, h))  # Crop out white spaces
+    img.save(output_dest_path, "png")
+    return img
 
-    # Center the drawing
-    draw.text(((img_w - w) / 2, (img_h - h) / 2), ascii_text, fill="black")
 
-    img.save(output_dest, "png")
+def seed_secret(ascii_file_path: str, secret: str, binary_mode: bool) -> None:
+    """
+    Insert the secret phrase randomly somewhere in the ascii file
 
-
-def seed_secret(ascii_file: str, secret: str, binary: bool) -> None:
-    """Insert the secret phrase randomly somewhere in the ascii file"""
-    with open(ascii_file, "r") as file:
+    :param ascii_file_path: ascii text file path
+    :param secret: secret phrase to hide
+    :param binary_mode: whether to hide the text in binary representation
+    :return: None
+    """
+    with open(ascii_file_path, "r") as file:
         lines = file.readlines()
 
     random_line = random.randint(0, len(lines) - 1)
 
     # Convert to binary representation if chosen 'insane mode'
-    if binary:
+    if binary_mode:
         secret = "".join(map(bin, bytearray(secret, "utf8")))
 
     line_length = len(lines[random_line])
     secret_length = len(secret)
 
-    # Raise error if the secret is longer than 10th of the entire ascii art
-    if secret_length > (line_length * len(lines) // 10):
-        raise ValueError("The secret phrase is too long to be hidden in this ascii art.")
-
-    # Replace the ascii art with secret message on randomly selected place
-    # TODO if secret is longer than the line length, overflow to the next line.
-    # If there is no next line, shift the random line by -1 to make room
     position = random.randint(0, line_length - secret_length - 1)
     lines[random_line] = (
         "".join([lines[random_line][0:position], secret, lines[random_line][position + secret_length:]])
     )
 
-    with open(ascii_file, "w") as file:
+    with open(ascii_file_path, "w") as file:
         file.writelines(lines)
 
 
@@ -135,32 +155,11 @@ if __name__ == "__main__":
         help="Secret phrase to hide in the ascii art",
     )
     parser.add_argument(
-        "--ascii-file",
-        dest="ascii_file",
-        required=False,
-        default="ascii.txt",
-        help="Output location for generated ascii text file",
-    )
-    parser.add_argument(
         "--output",
         dest="output",
         required=False,
         default="result.png",
         help="Output location for generated image file",
-    )
-    parser.add_argument(
-        "--scale",
-        dest="scale",
-        required=False,
-        default=0.5,
-        help="Aspect ratio used to calculate tile size",
-    )
-    parser.add_argument(
-        "--cols",
-        dest="cols",
-        required=False,
-        default=100,
-        help="Tile chunk size (width) in number pixels",
     )
     parser.add_argument(
         "--density",
@@ -177,11 +176,23 @@ if __name__ == "__main__":
         help="Hides secret phrase in binary string!!!",
     )
     args = parser.parse_args()
+    input_img, coordinates = prepare_input(args.input)
 
-    with open(args.ascii_file, "w") as f:
-        for r in img_to_ascii(args.input, int(args.cols), float(args.scale), int(args.dens)):
-            f.write(r + "\n")
-    seed_secret(args.ascii_file, args.secret, args.insane_mode)
-    ascii_to_img(args.ascii_file, args.output)
+    # Input image size validation
+    input_img_w, input_img_h = input_img.size
+    if input_img_w < 1000 or input_img_h < 1000:
+        raise ValueError("Please provide an image size bigger than 1000x1000!")
 
-    # TODO Next step: generate image with words instead of random characters
+    # Secret length validation
+    if len(args.secret) > input_img_w // 100:
+        raise ValueError("The secret phrase provided is too long to be hidden in this image size.")
+
+    ascii_file_path = "ascii.txt"
+
+    with open(ascii_file_path, "w") as f:
+        for row in img_to_ascii(input_img, int(args.dens)):
+            f.write(row + "\n")
+    seed_secret(ascii_file_path, args.secret, args.insane_mode)
+    output_img = ascii_to_img(ascii_file_path, args.output, coordinates)
+    output_img = output_img.resize(input_img.size)
+    output_img.save(args.output)
