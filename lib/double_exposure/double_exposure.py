@@ -4,6 +4,7 @@ from PIL import Image
 def double_exposure(image1: Image.Image, image2: Image.Image, alpha: float = 0.50) -> Image:
     """
     Blend two images together to create a double exposure effect.
+
     :param image1: The first image.
     :param image2: The second image.
     :param alpha: The blending factor (0.0 for image1, 1.0 for image2, 0.5 for an equal blend).
