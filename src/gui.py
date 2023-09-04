@@ -8,39 +8,6 @@ from menu import new_file, open_file, save_file, save_file_as
 
 WIN_W, WIN_H = (800, 600)
 
-menu_layout = [
-    ['File', ['New', 'Open', 'Save', 'Save As', '---', 'Exit']]
-]
-
-left_side = [
-    [sg.Sizer(WIN_W / 2, 0)],
-    [sg.Text('> New file <', font=('Consolas', 10), key='KEY-FILENAME')],
-    [sg.Multiline(
-        key="KEY-USER-INPUT",
-        enable_events=True,
-        size=(15, WIN_H // 25),
-        font=('Consolas', 16),
-        rstrip=False,
-        expand_x=True,
-        expand_y=True
-    )]
-]
-
-right_side = [
-    [sg.Sizer(WIN_W / 2, 0)],
-    [sg.Image(key="KEY-OUT-IMG")],
-]
-
-layout = [
-    [sg.Menu(menu_layout)],
-    [
-        sg.Column(left_side, element_justification='center', size=(WIN_W // 2, WIN_H)),
-        sg.VSeperator(),
-        sg.Column(right_side, element_justification='center', size=(WIN_W // 2, WIN_H))
-    ],
-    # TODO Show word count and size of image here...
-    [sg.StatusBar("Hello World !")]
-]
 
 
 class Gui:
@@ -59,12 +26,95 @@ class Gui:
         self.file = None  # Opened files
 
         # Creates the window
-        self.window = sg.Window('Pixel Studio',
-                                layout,
-                                resizable=True,
-                                finalize=True,
-                                size=(WIN_W, WIN_H),
-                                return_keyboard_events=True)
+        self.window = self.create_window1()
+        self.window2 = self.create_decrypt_encrypt()
+        self.window2.hide()
+    
+    # function to create the place to write text to create image
+    
+    def create_window1(self):
+        menu_layout = [
+        ['File', ['New', 'Open', 'Save', 'Save As', '---', 'Exit']]
+        ]
+
+        left_side = [
+            [sg.Sizer(WIN_W / 2, 0)],
+            [sg.Text('> New file <', font=('Consolas', 10), key='KEY-FILENAME')],
+            [sg.Multiline(
+                key="KEY-USER-INPUT",
+                enable_events=True,
+                size=(15, WIN_H // 25),
+                font=('Consolas', 16),
+                rstrip=False,
+                expand_x=True,
+                expand_y=True
+            )]
+        ]
+
+        right_side = [
+            [sg.Sizer(WIN_W / 2, 0)],
+            [sg.Image(key="KEY-OUT-IMG")],
+            ]
+        transition_page = [
+            [sg.Sizer(WIN_W / 2, 0)],
+            [sg.Button('Encrypt/Decrypt', key='TRANSITION')]
+            ]
+        layout = [
+            [sg.Menu(menu_layout)],
+            [
+            sg.Column(left_side, element_justification='center', size=(WIN_W // 2, WIN_H //2)),
+            sg.VSeperator(),
+            sg.Column(right_side, element_justification='center', size=(WIN_W // 2, WIN_H))
+            ],
+            [
+            sg.Column(transition_page, element_justification='center', size=(WIN_W // 2, WIN_H))
+            ],
+            # TODO Show word count and size of image here...
+            [sg.StatusBar("Hello World !")]
+            ]
+        return sg.Window('Pixel Studio', 
+                         layout, 
+                         resizable=True, 
+                         finalize=True, 
+                         size = (WIN_W, WIN_H), 
+                         return_keyboard_events=True)
+    # function to create a window to input encryption key  
+    def create_decrypt_encrypt(self):
+        menu_layout = [
+            ['File', ['New', 'Open', 'Save', 'Save As', '---', 'Exit']]
+        ]
+
+        transition_page2 = [
+            [sg.Sizer(WIN_W / 2, 0)],
+            [sg.Button('Return to Normal Page', key='TRANSITION2')]
+        ]
+
+        second_page = [
+            [sg.Sizer(WIN_W / 2, 0)],
+            [sg.Text('Encryption Key', font=('Consolas', 10), key='ENCRYPT')],
+            [sg.InputText(
+                key="ENCRYPTION-KEY",
+                enable_events=True,
+                size=(15, WIN_H // 25),
+                font=('Consolas', 16),
+                expand_x=True,
+                expand_y=True
+            )],
+            [sg.Submit(key='ENCRYPTION-SUBMIT')]
+        ]
+
+        layout2 = [
+        [sg.Menu(menu_layout)],
+        [sg.Column(second_page, element_justification='center', size=(WIN_W //2, WIN_H // 3))],
+        [sg.Column(transition_page2, element_justification='center', size=(WIN_W //2, WIN_H // 3))], 
+        [sg.StatusBar("Hello World !")]
+    ]
+        return sg.Window('Pixel Studio2',
+                                    layout2,
+                                    resizable=True,
+                                    finalize=True,
+                                    size=(WIN_W, WIN_H),
+                                    return_keyboard_events=True)
 
     def update_img(self, value):
         """Updates Generated Image
@@ -79,8 +129,8 @@ class Gui:
     def run(self):
         """Main loop to process events"""
         while True:
-            event, values = self.window.read(timeout=100)
-            if event == sg.WIN_CLOSED:  # if user closes window or clicks cancel
+            event, values = self.window(timeout=100)
+            if event in (sg.WIN_CLOSED, 'Exit'):  # if user closes window or clicks cancel
                 break
 
             user_input = values['KEY-USER-INPUT']
@@ -99,7 +149,21 @@ class Gui:
                     self.update_img(user_input)
 
                 self.last_time = time.time()
-
+            if event == "TRANSITION":
+                self.window2.un_hide()
+                self.window.hide()
+            
+            while self.window2.Shown: #check if window2(decryption window) is open | going to get changed
+                event2, value2 = self.window2.read(timeout=100)
+                if event2 in (sg.WIN_CLOSED, 'Exit'):  # if user closes window or clicks cancel
+                    self.window.close()
+                    break
+                if event2 == "TRANSITION2": # check the button to switch windows
+                    self.window2.hide()
+                    self.window.un_hide()
+                    break
+                if event2 == "ENCRYPTION-SUBMIT":
+                    self.typingColors.set_encryption(value2['ENCRYPTION-KEY'])
             # Menu Events
             # '$letter:$code' are used to implement `ctrl + $letter` shortcuts
 

@@ -91,3 +91,6 @@ class TypingColors:
         bio = io.BytesIO()
         self.canvas.resize(size, Image.BOX).save(bio, format='PNG')
         return bio.getvalue()
+    
+    def set_encryption(self, encryption):
+        self.encryption_key = encryption
