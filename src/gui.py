@@ -7,6 +7,7 @@ import loadsave  # noqa: F401
 from menu import new_file, open_file, save_file, save_file_as
 
 WIN_W, WIN_H = (800, 600)
+POP_W, POP_H = (400, 300)
 
 
 class Gui:
@@ -26,15 +27,26 @@ class Gui:
 
         # Creates the window
         self.main_window = self.create_main_window()
-        self.popup_window = self.create_decrypt_encrypt_window()
-        self.main_window.hide()
+        # self.popup_window = self.create_decrypt_encrypt_window()
+        # self.main_window.hide()
+
+        self.ask_key()
+
+    def ask_key(self):
+        """Asks For encryption key from the user"""
+        key = sg.popup_get_text('Enter encryption key', title="Enter Key")
+        if key is None:
+            self.typingColors.set_encryption("")
+        else:
+            self.typingColors.set_encryption(key)
 
     # function to create the place to write text to create image
 
     def create_main_window(self):
         """Creates Window for the application"""
         menu_layout = [
-            ['File', ['New', 'Open', 'Save', 'Save As', '---', 'Exit']]
+            ['File', ['New', 'Open', 'Save', 'Save As', '---', 'Exit']],
+            ['Config', ['Set Key']]
         ]
 
         left_side = [
@@ -55,10 +67,10 @@ class Gui:
             [sg.Sizer(WIN_W / 2, 0)],
             [sg.Image(key="KEY-OUT-IMG")],
         ]
-        transition_page = [
-            [sg.Sizer(WIN_W / 2, 0)],
-            [sg.Button('Encrypt/Decrypt', key='KEY-TRANSITION')]
-        ]
+        # transition_page = [
+        #     [sg.Sizer(WIN_W / 2, 0)],
+        #     [sg.Button('Encrypt/Decrypt', key='KEY-TRANSITION')]
+        # ]
         layout = [
             [sg.Menu(menu_layout)],
             [
@@ -66,12 +78,13 @@ class Gui:
                 sg.VSeperator(),
                 sg.Column(right_side, element_justification='center', size=(WIN_W // 2, WIN_H))
             ],
-            [
-                sg.Column(transition_page, element_justification='center', size=(WIN_W // 2, WIN_H))
-            ],
+            # [
+            #     sg.Column(transition_page, element_justification='center', size=(WIN_W // 2, WIN_H))
+            # ],
             # TODO Show word count and size of image here...
             [sg.StatusBar("Hello World !")]
         ]
+
         return sg.Window('Pixel Studio',
                          layout,
                          resizable=True,
@@ -86,21 +99,21 @@ class Gui:
         ]
 
         encryption_button = [
-            [sg.Sizer(WIN_W / 2, 0)],
+            [sg.Sizer(POP_W / 2, 0)],
             [sg.Button('Encrypt', key='KEY-ENCRYPT-BUTTON')]
         ]
         decryption_button = [
-            [sg.Sizer(WIN_W / 2, 0)],
+            [sg.Sizer(POP_W / 2, 0)],
             [sg.Button('Decrypt', key='KEY-DECRYPT-BUTTON')]
         ]
 
         encryption_decryption = [
-            [sg.Sizer(WIN_W, 0)],
+            [sg.Sizer(POP_W, 0)],
             [sg.Text('Encryption Key', font=('Consolas', 10))],
             [sg.InputText(
                 key="KEY-ENCRYPTION-INPUT",
                 enable_events=True,
-                size=(15, WIN_H // 25),
+                size=(15, POP_H // 25),
                 font=('Consolas', 16),
                 expand_x=True,
                 expand_y=True
@@ -109,19 +122,18 @@ class Gui:
 
         layout2 = [
             [sg.Menu(menu_layout)],
-            [sg.Column(encryption_decryption, element_justification='center', size=(WIN_W, WIN_H // 3))],
+            [sg.Column(encryption_decryption, element_justification='center', size=(POP_W, POP_H // 3))],
             [
-                sg.Column(encryption_button, element_justification='center', size=(WIN_W // 2, WIN_H // 3)),
-                sg.Column(decryption_button, element_justification='center', size=(WIN_W // 2, WIN_H // 3))
+                sg.Column(encryption_button, element_justification='center', size=(POP_W // 2, POP_H // 3)),
+                sg.Column(decryption_button, element_justification='center', size=(POP_W // 2, POP_H // 3))
             ],
-            [sg.StatusBar("Hello World !")]
         ]
 
         return sg.Window('Pixel Studio2',
                          layout2,
                          resizable=True,
                          finalize=True,
-                         size=(WIN_W, WIN_H),
+                         size=(POP_W, POP_H),
                          return_keyboard_events=True)
 
     def update_img(self, value):
@@ -136,21 +148,21 @@ class Gui:
 
     def run(self):
         """Application Event loop"""
-        while True:
-            event, value = self.popup_window.read(timeout=100)
-            if event in (sg.WIN_CLOSED, 'Exit'):  # if user closes window or clicks cancel
-                self.main_window.close()
-                break
-            elif event == "KEY-ENCRYPT-BUTTON":
-                self.typingColors.set_encryption(value['KEY-ENCRYPTION-INPUT'])
-                self.popup_window.hide()
-                self.main_window.un_hide()
-                break
-            elif event == "KEY-DECRYPT-BUTTON":
-                self.typingColors.set_encryption(value['KEY-ENCRYPTION-INPUT'])
-                self.popup_window.hide()
-                self.main_window.un_hide()
-                break
+        # while True:
+        #     event, value = self.popup_window.read(timeout=100)
+        #     if event in (sg.WIN_CLOSED, 'Exit'):  # if user closes window or clicks cancel
+        #         self.main_window.close()
+        #         break
+        #     elif event == "KEY-ENCRYPT-BUTTON":
+        #         self.typingColors.set_encryption(value['KEY-ENCRYPTION-INPUT'])
+        #         self.popup_window.hide()
+        #         self.main_window.un_hide()
+        #         break
+        #     elif event == "KEY-DECRYPT-BUTTON":
+        #         self.typingColors.set_encryption(value['KEY-ENCRYPTION-INPUT'])
+        #         self.popup_window.hide()
+        #         self.main_window.un_hide()
+        #         break
 
         """Main loop to process events"""
         while True:
@@ -182,6 +194,7 @@ class Gui:
             # Menu Events
             # '$letter:$code' are used to implement `ctrl + $letter` shortcuts
 
+            # 'File' submenu events
             if event in ('New', 'n:78'):
                 self.file = None
                 new_file(self.main_window)
@@ -191,12 +204,11 @@ class Gui:
                 self.UPDATE_FLAG = True
             elif event in ('Save', 's:83'):
                 save_file(self.main_window, self.file, user_input)
-            elif event in ('Save As',):
+            elif event == 'Save As':
                 self.file = save_file_as(self.main_window, user_input)
 
-        self.main_window.close()
+            # 'Config' submenu events==
+            elif event == 'Set Key':
+                self.ask_key()
 
-# Testing
-# if __name__ == "__main__":
-#     gui = Gui(backend.TypingColors())
-#     gui.run()
+        self.main_window.close()
