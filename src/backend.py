@@ -105,3 +105,7 @@ class TypingColors:
         bio = BytesIO()
         self.canvas.resize(size, Image.BOX).save(bio, format='PNG')
         return bio.getvalue()
+
+    def set_key(self, key: str):
+        """Sets encryption key for the Pallete"""
+        self.palette = Pallete(key)  # maps characters to colours
