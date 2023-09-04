@@ -16,7 +16,6 @@ class MainWindow(QMainWindow):
         self.level = 1
         self.init_ui()
 
-
     def init_ui(self) -> None:
         """
         Initialize the User Interface
@@ -41,7 +40,6 @@ class MainWindow(QMainWindow):
         widget.setLayout(layout)
         widget.setMinimumSize(850, 550)
         self.setCentralWidget(widget)
-
 
     def create_main_layout(self, img_source: str, filters: list) -> QGridLayout:
         """
@@ -113,13 +111,12 @@ class MainWindow(QMainWindow):
             btn.setIconSize(QSize(40, 40))
             btn.pressed.connect(i[2])
             self.filter_dock.addWidget(btn)
-            
+
 
         # Display first filter control panel
         self.control_tabs.setCurrentIndex(0)
 
         return self.padding
-
 
     def create_image_widget(self, img_source: str) -> QLabel:
         """
@@ -133,7 +130,6 @@ class MainWindow(QMainWindow):
         img.setPixmap(image)
 
         return img
-
 
     def create_panel_title(self, name: str) -> QFrame:
         """
@@ -156,13 +152,12 @@ class MainWindow(QMainWindow):
 
         title = QLabel(name)
         title.setStyleSheet('font-size: 22px')
-        
+
         title_centre.addWidget(QLabel())
         title_centre.addWidget(title)
         title_centre.addWidget(QLabel())
 
         return title_box
-
 
     def style_slider(self, slider: QSlider,
                      range_value: tuple, horizontal: bool) -> QFrame:
@@ -178,7 +173,7 @@ class MainWindow(QMainWindow):
                                    'border: 1px solid "black";'
                                    'border-radius: 6px;'
                                    'background-color: "white"; }')
-        
+
         if horizontal:
             slider_layout = QHBoxLayout(slider_frame)
         else:
@@ -190,7 +185,6 @@ class MainWindow(QMainWindow):
 
         return slider_frame
 
-        
     def img_difference(self) -> QWidget:
         """
         Image difference control panel (example)
@@ -218,7 +212,6 @@ class MainWindow(QMainWindow):
         img_diff.addStretch()
 
         return container
-
 
     def motion_mani(self) -> QWidget:
         """
@@ -275,7 +268,6 @@ class MainWindow(QMainWindow):
         img_diff.addStretch()
 
         return container
-
 
 # Driver Code
 if __name__ == '__main__':
