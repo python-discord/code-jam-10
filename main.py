@@ -45,8 +45,9 @@ class MainWindow(QMainWindow):
         """
         Create the main layout of the application
 
-        :param img_source:
-        :return: self.padding
+        :param img_source: The source of the image.
+        :param filters: List of filters to be displayed.
+        :return: QGridLayout containing the main layout.
         """
         # Layouts
         self.padding = QGridLayout()
@@ -121,8 +122,8 @@ class MainWindow(QMainWindow):
         """
         Create the image widget
 
-        :param img_source:
-        :return: image widget
+        :param img_source: The source of the image.
+        :return: QLabel containing the image widget.
         """
         img = QLabel(self)
         image = QPixmap(img_source).scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio)
@@ -132,10 +133,10 @@ class MainWindow(QMainWindow):
 
     def create_panel_title(self, name: str) -> QFrame:
         """
-        Stylised control panel title for consistency
+        Stylized control panel title for consistency
 
-        :param name:
-        :return: QFrame panel title
+        :param name: The name of the panel.
+        :return: QFrame containing the stylized title.
         """
         title_box = QFrame()
         object_name = '_'.join(name.lower().split())
@@ -163,8 +164,10 @@ class MainWindow(QMainWindow):
         """
         Style PyQt6 sliders for consistency
 
-        :param slider, range_value, horizontal:
-        :return: QFrame slider
+        :param slider: The QSlider to be styled.
+        :param range_value: A tuple specifying the slider's range.
+        :param horizontal: True for horizontal, False for vertical.
+        :return: QFrame containing the styled slider.
         """
         slider_frame = QFrame()
         slider_frame.setObjectName('sliderframe')
@@ -188,7 +191,7 @@ class MainWindow(QMainWindow):
         """
         Image difference control panel (example)
 
-        :return: image difference control panel
+        :return: QWidget containing the image difference control panel.
         """
         container = QWidget()
         img_diff = QVBoxLayout(container)
@@ -216,7 +219,7 @@ class MainWindow(QMainWindow):
         """
         Motion manipulation control panel (example)
 
-        :return: motion manipulation control panel
+        :return: QWidget containing the motion manipulation control panel.
         """
         container = QWidget()
         img_diff = QVBoxLayout(container)
@@ -250,7 +253,7 @@ class MainWindow(QMainWindow):
         """
         Double exposure control panel (example)
 
-        :return: double exposure control panel
+        :return: QWidget containing the double exposure control panel.
         """
         container = QWidget()
         img_diff = QVBoxLayout(container)
