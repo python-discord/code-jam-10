@@ -1,10 +1,10 @@
 import sys
 
-from PyQt6.QtCore import Qt, QSize
-from PyQt6.QtGui import QPixmap, QIcon
+from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import (
-    QApplication, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QMainWindow,
-    QPushButton, QSlider, QStackedLayout, QVBoxLayout, QWidget, QFrame
+    QApplication, QFrame, QGridLayout, QHBoxLayout, QLabel, QLineEdit,
+    QMainWindow, QPushButton, QSlider, QStackedLayout, QVBoxLayout, QWidget
 )
 
 
