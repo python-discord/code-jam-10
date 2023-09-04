@@ -11,7 +11,8 @@ def load(file_path, key):
     returns TypingColors object if key and image works, raises KeyError otherwise
     """
     img = Image.open(file_path)
-    object = TypingColors(img.convert("RGBA"), key)  # load key
+    object = TypingColors(img.convert("RGBA"))  # load key
+    object.set_encryption(key)
     decoded_text = "".join([
         object.palette.rgbtocol[(r, g, b)]
         for r, g, b, a in img.getdata()

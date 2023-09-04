@@ -45,7 +45,8 @@ class Gui:
         """Creates Window for the application"""
         menu_layout = [
             ['File', ['New', 'Open', 'Save', 'Save As', '---', 'Exit']],
-            ['Config', ['Set Key']]
+            ['Config', ['Set Key']],
+            ['Options', ['Import', 'Export']]
         ]
 
         left_side = [
@@ -209,5 +210,17 @@ class Gui:
             # 'Config' submenu events==
             elif event == 'Set Key':
                 self.ask_key()
+
+            elif event == 'Import':
+                # load png in backend
+                filename = sg.popup_get_file('Open', no_window=True, keep_on_top=True)
+                self.typingColors = loadsave.load(filename, self.typingColors.key)
+                # load text and image in gui
+                decoded_text = self.typingColors.text
+                self.main_window['KEY-USER-INPUT'].update(value=decoded_text)
+                self.update_img(decoded_text)
+            elif event == 'Export':
+                filename = sg.popup_get_file('Save As', save_as=True, no_window=True)
+                loadsave.save(self.typingColors, filename)
 
         self.main_window.close()

@@ -55,6 +55,7 @@ class TypingColors:
         self.width, self.height = self.size
         self.canvas_drawer = ImageDraw.Draw(self.canvas)
         self.palette = None  # will be set later
+        self.key = None
         # self.palette = Pallete(key)  # maps characters to colours
 
     def _idx2coord(self, idx):
@@ -67,6 +68,7 @@ class TypingColors:
 
     def set_encryption(self, key: str = None):
         """Sets the encryption key"""
+        self.key = key
         self.palette = Palette(key)
 
     def update(self, text):
