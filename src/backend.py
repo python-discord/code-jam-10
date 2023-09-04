@@ -30,11 +30,8 @@ class Pallete:
         if char == " ":  # transparent whitespace
             color = (0, 0, 0, 0,)
         elif char not in self.palette:  # add to palette
-            val = self.key + (string.printable.index(char)*10)
-            sub = 255 + string.printable.index(char)  # Making colors more distinctive
-            r = val % sub
-            g = (val // 255) % sub
-            b = ((val // 255) // 255) % sub
+            val = (self.key * string.printable.index(char)) % 16777216  # 16777216=256^3
+            r, g, b = (val & 255), (val >> 8) & 255, (val >> 16) & 255
             color = (r, g, b, 255)
             self.palette[char] = color
         else:  # character already exists
