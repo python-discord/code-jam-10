@@ -23,5 +23,4 @@ def double_exposure(image1: Image.Image, image2: Image.Image, alpha: float = 0.5
     return new_image
 
 
-if __name__ == "__main__":
-    double_exposure(Image.open("flowpfp.png").convert('RGB'), Image.open("leopfp.png").convert('RGB'), ).show()
+

@@ -1,11 +1,10 @@
 import unittest
 from PIL import Image
-from double_exposure import double_exposure
+from .double_exposure import double_exposure
 
 
 class MyTestCase(unittest.TestCase):
     """Tests For double_exposure.py"""
-
     def test_size(self):
         # Load two example images
         image1 = Image.new("RGB", (200, 200))
@@ -40,5 +39,4 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(result_image, image2)
 
 
-if __name__ == '__main__':
-    unittest.main()
+
