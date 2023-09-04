@@ -1,4 +1,3 @@
-import argparse
 import random
 from pathlib import Path
 from typing import List, Tuple
@@ -182,45 +181,3 @@ def generate_ascii_file(input_img: Image.Image, ascii_file_path: Path, dens: int
     with open(ascii_file_path, "w") as f:
         for row in img_to_ascii(input_img, dens):
             f.write(row + "\n")
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Converts input image into ascii art and saves the resulting text back into image (.png)"
-    )
-    parser.add_argument("--input", dest="input", required=True, help="Input image")
-    parser.add_argument(
-        "--secret",
-        dest="secret",
-        required=True,
-        help="Secret phrase to hide in the ascii art",
-    )
-    parser.add_argument(
-        "--output",
-        dest="output",
-        required=False,
-        default="result.png",
-        help="Output location for generated image file",
-    )
-    parser.add_argument(
-        "--density",
-        dest="dens",
-        required=False,
-        default=2,
-        help="Resolution of greyscale (0: Low, 1: Medium, 2: High (Default))",
-    )
-    parser.add_argument(
-        "--insane-mode",
-        dest="insane_mode",
-        required=False,
-        action="store_true",
-        help="Hides secret phrase in binary string!!!",
-    )
-    args = parser.parse_args()
-    input_img, coordinates = prepare_input(Path(args.input))
-    validate_image_size(input_img)
-    validate_secret_length(args.secret, input_img.size[0])
-    ascii_file_path = Path("ascii.txt")
-    generate_ascii_file(input_img, ascii_file_path, int(args.dens))
-    seed_secret(ascii_file_path, args.secret, args.insane_mode)
-    ascii_to_img(ascii_file_path, coordinates, input_img.size, Path(args.output))
