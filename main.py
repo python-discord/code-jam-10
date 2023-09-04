@@ -97,7 +97,7 @@ class MainWindow(QMainWindow):
         # Clear secret code input field
         self.close = QPushButton()
         self.close.setMinimumSize(40, 40)
-        self.close.setIcon(QIcon('icons\close.png'))
+        self.close.setIcon(QIcon('icons\\close.png'))
         self.close.setIconSize(QSize(20, 20))
         self.close.pressed.connect(lambda: self.check_input.setText(''))
         self.filter_dock.addWidget(self.close)
@@ -111,7 +111,6 @@ class MainWindow(QMainWindow):
             btn.setIconSize(QSize(40, 40))
             btn.pressed.connect(i[2])
             self.filter_dock.addWidget(btn)
-
 
         # Display first filter control panel
         self.control_tabs.setCurrentIndex(0)
@@ -268,6 +267,7 @@ class MainWindow(QMainWindow):
         img_diff.addStretch()
 
         return container
+
 
 # Driver Code
 if __name__ == '__main__':
