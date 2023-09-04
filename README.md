@@ -65,7 +65,7 @@ Before you begin, ensure you have met the following requirements:
 ## License
 MIT License
 
-Copyright (c) 2023 Async Aggrogaters
+Copyright (c) 2023 Async Aggregaters
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
