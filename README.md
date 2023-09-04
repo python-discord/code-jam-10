@@ -2,7 +2,7 @@
 
 **Digital Shadows** transports players into the enthralling depths of the digital realm, bridging the gap
 between the online world and palpable real-world locations, ranging from underground hacker dens and
-abandoned warehouses to fortified safehouses.
+abandoned warehouses to fortified safe houses.
 
 In the game's opening cinematic, the narrative unfolds on a screen shrouded in darkness, gradually
 illuminated by cascading lines of mysterious code. As the climax of this digital downpour is reached,
