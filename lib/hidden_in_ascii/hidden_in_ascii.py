@@ -57,7 +57,7 @@ def img_to_ascii(img: Image.Image, dens: int) -> List[str]:
         "@B$%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1lIi!{}[]?-_+~<>;:,^`'. ",  # 70 characters,
     ]
 
-    # Convert to grayscale (L stands for luminance)
+    # Convert to greyscale (L stands for luminance)
     gs_img = img.convert("L")
     gs_img_w, gs_img_h = gs_img.size[0], gs_img.size[1]
     cols = int(gs_img_w // 10)  # 1/10th of the cropped square
@@ -88,12 +88,12 @@ def img_to_ascii(img: Image.Image, dens: int) -> List[str]:
     return ascii_
 
 
-def ascii_to_img(ascii_text_file_path: Path, output_dest_path: Path, coordinates: List[int]) -> Image.Image:
+def ascii_to_img(ascii_text_file_path: Path, coordinates: List[int], input_img_size: Tuple[int, int],
+                 output_path: Path) -> Image.Image:
     """
     Creates image file from ascii text file
 
     :param ascii_text_file_path: ascii text file path
-    :param output_dest_path: output destination file path
     :param coordinates: coordinates used to crop the original image
     :return: Generated image from converting ascii text into PNG
     """
@@ -109,9 +109,11 @@ def ascii_to_img(ascii_text_file_path: Path, output_dest_path: Path, coordinates
     w = right - left
     h = bottom - top
     draw.text((0, 0), ascii_text, fill="black")
-    img = img.crop((0, 0, w, h))  # Crop out white spaces
-    img.save(output_dest_path, "png")
-    return img
+
+    # Crop out white spaces and resize to match the original input image size
+    output = img.crop((0, 0, w, h)).resize(input_img_size)
+    output.save(output_path)
+    return output
 
 
 def seed_secret(ascii_file_path: Path, secret: str, binary_mode: bool) -> None:
@@ -142,6 +144,44 @@ def seed_secret(ascii_file_path: Path, secret: str, binary_mode: bool) -> None:
 
     with open(ascii_file_path, "w") as file:
         file.writelines(lines)
+
+
+def validate_image_size(input_img: Image.Image) -> None:
+    """
+    For the quality of the tool, the image must be larger than 1000x1000
+
+    :param input_img: Prepared input PIL Image
+    :return: None
+    """
+    input_img_w, input_img_h = input_img.size
+    if input_img_w < 1000 or input_img_h < 1000:
+        raise ValueError("Please provide an image size bigger than 1000x1000!")
+
+
+def validate_secret_length(secret: str, input_img_w: int) -> None:
+    """
+    The secret phrase cannot be too long otherwise the puzzle will be too obvious
+
+    :param secret: Secret phrase
+    :param input_img_w: Width of the input image
+    :return: None
+    """
+    if len(secret) > input_img_w // 100:
+        raise ValueError("The secret phrase provided is too long to be hidden in this image size.")
+
+
+def generate_ascii_file(input_img: Image.Image, ascii_file_path: Path, dens: int) -> None:
+    """
+    Generate ascii file from image input
+
+    :param input_img: PIL prepared input image
+    :param ascii_file_path: Destination location of the ascii output
+    :param dens: Quality of the greyscale between range of 0,1,2
+    :return: None
+    """
+    with open(ascii_file_path, "w") as f:
+        for row in img_to_ascii(input_img, dens):
+            f.write(row + "\n")
 
 
 if __name__ == "__main__":
@@ -178,22 +218,9 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     input_img, coordinates = prepare_input(Path(args.input))
-
-    # Input image size validation
-    input_img_w, input_img_h = input_img.size
-    if input_img_w < 1000 or input_img_h < 1000:
-        raise ValueError("Please provide an image size bigger than 1000x1000!")
-
-    # Secret length validation
-    if len(args.secret) > input_img_w // 100:
-        raise ValueError("The secret phrase provided is too long to be hidden in this image size.")
-
+    validate_image_size(input_img)
+    validate_secret_length(args.secret, input_img.size[0])
     ascii_file_path = Path("ascii.txt")
-
-    with open(ascii_file_path, "w") as f:
-        for row in img_to_ascii(input_img, int(args.dens)):
-            f.write(row + "\n")
+    generate_ascii_file(input_img, ascii_file_path, int(args.dens))
     seed_secret(ascii_file_path, args.secret, args.insane_mode)
-    output_img = ascii_to_img(ascii_file_path, Path(args.output), coordinates)
-    output_img = output_img.resize(input_img.size)
-    output_img.save(args.output)
+    ascii_to_img(ascii_file_path, coordinates, input_img.size, Path(args.output))
