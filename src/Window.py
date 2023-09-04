@@ -16,19 +16,19 @@ class Window(QMainWindow):
         self.secret_answer = level.secret_answer
         self.level = level
         self.secret_code = ""
-        self.init_ui()
+        self._init_ui()
 
-    def init_ui(self) -> None:
+    def _init_ui(self) -> None:
         """Initialize the User Interface"""
         self.setWindowTitle(f"Digital Shadows - Async Aggregators - Level {self.level.level_number}")
-        layout = self.create_main_layout()
+        layout = self._create_main_layout()
 
         widget = QWidget()
         widget.setLayout(layout)
         widget.setMinimumSize(850, 550)
         self.setCentralWidget(widget)
 
-    def create_main_layout(self) -> QGridLayout:
+    def _create_main_layout(self) -> QGridLayout:
         """Create the main layout of the application"""
         main_layout = QGridLayout()
 
@@ -49,7 +49,8 @@ class Window(QMainWindow):
 
         layout = QHBoxLayout(frame)
         img = QPixmap(self.level.img_source).scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio)
-        img_label = QLabel(self, pixmap=img)
+        img_label = QLabel(self)
+        img_label.setPixmap(img)
 
         layout.addWidget(img_label)
         layout.addLayout(self._create_tabbed_controls())
