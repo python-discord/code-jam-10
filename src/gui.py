@@ -28,7 +28,7 @@ class Gui:
         # Creates the window
         self.window = self.create_window1()
         self.window2 = self.create_decrypt_encrypt()
-        self.window2.hide()
+        self.window.hide()
     
     # function to create the place to write text to create image
     
@@ -84,13 +84,17 @@ class Gui:
             ['File', ['New', 'Open', 'Save', 'Save As', '---', 'Exit']]
         ]
 
-        transition_page2 = [
+        encryption_button = [
             [sg.Sizer(WIN_W / 2, 0)],
-            [sg.Button('Return to Normal Page', key='TRANSITION2')]
+            [sg.Button('Encrypt', key='ENCRYPT_BUTTON')]
+        ]
+        decryption_button = [
+            [sg.Sizer(WIN_W / 2, 0)],
+            [sg.Button('Decrypt', key = 'DECRYPT_BUTTON')]
         ]
 
-        second_page = [
-            [sg.Sizer(WIN_W / 2, 0)],
+        encryption_decryption = [
+            [sg.Sizer(WIN_W, 0)],
             [sg.Text('Encryption Key', font=('Consolas', 10), key='ENCRYPT')],
             [sg.InputText(
                 key="ENCRYPTION-KEY",
@@ -99,14 +103,16 @@ class Gui:
                 font=('Consolas', 16),
                 expand_x=True,
                 expand_y=True
-            )],
-            [sg.Submit(key='ENCRYPTION-SUBMIT')]
+            )]
         ]
 
         layout2 = [
         [sg.Menu(menu_layout)],
-        [sg.Column(second_page, element_justification='center', size=(WIN_W //2, WIN_H // 3))],
-        [sg.Column(transition_page2, element_justification='center', size=(WIN_W //2, WIN_H // 3))], 
+        [sg.Column(encryption_decryption, element_justification='center', size=(WIN_W, WIN_H // 3))],
+        [
+            sg.Column(encryption_button, element_justification='center', size=(WIN_W //2, WIN_H // 3)),
+            sg.Column(decryption_button, element_justification='center', size=(WIN_W //2, WIN_H // 3))
+        ], 
         [sg.StatusBar("Hello World !")]
     ]
         return sg.Window('Pixel Studio2',
@@ -127,6 +133,23 @@ class Gui:
         self.window["KEY-OUT-IMG"].update(data=img_data)
 
     def run(self):
+        while True:
+            event2, value2 = self.window2.read(timeout=100)
+            if event2 in (sg.WIN_CLOSED, 'Exit'):  # if user closes window or clicks cancel
+                self.window.close()
+                break
+            if event2 == "ENCRYPT_BUTTON":
+                self.typingColors.set_encryption(value2['ENCRYPTION-KEY'])
+                self.window2.close()
+                self.window.un_hide()
+                break
+            if event2 == "DECRYPT_BUTTON":
+                self.typingColors.set_encryption(value2['ENCRYPTION-KEY'])
+                self.window2.close()
+                self.window.unhide()
+                break
+
+
         """Main loop to process events"""
         while True:
             event, values = self.window(timeout=100)
@@ -153,17 +176,6 @@ class Gui:
                 self.window2.un_hide()
                 self.window.hide()
             
-            while self.window2.Shown: #check if window2(decryption window) is open | going to get changed
-                event2, value2 = self.window2.read(timeout=100)
-                if event2 in (sg.WIN_CLOSED, 'Exit'):  # if user closes window or clicks cancel
-                    self.window.close()
-                    break
-                if event2 == "TRANSITION2": # check the button to switch windows
-                    self.window2.hide()
-                    self.window.un_hide()
-                    break
-                if event2 == "ENCRYPTION-SUBMIT":
-                    self.typingColors.set_encryption(value2['ENCRYPTION-KEY'])
             # Menu Events
             # '$letter:$code' are used to implement `ctrl + $letter` shortcuts
 
