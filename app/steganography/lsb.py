@@ -7,8 +7,12 @@ EOM = "$$$"
 class Lsb(Steganography):
     """Least Significant Bit Implementation of Steganography"""
 
-    def encode(self, text: str, img: Image) -> Image:
+    def encode(self, text: str, img: Image):
         """Encode the text in the image.
+
+        The image is mutated by this function so a new image is not created.
+        The file is not overwritten and the mutated image can be saved to a new file
+        with `Image.save`.
 
         Args:
             text (str): text to encode in the image
@@ -16,9 +20,6 @@ class Lsb(Steganography):
 
         Raises:
             ValueError: If the input text cannot be encoded in the image.
-
-        Returns:
-            Image: Image that has the given text encoded in it
         """
         bytes_input = (text + EOM).encode()
 
@@ -26,17 +27,18 @@ class Lsb(Steganography):
             raise ValueError("Input text exceeds the maximum bytes that can be encoded")
 
         bits = byteutils.iter_bits(bytes_input)
-        for row in img:
-            for pixel in row:
-                for idx, channel in enumerate(pixel):
-                    try:
-                        bit = next(bits)
-                        if bool(bit):
-                            pixel[idx] = byteutils.set_bit(pixel[idx], 0)
-                        else:
-                            pixel[idx] = byteutils.clear_bit(pixel[idx], 0)
-                    except StopIteration:
-                        return img
+        pixel_data = img.pixels
+        for pixel in pixel_data:
+            for idx, channel in enumerate(pixel):
+                try:
+                    bit = next(bits)
+                    if bool(bit):
+                        pixel[idx] = byteutils.set_bit(channel, 0)
+                    else:
+                        pixel[idx] = byteutils.clear_bit(channel, 0)
+                except StopIteration:
+                    img.pixels = pixel_data
+                    return
 
     def decode(self, img: Image) -> str:
         """Decode the text from the image
@@ -50,14 +52,13 @@ class Lsb(Steganography):
         char = 0
         bit_idx = 7
         text = ""
-        for row in img:
-            for pixel in row:
-                for channel in pixel:
-                    lsb = channel & 1
-                    char += (2**bit_idx) * lsb
-                    bit_idx = (bit_idx - 1) % 8
-                    if bit_idx == 7:
-                        text += chr(char)
-                        char = 0
-                        if text.endswith(EOM):
-                            return text[: -len(EOM)]
+        for pixel in img:
+            for channel in pixel:
+                lsb = channel & 1
+                char += (2**bit_idx) * lsb
+                bit_idx = (bit_idx - 1) % 8
+                if bit_idx == 7:
+                    text += chr(char)
+                    char = 0
+                    if text.endswith(EOM):
+                        return text[: -len(EOM)]

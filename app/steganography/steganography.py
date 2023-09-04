@@ -2,7 +2,8 @@ from functools import cached_property
 from pathlib import Path
 from typing import Protocol
 
-import cv2
+import PIL
+from PIL.Image import Image as PILImage
 
 
 class Image:
@@ -10,20 +11,21 @@ class Image:
 
     def __init__(self, filename: Path):
         self.__filename = filename
-        self.__image = cv2.imread(str(filename), flags=cv2.IMREAD_UNCHANGED)
+        self.__image = PIL.Image.open(str(filename))
 
     def __iter__(self):
-        return iter(self.image)
+        """Iterate over the image's pixels."""
+        return iter(self.image.getdata())
 
     @property
-    def image(self) -> cv2.typing.MatLike:
+    def image(self) -> PILImage:
         """Get the image"""
         return self.__image
 
     @cached_property
     def max_bytes(self) -> int:
         """Maximum number of bytes that can be encoded in the image"""
-        shape = self.__image.shape
+        shape = self.__image.size
         return (shape[0] * shape[1] * 3) // 8
 
     def can_encode(self, b: bytes) -> bool:
@@ -37,35 +39,53 @@ class Image:
         """
         return len(b) <= self.max_bytes
 
-    def save(self, file: Path) -> bool:
+    @property
+    def pixels(self) -> list[list[int]]:
+        """Get the pixels of the image
+
+        Returns:
+            list[list[int]]: Array of pixels in the image, where each pixel is a list of integers
+        """
+        return list([list(rgb) for rgb in self.image.getdata()])
+
+    @pixels.setter
+    def pixels(self, newdata: list[list[int]]):
+        """Set the pixels of the image
+
+        Args:
+            newdata (list[list[int]]): Array of pixels to set in the image, where each pixel is a list of integers
+        """
+        newdata = list([tuple(rgb) for rgb in newdata])
+        self.image.putdata(newdata)
+
+    def save(self, file: Path):
         """Save the image to the given file
 
         Args:
             file (Path): File to save the image to
-
-        Returns:
-            bool: Whether the save was successful
         """
-        return cv2.imwrite(str(file), self.image)
+        # Saving as JPEG breaks encoding due to lossy compression.
+        self.image.save(file, format="PNG")
 
 
 class Steganography(Protocol):
     """Steganography Interface"""
 
-    def encode(self, text: str, img: Image) -> Image:
-        """Encode the text into the image
+    def encode(self, text: str, img: Image):
+        """Encode the text into the image.
+
+        The image is mutated with the encoded data.
+        The file is not overwritten and the mutated image can be saved to a new file
+        with `Image.save`.
 
         Args:
             text (str): Text to encode
             img (Image): Image to encode text in
-
-        Returns:
-            Image: Image with the given text encoded
         """
         ...
 
     def decode(self, img: Image) -> str:
-        """Decode the text from the image
+        """Decode the text from the image.
 
         Args:
             img (Image): Image to decode text from
@@ -86,7 +106,7 @@ def encode(text: str, infile: Path, outfile: Path, algorithm: Steganography):
         algorithm (Steganography): Steganography algorithm to use
     """
     img = Image(infile)
-    img = algorithm.encode(text, img)
+    algorithm.encode(text, img)
     img.save(outfile)
 
 
