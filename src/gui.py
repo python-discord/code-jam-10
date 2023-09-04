@@ -146,7 +146,7 @@ class Gui:
             if event2 == "DECRYPT_BUTTON":
                 self.typingColors.set_encryption(value2['ENCRYPTION-KEY'])
                 self.window2.close()
-                self.window.unhide()
+                self.window.un_hide()
                 break
 
 
