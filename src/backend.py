@@ -6,10 +6,10 @@ from random import choices
 from PIL import Image, ImageDraw
 
 
-class Pallete:
+class Palette:
     """Pallete object to map chars to colours"""
 
-    def __init__(self, key=None):
+    def __init__(self, key: str = None):
         """Maps all characters to colours using the key"""
         self.palette = {}
         self.rgbtocol = {(0, 0, 0): ' '}
@@ -44,7 +44,7 @@ class Pallete:
 class TypingColors:
     """The main backend object."""
 
-    def __init__(self, img=None, key=None):
+    def __init__(self, img=None):
         self.text = ""
         if img is None:  # start blank
             self.size = (30, 45)
@@ -54,7 +54,8 @@ class TypingColors:
             self.canvas = img
         self.width, self.height = self.size
         self.canvas_drawer = ImageDraw.Draw(self.canvas)
-        self.palette = Pallete(key)  # maps characters to colours
+        self.palette = None  # will be set later
+        # self.palette = Pallete(key)  # maps characters to colours
 
     def _idx2coord(self, idx):
         """
@@ -63,6 +64,10 @@ class TypingColors:
         Example: 200 => X: 30, Y: 2
         """
         return [idx % self.width, idx // self.width]
+
+    def set_encryption(self, key: str = None):
+        """Sets the encryption key"""
+        self.palette = Palette(key)
 
     def update(self, text):
         """Makes changes to the image from the new text"""
@@ -105,7 +110,3 @@ class TypingColors:
         bio = BytesIO()
         self.canvas.resize(size, Image.BOX).save(bio, format='PNG')
         return bio.getvalue()
-
-    def set_key(self, key: str):
-        """Sets encryption key for the Pallete"""
-        self.palette = Pallete(key)  # maps characters to colours
