@@ -11,10 +11,19 @@ class Pallete:
 
     def __init__(self, key=None):
         self.palette = {}
+        self.rgbtocol = {(0, 0, 0): ' '}
+
         if key:
             self.key = self._generate_key(key)
         else:
             self.key = self._generate_key(''.join(choices(string.printable, k=16)))
+
+        for n, char in enumerate(string.printable):  # generate pallete
+            val = (self.key * (n + 1)) % 16777216  # 16777216=256^3
+            r, g, b = (val & 255), (val >> 8) & 255, (val >> 16) & 255
+            color = (r, g, b, 255)
+            self.palette[char] = color
+            self.rgbtocol[(r, g, b)] = char
 
     def _generate_key(self, key):
         """Generates a int key from the string"""
@@ -22,19 +31,11 @@ class Pallete:
             raise ValueError("String for encryption cannot be empty")
         return int.from_bytes(key.encode(), 'little')
 
-    def __setitem__(self, char, color):
-        self.palette[char] = color
-
     def __getitem__(self, char):
-        """Generates a palette of colors based on the key"""
+        """Returns the color from char"""
         if char == " ":  # transparent whitespace
-            color = (0, 0, 0, 0,)
-        elif char not in self.palette:  # add to palette
-            val = (self.key * string.printable.index(char)) % 16777216  # 16777216=256^3
-            r, g, b = (val & 255), (val >> 8) & 255, (val >> 16) & 255
-            color = (r, g, b, 255)
-            self.palette[char] = color
-        else:  # character already exists
+            color = (0, 0, 0, 0)
+        else:
             color = self.palette[char]
         return color
 
@@ -42,7 +43,7 @@ class Pallete:
 class TypingColors:
     """The main backend object."""
 
-    def __init__(self, img=None):
+    def __init__(self, img=None, key=None):
         self.text = ""
         if img is None:  # start blank
             self.size = (30, 45)
@@ -52,7 +53,7 @@ class TypingColors:
             self.canvas = img
         self.width, self.height = self.size
         self.canvas_drawer = ImageDraw.Draw(self.canvas)
-        self.palette = Pallete()  # maps characters to colours
+        self.palette = Pallete(key)  # maps characters to colours
 
     def _idx2coord(self, idx):
         """
