@@ -15,7 +15,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
 
         self.setWindowTitle("CodeJam Async Aggregators")
-        img_source = 'Images/sample.png'
+        img_source = 'images/sample.png'
         level = 1
 
         padding = QGridLayout()
