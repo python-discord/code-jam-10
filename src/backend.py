@@ -10,6 +10,7 @@ class Pallete:
     """Pallete object to map chars to colours"""
 
     def __init__(self, key=None):
+        """Maps all characters to colours using the key"""
         self.palette = {}
         self.rgbtocol = {(0, 0, 0): ' '}
 
