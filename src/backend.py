@@ -1,45 +1,37 @@
-# TODO: support newlines
-import io, string
+import string
 from difflib import ndiff
+from io import BytesIO
 from random import choices
 
 from PIL import Image, ImageDraw
 
-class TypingColors:
-    """The main backend object."""
 
-    def __init__(self, key=None, img=None):
-        self.text = ""
-        if img is None:  # start blank
-            self.size = (30, 45)
-            self.canvas = Image.new("RGBA", self.size, (0, 0, 0, 0))
+class Pallete:
+    """Pallete object to map chars to colours"""
+
+    def __init__(self, key=None):
+        self.palette = {}
+        if key:
+            self.key = self._generate_key(key)
         else:
-            self.size = img.size
-            self.canvas = img
-        self.width, self.height = self.size
-        self.canvas_drawer = ImageDraw.Draw(self.canvas)
-        self.palette = {}  # maps characters to colours
-        self.key = self._generate_key(key if key else ''.join(choices(string.printable, k=16))) # The encryption key/code for the image
+            self.key = self._generate_key(''.join(choices(string.printable, k=16)))
 
-    def _generate_key(self, s:str="", byteorder='little'):
-        if s == "": raise ValueError("String for encryption cannot be empty")
-        return int.from_bytes(s.encode(), byteorder) # or big
+    def _generate_key(self, key):
+        """Generates a int key from the string"""
+        if not key:
+            raise ValueError("String for encryption cannot be empty")
+        return int.from_bytes(key.encode(), 'little')
 
-    def _idx2coord(self, idx):
-        """
-        Helper that converts string index to 2d image coordinate
+    def __setitem__(self, char, color):
+        self.palette[char] = color
 
-        Example: 200 => X: 30, Y: 2
-        """
-        return [idx % self.width, idx // self.width]
-
-    def _palette_check(self, char:str):
+    def __getitem__(self, char):
         """Generates a palette of colors based on the key"""
-        if char == " ": # transparent whitespace
+        if char == " ":  # transparent whitespace
             color = (0, 0, 0, 0,)
-        elif char not in self.palette: # adding to palette
+        elif char not in self.palette:  # add to palette
             val = self.key + (string.printable.index(char)*10)
-            sub = 255 + string.printable.index(char) # Making colors more distinctive
+            sub = 255 + string.printable.index(char)  # Making colors more distinctive
             r = val % sub
             g = (val // 255) % sub
             b = ((val // 255) // 255) % sub
@@ -49,18 +41,41 @@ class TypingColors:
             color = self.palette[char]
         return color
 
+
+class TypingColors:
+    """The main backend object."""
+
+    def __init__(self, img=None):
+        self.text = ""
+        if img is None:  # start blank
+            self.size = (30, 45)
+            self.canvas = Image.new("RGBA", self.size, (0, 0, 0, 0))
+        else:
+            self.size = img.size
+            self.canvas = img
+        self.width, self.height = self.size
+        self.canvas_drawer = ImageDraw.Draw(self.canvas)
+        self.palette = Pallete()  # maps characters to colours
+
+    def _idx2coord(self, idx):
+        """
+        Helper that converts string index to 2d image coordinate
+
+        Example: 200 => X: 30, Y: 2
+        """
+        return [idx % self.width, idx // self.width]
+
     def update(self, text):
         """Makes changes to the image from the new text"""
         insertions = {}  # stores pixels to be inserted, process deletions first
 
-        # preprocess new text
+        # deal with newlines - simply turn them to spaces
         text = ''.join([i+(' '*(self.width-len(i))) for i in text.split('\n')]).rstrip()
 
         # loop through ndiff to get needed changes
         pos = 0
         for original_pos, diff in enumerate(ndiff(self.text, text)):
             operation, char = diff[0], diff[-1]
-            # can't use modified text length here
             original_char = self.text[pos] if pos < len(self.text) else None
 
             if operation == '-':  # remove char (make it transparent again)
@@ -76,7 +91,7 @@ class TypingColors:
             pos += 1
 
         for pos, char in insertions.items():  # process inserts/replaces
-            color = self._palette_check(char)
+            color = self.palette[char]
             self.canvas_drawer.point(self._idx2coord(pos), color)
 
         # remove pixels out of updated text range
@@ -88,6 +103,6 @@ class TypingColors:
 
     def img_scaled(self, size=(390, 585)):  # size around half the gui window
         """Returns scaled PNG bytes of image for GUI"""
-        bio = io.BytesIO()
+        bio = BytesIO()
         self.canvas.resize(size, Image.BOX).save(bio, format='PNG')
         return bio.getvalue()
