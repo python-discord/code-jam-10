@@ -139,7 +139,7 @@ class MainWindow(QMainWindow):
         """
         title_box = QFrame()
         object_name = '_'.join(name.lower().split())
-        
+
         title_box.setObjectName(object_name + '_box')
         title_box.setMinimumSize(200, 0)
         title_box.setStyleSheet(f'QFrame#{object_name + "_box"}'
