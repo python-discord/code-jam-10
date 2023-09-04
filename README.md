@@ -35,21 +35,6 @@ Before you begin, ensure you have met the following requirements:
 
 ## Installation & Setup
 
-### With Docker
-
-1. **Clone the repository:**
-
-   ```bash
-   git clone https://github.com/Flow-Glow/Code-Jam-2023-Async-Aggrogaters.git
-   cd Code-Jam-2023-Async-Aggrogaters
-    ```
-2. **Build the Docker image**
-    ```bash
-    docker build -t digital-shadows .
-    ```
-
-### Without Docker
-
 1. **Clone the repository:**
 
    ```bash
@@ -61,15 +46,6 @@ Before you begin, ensure you have met the following requirements:
     poetry install
     ```
 ## Running the Project
-
-### With Docker
-
-1. **Run the Docker container**
-    ```bash
-    docker run -it --rm digital-shadows
-    ```
-
-### Without Docker
 
 1. Activate the poetry environment:
     ```bash
