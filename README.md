@@ -38,8 +38,8 @@ Before you begin, ensure you have met the following requirements:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/Flow-Glow/Code-Jam-2023-Async-Aggrogaters.git
-   cd Code-Jam-2023-Async-Aggrogaters
+   git clone https://github.com/Flow-Glow/Code-Jam-2023-Async-Aggregators.git
+   cd Code-Jam-2023-Async-Aggregators
     ```
 2. **Install dependencies:**
     ```bash
@@ -65,7 +65,7 @@ Before you begin, ensure you have met the following requirements:
 ## License
 MIT License
 
-Copyright (c) 2023 Async Aggregaters
+Copyright (c) 2023 Async Aggregators
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -20,10 +20,10 @@ class Level:
         """
         # This can be extended to retrieve images dynamically based on the level
         if self.level_number == 1:
-            return 'Images/sample.png'
+            return 'images/sample.png'
         if self.level_number == 2:
-            return 'Images/Clockwork.jpg'
-        return 'Images/default.png'
+            return 'images/clockwork.jpg'
+        return 'images/default.png'
 
     def get_secret_answer(self) -> str:
         """
