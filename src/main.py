@@ -1,10 +1,10 @@
 import sys
-from pathlib import Path
 
 from PyQt6.QtWidgets import QApplication
 
 from level import Level
 from window import Window
+
 
 def main() -> None:
     """Main function"""
@@ -15,6 +15,7 @@ def main() -> None:
 
     window.show()
     sys.exit(app.exec())
+
 
 if __name__ == '__main__':
     main()

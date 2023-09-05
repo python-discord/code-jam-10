@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from PyQt6.QtCore import Qt
 
 from control_panel import ControlPanel
@@ -12,18 +14,20 @@ class Level:
         self.img_source = self.get_image_source()
         self.filters = self.get_filters()
 
-    def get_image_source(self) -> str:
+    def get_image_source(self) -> Path:
         """
         Get the image source for the level
 
         :return: str
         """
         # This can be extended to retrieve images dynamically based on the level
+
+        image_dir_path = Path(Path(__file__).parent, 'images')
         if self.level_number == 1:
-            return 'images/sample.png'
+            return Path(image_dir_path, 'sample.png')
         if self.level_number == 2:
-            return 'images/clockwork.jpg'
-        return 'images/default.png'
+            return Path(image_dir_path, 'clockwork.jpg')
+        return Path(image_dir_path, 'default.png')
 
     def get_secret_answer(self) -> str:
         """
@@ -45,10 +49,12 @@ class Level:
         :return: list
         """
         # This can be extended to provide filters dynamically based on the level
+
+        icons_dir_path = Path(Path(__file__).parent, 'icons')
         if self.level_number == 1:
             filters = [
                 (
-                    'icons/button_sample.png',
+                    Path(icons_dir_path, 'button_sample.png'),
                     ControlPanel(
                         'Image Differencing',
                         [('X', (0, 100), Qt.Orientation.Horizontal),
@@ -56,14 +62,14 @@ class Level:
                     ),
                 ),
                 (
-                    'icons/button_sample2.png',
+                    Path(icons_dir_path, 'button_sample2.png'),
                     ControlPanel(
                         'Double Exposure',
                         [('Exposure', ('Image 1', 'Image 2'), Qt.Orientation.Horizontal)]
                     ),
                 ),
                 (
-                    'icons/button_sample3.png',
+                    Path(icons_dir_path, 'button_sample3.png'),
                     ControlPanel(
                         'Motion Manipulation',
                         [('Wavelength', (0, 100), Qt.Orientation.Horizontal),
@@ -76,7 +82,7 @@ class Level:
         if self.level_number == 2:
             return [
                 (
-                    'icons/button_sample.png',
+                    Path(icons_dir_path, 'button_sample.png'),
                     ControlPanel(
                         'Image Differencing',
                         [
@@ -86,14 +92,14 @@ class Level:
                     ),
                 ),
                 (
-                    'icons/button_sample2.png',
+                    Path(icons_dir_path, 'button_sample2.png'),
                     ControlPanel(
                         'Double Exposure',
                         [('Exposure', ('Image 1', 'Image 2'), Qt.Orientation.Horizontal)]
                     ),
                 ),
                 (
-                    'icons/button_sample3.png',
+                    Path(icons_dir_path, 'button_sample3.png'),
                     ControlPanel(
                         'Motion Manipulation',
                         [

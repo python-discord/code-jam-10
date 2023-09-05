@@ -1,8 +1,8 @@
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import (
-    QFrame, QGridLayout, QHBoxLayout, QVBoxLayout, QLabel, QLineEdit,
-    QMainWindow, QMessageBox, QPushButton, QStackedLayout, QWidget
+    QFrame, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QMainWindow,
+    QMessageBox, QPushButton, QStackedLayout, QWidget
 )
 
 from level import Level
@@ -58,7 +58,7 @@ class Window(QMainWindow):
                             'background-color: "#e4e0e0"; }')
 
         layout = QHBoxLayout(frame)
-        img = QPixmap(self.level.img_source).scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio)
+        img = QPixmap(str(self.level.img_source)).scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio)
         img_label = QLabel(self)
         img_label.setPixmap(img)
 
@@ -142,7 +142,7 @@ class Window(QMainWindow):
 
         for filter_item in self.level.filters:
             filter_button = QPushButton()
-            filter_button.setIcon(QIcon(filter_item[0]))
+            filter_button.setIcon(QIcon(str(filter_item[0])))
             filter_button.setIconSize(QSize(40, 40))
 
             filter_idx = self.level.filters.index(filter_item)
