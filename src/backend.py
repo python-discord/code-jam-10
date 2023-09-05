@@ -13,7 +13,7 @@ class Palette:
     def __init__(self, key: str = None):
         """Maps all characters to colours using the key"""
         self.palette = {' ': (0, 0, 0, 0)}
-        self.rgbtocol = {(0, 0, 0): ' '}
+        self.rgbtocol = {(0, 0, 0, 0): ' '}
 
         if not key:
             key = ''.join(choices(PRINTABLE, k=16))
@@ -21,12 +21,11 @@ class Palette:
         self.key = self._generate_key(key)
 
         for n, char in enumerate(PRINTABLE):  # generate pallete
-            val = (self.key + (n * self.keylen))  # 16777216=256^3
-            sub = 255 + n
-            r, g, b = (val % sub), (val >> 8) % sub, (val >> 16) % sub
-            color = (r, g, b, 255)
+            val = (self.key * (n ** self.keylen)) % (255*255*255*64)
+            r, g, b, a = (val & 255), (val >> 8) & 255, (val >> 16) & 255, (val >> 20) & 63
+            color = (r, g, b, 255-a)
             self.palette[char] = color
-            self.rgbtocol[(r, g, b)] = char
+            self.rgbtocol[color] = char
 
     def _generate_key(self, key):
         """Generates a int key from the string"""
@@ -60,7 +59,6 @@ class TypingColors:
         self.canvas_drawer = ImageDraw.Draw(self.canvas)
         self.palette = None  # will be set later
         self.key = None
-        # self.palette = Pallete(key)  # maps characters to colours
 
     def _idx2coord(self, idx):
         """
@@ -95,8 +93,9 @@ class TypingColors:
             self.canvas = Image.new("RGBA", self.size)
             self.canvas_drawer = ImageDraw.Draw(self.canvas)
             self.text = ''
-            self.update(new_text)
-            return
+            text = ''.join([
+                i + (' ' * (self.width - len(i) % self.width)) for i in new_text.split('\n')
+            ]).rstrip()
 
         # check if text too small
         textlen = sum([max(len(i), self.width-self.ar_width) for i in new_text.split('\n')])
@@ -111,8 +110,9 @@ class TypingColors:
             self.canvas = Image.new("RGBA", self.size)
             self.canvas_drawer = ImageDraw.Draw(self.canvas)
             self.text = ''
-            self.update(new_text)
-            return
+            text = ''.join([
+                i + (' ' * (self.width - len(i) % self.width)) for i in new_text.split('\n')
+            ]).rstrip()
 
         # stores pixels to be updated, process deletions first
         insertions = {}

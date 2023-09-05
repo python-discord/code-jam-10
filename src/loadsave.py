@@ -12,39 +12,21 @@ def load(file_path, key):
     """
     img = Image.open(file_path)
     w, h = img.size
-    object = TypingColors(img.convert("RGBA"))  # load key
-    object.set_encryption(key)
+    object = TypingColors(img.convert("RGBA"))
+    object.set_encryption(key)  # load the key
     decoded_text = "".join([
-        object.palette[(r, g, b)]
+        object.palette[(r, g, b, a)]
         for r, g, b, a in img.getdata()
-    ]).rstrip()
-    # split into rows (getting the newlines back)
+    ]).rstrip()  # get the text
+    # split into rows and turning spaces to newlines
     decoded_chunks = [decoded_text[i:i+w]
                       for i in range(0, len(decoded_text), w)]
     decoded_text = ''.join([(line.rstrip()+'\n') if line.endswith(' ') else line
                             for line in decoded_chunks])
     object.update(decoded_text)
-    return object, decoded_text
+    return object, decoded_text  # return the text for the gui
 
 
 def save(object, file_path="Untitled.png"):
     """Simply saves backend object into given file."""
-    object.canvas.save(file_path)
-
-
-# testing
-# loremipsum = '''"But I must explain to you
-# how all this mistaken idea of
-# denouncing pleasure and praising
-# pain was born and I will give you a
-# complete account of the system, and
-# expound the actual teachings of the great
-# explorer
-# of the truth, the master-builder of human
-# happiness."
-# '''
-# obj = TypingColors(key='hello')
-# obj.update(loremipsum)
-# save(obj)
-# obj = load("Untitled.png", 'hello')
-# print(obj.text)
+    object.canvas.save(file_path, "PNG")
