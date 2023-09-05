@@ -1,7 +1,6 @@
 import tkinter as tk  # noqa: F401
 import backend as backend  # noqa: F401
 import loadsave  # noqa: F401
-import time
 from menu import new_file, open_file, save_file, save_file_as  # noqa: F401
 from PIL import Image, ImageTk  # noqa: F401
 from tkinter import PhotoImage, Frame, Button, Label, Menu, Tk  # noqa: F401
