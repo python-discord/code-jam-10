@@ -10,34 +10,41 @@ class ImageLabel(tk.Label):
     :im: A PIL Image instance or a string filename
     """
 
-    def load(self, im):
+    def load(self, im: str, repeat: bool = False, after_exec=None):
         """Loads an image"""
+        self.im = im
+        self.after_exec = after_exec
         if isinstance(im, str):
             im = Image.open(im)
-        frames = []
+        self.og_frames = []
         try:
             for i in count(1):
-                frames.append(ImageTk.PhotoImage(im.copy()))
+                self.og_frames.append(ImageTk.PhotoImage(im.copy()))
                 im.seek(i)
         except EOFError:
             pass
-        self.frames = cycle(frames)
+        self.frames = cycle(self.og_frames) if repeat else iter(self.og_frames)  # If img needs to be cycled
         try:
             self.delay = im.info['duration']
         except Exception:
             self.delay = 100
-        if len(frames) == 1:
+        if len(self.og_frames) == 1:  # If image is not a gif
             self.config(image=next(self.frames))
-        else:
+        else:  # If image is gif
             self.next_frame()
 
     def unload(self):
-        """Uploads the iamge"""
+        """Unloads the iamge"""
         self.config(image=None)
         self.frames = None
 
     def next_frame(self):
         """Updates the image frame (if gif)"""
         if self.frames:
-            self.config(image=next(self.frames))
-            self.after(self.delay, self.next_frame)
+            try:
+                self.config(image=next(self.frames))
+                self.after(self.delay, self.next_frame)
+            except StopIteration:
+                print("Hey")
+                if self.after_exec:
+                    self.after_exec()

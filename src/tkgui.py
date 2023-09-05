@@ -1,6 +1,7 @@
 import tkinter as tk  # noqa: F401
 import backend as backend  # noqa: F401
 import loadsave  # noqa: F401
+import time
 from menu import new_file, open_file, save_file, save_file_as  # noqa: F401
 from PIL import Image, ImageTk  # noqa: F401
 from tkinter import PhotoImage, Frame, Button, Label, Menu, Tk  # noqa: F401
@@ -41,14 +42,6 @@ class GUI:
 
     # function to create the place to write text to create image
 
-    def runGif(self, label, frames, ind, frameCnt):
-        frame = frames[ind]
-        ind += 1
-        if ind == frameCnt:
-            0
-        label.configure(image=frame)
-        self.root.after(100, lambda: self.runGif(label, frames, ind, frameCnt))
-
     def loading_screen(self):
         """The starting page for the application"""
         self.root.title("Pixel Studios")
@@ -56,25 +49,38 @@ class GUI:
         # title = Label(self.root, bg=DARK_GRAY, width=WIN_W, height=WIN_H, image="")
         # canvas = tk.Canvas(self.root, width=WIN_W, height=WIN_H, bg=DARK_GRAY, bd=0, highlightthickness=0)
         # canvas.place(relx=0.5, rely=0.5, anchor="center")
-        gif = ImageLabel(self.root)
-        gif.pack()
-        gif.load("assets\\imgs\\title.gif")
-        # canvas.create_image(WIN_W/2, WIN_H/2, anchor="center", image=img)
 
-        # # Create a Label Widget to display the text or Image
-        # title = Label(self.root, image=img)
-        # title.place(relx=0.5, rely=0.5, anchor="center")
+        gif = ImageLabel(self.root)
+        gif.configure(bd=0, highlightbackground=None)
+        gif.place(relx=0.5, rely=0.45, anchor="center")
+
+        def loading_animation(root):
+            """Loading animation circle for the application"""
+            loading = ImageLabel(root)
+            loading.configure(bd=0, highlightbackground=None)
+            loading.place(relx=0.5, rely=0.55, anchor="center")
+            loading.load("assets\\imgs\\loading.gif", False, lambda: self.create_main_window([loading, gif]))
+        gif.load("assets\\imgs\\title.gif", False, lambda: loading_animation(self.root))
         self.root.configure(background=DARK_GRAY)
         self.root.mainloop()
 
-    def create_main_window(self):
-        """Creates Window for the application"""
-        file_layout = {'New': {'command': '', 'image': 'assets\\menubar\\demo.png', 'accelerator': 'Ctrl+N'},
-                       'Open': {'command': '', 'image': 'assets\\menubar\\demo.png', 'accelerator': 'Ctrl+O'},
-                       'Save': {'command': '', 'image': 'assets\\menubar\\demo.png', 'accelerator': 'Ctrl+S'},
-                       'Save As': {'command': '', 'image': 'assets\\menubar\\demo.png', 'accelerator': 'Ctrl+Shift+S'},
+    def create_main_window(self, destroy: list[ImageLabel]):
+        """Creates The Main Window Page for the application"""
+        if len(destroy) > 0:  # Destroy the previous image labels for a fresh home screen application.
+            for i in destroy:
+                i.destroy()
+
+        file_layout = {'New': {'command': '', 'image': 'assets\\menubar\\demo.png',
+                               'accelerator': 'Ctrl+N'},
+                       'Open': {'command': '', 'image': 'assets\\menubar\\demo.png',
+                                'accelerator': 'Ctrl+O'},
+                       'Save': {'command': '', 'image': 'assets\\menubar\\demo.png',
+                                'accelerator': 'Ctrl+S'},
+                       'Save As': {'command': '', 'image': 'assets\\menubar\\demo.png',
+                                   'accelerator': 'Ctrl+Shift+S'},
                        '---': '',
-                       'Exit': {'command': self.root.destroy, 'image': 'assets\\menubar\\demo.png', 'accelerator': 'Alt+F4'}
+                       'Exit': {'command': self.root.destroy, 'image': 'assets\\menubar\\demo.png',
+                                'accelerator': 'Alt+F4'}
                        }
         config_layout = ['Set Key']
 
