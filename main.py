@@ -23,7 +23,7 @@ class MainWindow(QMainWindow):
         :return: None
         """
         self.setWindowTitle("Digital Shadows - Async Aggregators")
-        img_source = 'Images/sample.png'
+        img_source = 'images/sample.png'
 
         # Contains buttons + their filter panel
         # (button icon, filter, layer)
