@@ -1,41 +1,48 @@
-from PyQt6.QtCore import Qt
+from PIL import Image
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import (
     QFrame, QHBoxLayout, QLabel, QSlider, QVBoxLayout, QWidget
 )
+
+from src.Utils.apply_double_exposure import apply_double_exposure
 
 
 class Filter(QWidget):
     """Filter"""
 
+    # Define a custom signal to be emitted when any slider changes its value
+    sliderValueChanged = pyqtSignal(str, int)
+
     def __init__(self, name: str, sliders_info: list):
-        """Init
-
-        Create a filter panel with a title and a set of sliders.
-
-        :param name: Name of the filter.
-        :param sliders_info: List of tuples. Each tuple should contain:
-                             - label name (str)
-                             - range for the slider (tuple)
-                             - orientation of the slider (Qt.Orientation)
-        """
+        """Init"""
         super().__init__()
+
+        self.name = name
+        self.sliders = {}  # Dictionary to store sliders with their labels as keys
+
         layout = QVBoxLayout(self)
 
-        # Create and add title box
         title_box = self.create_panel_title(name)
         layout.addWidget(title_box)
 
-        # Dynamically create sliders based on the provided sliders_info
         for slider_label, slider_range, slider_orientation in sliders_info:
             layout.addWidget(QLabel(slider_label))
             slider = QSlider(slider_orientation)
-            slider_frame = self.style_slider(slider,
-                                             slider_range,
-                                             slider_orientation == Qt.Orientation.Horizontal)
-            slider_frame.setMaximumHeight(45)
+            slider.setRange(*slider_range)
+            slider.valueChanged.connect(lambda value, lbl=slider_label: self._on_slider_value_changed(lbl, value))
+            slider_frame = self.style_slider(slider, slider_range, slider_orientation == Qt.Orientation.Horizontal)
             layout.addWidget(slider_frame)
 
+            self.sliders[slider_label] = slider
+
         layout.addStretch()
+
+    def _on_slider_value_changed(self, label, value):
+        self.sliderValueChanged.emit(label, value)
+
+    def get_slider_value(self, label):
+        return self.sliders[label].value()
 
     @staticmethod
     def create_panel_title(name: str) -> QFrame:
@@ -86,3 +93,23 @@ class Filter(QWidget):
         slider_layout.addWidget(QLabel(str(range_value[-1])))
 
         return slider_frame
+
+
+def apply_filter(level, filter_name, args: dict) -> QPixmap:
+    """
+    Apply a filter to an image
+
+    :param level:
+    :param filter_name:
+    :param args:
+    :return: img
+    """
+    print("Type of args: ", type(args))
+    print("Args: ", args)
+
+    if filter_name == "Double Exposure":
+        new_img = apply_double_exposure(args["img_to_edit"], args["img_path"], args["slider_value"])
+        return new_img
+
+    pass
+

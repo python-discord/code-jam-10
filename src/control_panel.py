@@ -1,4 +1,4 @@
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
     QFrame, QHBoxLayout, QLabel, QSlider, QVBoxLayout, QWidget
 )
@@ -6,10 +6,13 @@ from PyQt6.QtWidgets import (
 
 class ControlPanel(QWidget):
     """Control Panel"""
+    # Define a new signal at the top of the class
+    controlValueChanged = pyqtSignal(str, int)
 
     def __init__(self, title: str, sliders_info: list):
         super().__init__()
         layout = QVBoxLayout(self)
+        self.title = title
 
         title_box = self.create_panel_title(title)
         layout.addWidget(title_box)
@@ -18,11 +21,16 @@ class ControlPanel(QWidget):
             label, slider_range, orientation = info
             layout.addWidget(QLabel(label))
             slider = QSlider(orientation)
+            slider.valueChanged.connect(lambda value, lbl=label: self.forward_signal(lbl, value))
             slider_frame = self.style_slider(slider, slider_range, orientation == Qt.Orientation.Horizontal)
             slider_frame.setMaximumHeight(45)
             layout.addWidget(slider_frame)
 
         layout.addStretch()
+
+    def forward_signal(self, label, value):
+        # Emit the new signal
+        self.controlValueChanged.emit(label, value)
 
     @staticmethod
     def create_panel_title(name: str) -> QFrame:
