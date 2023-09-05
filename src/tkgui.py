@@ -3,7 +3,8 @@ import backend as backend  # noqa: F401
 import loadsave  # noqa: F401
 from menu import new_file, open_file, save_file, save_file_as  # noqa: F401
 from PIL import Image, ImageTk  # noqa: F401
-from tkinter import Frame, Button, Label, Menu, Tk  # noqa: F401
+from tkinter import PhotoImage, Frame, Button, Label, Menu, Tk  # noqa: F401
+from modules import ImageLabel  # noqa: F401
 
 WIN_W, WIN_H = (800, 600)
 POP_W, POP_H = (400, 300)
@@ -40,27 +41,31 @@ class GUI:
 
     # function to create the place to write text to create image
 
+    def runGif(self, label, frames, ind, frameCnt):
+        frame = frames[ind]
+        ind += 1
+        if ind == frameCnt:
+            0
+        label.configure(image=frame)
+        self.root.after(100, lambda: self.runGif(label, frames, ind, frameCnt))
+
     def loading_screen(self):
         """The starting page for the application"""
         self.root.title("Pixel Studios")
         self.root.geometry(f"{WIN_W}x{WIN_H}")
-        title = Frame(self.root)
-        word = "Pixel Studios"
-        for w in word:
-            temp = Label(title, text=w, bg=DARK_GRAY, fg=WHITE,
-                         borderwidth=0, relief="solid", font=("Consolas", 50))
-            # temp.pack(side="left")
-            self.show(temp)
-            # self.root.after(1, self.add_loop, temp)
-        title.place(relx=0.5, rely=0.5, anchor="center")
+        # title = Label(self.root, bg=DARK_GRAY, width=WIN_W, height=WIN_H, image="")
+        # canvas = tk.Canvas(self.root, width=WIN_W, height=WIN_H, bg=DARK_GRAY, bd=0, highlightthickness=0)
+        # canvas.place(relx=0.5, rely=0.5, anchor="center")
+        gif = ImageLabel(self.root)
+        gif.pack()
+        gif.load("assets\\imgs\\title.gif")
+        # canvas.create_image(WIN_W/2, WIN_H/2, anchor="center", image=img)
+
+        # # Create a Label Widget to display the text or Image
+        # title = Label(self.root, image=img)
+        # title.place(relx=0.5, rely=0.5, anchor="center")
         self.root.configure(background=DARK_GRAY)
         self.root.mainloop()
-
-    def show(self, label: Label, y=-50):
-        """Animated a label from top to bottom"""
-        if y < 200:
-            label.place(x=200, y=y)
-            self.root.after(30, self.show, label, y+10)
 
     def create_main_window(self):
         """Creates Window for the application"""
@@ -89,7 +94,7 @@ class GUI:
                                      command=data['command'],
                                      accelerator=data['accelerator'],
                                      image=icon,
-                                    #  compound="left",
+                                     compound="left",
                                      activeforeground=WHITE,
                                      activebackground=AQUA,
                                      )

@@ -1,0 +1,43 @@
+import tkinter as tk
+from PIL import Image, ImageTk
+from itertools import count, cycle
+
+
+class ImageLabel(tk.Label):
+    """A Label that displays images, and plays them if they are gifs"""
+
+    """
+    :im: A PIL Image instance or a string filename
+    """
+
+    def load(self, im):
+        """Loads an image"""
+        if isinstance(im, str):
+            im = Image.open(im)
+        frames = []
+        try:
+            for i in count(1):
+                frames.append(ImageTk.PhotoImage(im.copy()))
+                im.seek(i)
+        except EOFError:
+            pass
+        self.frames = cycle(frames)
+        try:
+            self.delay = im.info['duration']
+        except Exception:
+            self.delay = 100
+        if len(frames) == 1:
+            self.config(image=next(self.frames))
+        else:
+            self.next_frame()
+
+    def unload(self):
+        """Uploads the iamge"""
+        self.config(image=None)
+        self.frames = None
+
+    def next_frame(self):
+        """Updates the image frame (if gif)"""
+        if self.frames:
+            self.config(image=next(self.frames))
+            self.after(self.delay, self.next_frame)
