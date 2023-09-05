@@ -36,7 +36,10 @@ class Gui:
         # TODO: What to do when the user changes the key when we already has some output on the left
         # coz the previously set color pixels wont change rn
         """Asks For encryption key from the user"""
-        key = sg.popup_get_text('Enter encryption key', title="Enter Key")
+        key = sg.popup_get_text('Enter encryption key', title="Enter Key", default_text=self.typingColors.key)
+        # Dont change the already set key if the user selects `cancel` in input
+        if key is None:
+            key = self.typingColors.key
         self.typingColors.set_encryption(key)
 
     # function to create the place to write text to create image
@@ -46,7 +49,7 @@ class Gui:
         menu_layout = [
             ['File', ['New', 'Open', 'Save', 'Save As', '---', 'Exit']],
             ['Config', ['Set Key']],
-            ['Options', ['Import', 'Export']]
+            ['Options', ['Import Image', 'Export Image']]
         ]
 
         left_side = [
@@ -74,7 +77,7 @@ class Gui:
         layout = [
             [sg.Menu(menu_layout)],
             [
-                sg.Column(left_side, element_justification='center', size=(WIN_W // 2, WIN_H // 2)),
+                sg.Column(left_side, element_justification='center', size=(WIN_W // 2, WIN_H)),
                 sg.VSeperator(),
                 sg.Column(right_side, element_justification='center', size=(WIN_W // 2, WIN_H))
             ],
@@ -211,15 +214,15 @@ class Gui:
             elif event == 'Set Key':
                 self.ask_key()
 
-            elif event == 'Import':
+            elif event == 'Import Image':
                 # load png in backend
                 filename = sg.popup_get_file('Open', no_window=True, keep_on_top=True)
                 self.typingColors, decoded_text = loadsave.load(filename, self.typingColors.key)
                 # load text and image in gui
                 self.main_window['KEY-USER-INPUT'].update(value=decoded_text)
                 self.update_img(decoded_text)
-            elif event == 'Export':
-                filename = sg.popup_get_file('Save As', save_as=True, no_window=True)
+            elif event == 'Export Image':
+                filename = sg.popup_get_file('Save As', save_as=True, no_window=True, default_extension='png')
                 loadsave.save(self.typingColors, filename)
 
         self.main_window.close()
