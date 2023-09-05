@@ -1,9 +1,11 @@
 import tkinter as tk  # noqa: F401
+from tkinter import Button, Frame, Label, Menu, PhotoImage, Tk  # noqa: F401
+
+from PIL import Image, ImageTk  # noqa: F401
+
 import backend as backend  # noqa: F401
 import loadsave  # noqa: F401
 from menu import new_file, open_file, save_file, save_file_as  # noqa: F401
-from PIL import Image, ImageTk  # noqa: F401
-from tkinter import PhotoImage, Frame, Button, Label, Menu, Tk  # noqa: F401
 from modules import ImageLabel  # noqa: F401
 
 WIN_W, WIN_H = (800, 600)
@@ -42,6 +44,14 @@ class GUI:
     # function to create the place to write text to create image
 
     def runGif(self, label, frames, ind, frameCnt):
+        """TODO: ADD DOC_STR
+
+        Args:
+            label (_type_): _description_
+            frames (_type_): _description_
+            ind (_type_): _description_
+            frameCnt (_type_): _description_
+        """
         frame = frames[ind]
         ind += 1
         if ind == frameCnt:
@@ -69,13 +79,18 @@ class GUI:
 
     def create_main_window(self):
         """Creates Window for the application"""
-        file_layout = {'New': {'command': '', 'image': 'assets\\menubar\\demo.png', 'accelerator': 'Ctrl+N'},
-                       'Open': {'command': '', 'image': 'assets\\menubar\\demo.png', 'accelerator': 'Ctrl+O'},
-                       'Save': {'command': '', 'image': 'assets\\menubar\\demo.png', 'accelerator': 'Ctrl+S'},
-                       'Save As': {'command': '', 'image': 'assets\\menubar\\demo.png', 'accelerator': 'Ctrl+Shift+S'},
-                       '---': '',
-                       'Exit': {'command': self.root.destroy, 'image': 'assets\\menubar\\demo.png', 'accelerator': 'Alt+F4'}
-                       }
+        file_layout = {
+            'New': {'command': '', 'image': 'assets\\menubar\\demo.png', 'accelerator': 'Ctrl+N'},
+            'Open': {'command': '', 'image': 'assets\\menubar\\demo.png', 'accelerator': 'Ctrl+O'},
+            'Save': {'command': '', 'image': 'assets\\menubar\\demo.png', 'accelerator': 'Ctrl+S'},
+            'Save As': {'command': '', 'image': 'assets\\menubar\\demo.png', 'accelerator': 'Ctrl+Shift+S'},
+            '---': '',
+            'Exit': {
+                'command': self.root.destroy,
+                'image': 'assets\\menubar\\demo.png',
+                'accelerator': 'Alt+F4'
+            }
+        }
         config_layout = ['Set Key']
 
         # Main Menu Bar
