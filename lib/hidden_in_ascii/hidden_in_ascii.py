@@ -1,12 +1,12 @@
-import argparse
 import random
+from pathlib import Path
 from typing import List, Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw
 
 
-def prepare_input(img_path: str) -> Tuple[Image.Image, List[int]]:
+def prepare_input(img_path: Path) -> Tuple[Image.Image, List[int]]:
     """
     Prepare the input image by center cropping into a square
 
@@ -56,7 +56,7 @@ def img_to_ascii(img: Image.Image, dens: int) -> List[str]:
         "@B$%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1lIi!{}[]?-_+~<>;:,^`'. ",  # 70 characters,
     ]
 
-    # Convert to grayscale (L stands for luminance)
+    # Convert to greyscale (L stands for luminance)
     gs_img = img.convert("L")
     gs_img_w, gs_img_h = gs_img.size[0], gs_img.size[1]
     cols = int(gs_img_w // 10)  # 1/10th of the cropped square
@@ -87,12 +87,12 @@ def img_to_ascii(img: Image.Image, dens: int) -> List[str]:
     return ascii_
 
 
-def ascii_to_img(ascii_text_file_path: str, output_dest_path: str, coordinates: List[int]) -> Image.Image:
+def ascii_to_img(ascii_text_file_path: Path, coordinates: List[int], input_img_size: Tuple[int, int],
+                 output_path: Path) -> Image.Image:
     """
     Creates image file from ascii text file
 
     :param ascii_text_file_path: ascii text file path
-    :param output_dest_path: output destination file path
     :param coordinates: coordinates used to crop the original image
     :return: Generated image from converting ascii text into PNG
     """
@@ -108,12 +108,14 @@ def ascii_to_img(ascii_text_file_path: str, output_dest_path: str, coordinates: 
     w = right - left
     h = bottom - top
     draw.text((0, 0), ascii_text, fill="black")
-    img = img.crop((0, 0, w, h))  # Crop out white spaces
-    img.save(output_dest_path, "png")
-    return img
+
+    # Crop out white spaces and resize to match the original input image size
+    output = img.crop((0, 0, w, h)).resize(input_img_size)
+    output.save(output_path)
+    return output
 
 
-def seed_secret(ascii_file_path: str, secret: str, binary_mode: bool) -> None:
+def seed_secret(ascii_file_path: Path, secret: str, binary_mode: bool) -> None:
     """
     Insert the secret phrase randomly somewhere in the ascii file
 
@@ -143,56 +145,39 @@ def seed_secret(ascii_file_path: str, secret: str, binary_mode: bool) -> None:
         file.writelines(lines)
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Converts input image into ascii art and saves the resulting text back into image (.png)"
-    )
-    parser.add_argument("--input", dest="input", required=True, help="Input image")
-    parser.add_argument(
-        "--secret",
-        dest="secret",
-        required=True,
-        help="Secret phrase to hide in the ascii art",
-    )
-    parser.add_argument(
-        "--output",
-        dest="output",
-        required=False,
-        default="result.png",
-        help="Output location for generated image file",
-    )
-    parser.add_argument(
-        "--density",
-        dest="dens",
-        required=False,
-        default=2,
-        help="Resolution of greyscale (0: Low, 1: Medium, 2: High (Default))",
-    )
-    parser.add_argument(
-        "--insane-mode",
-        dest="insane_mode",
-        required=False,
-        action="store_true",
-        help="Hides secret phrase in binary string!!!",
-    )
-    args = parser.parse_args()
-    input_img, coordinates = prepare_input(args.input)
+def validate_image_size(input_img: Image.Image) -> None:
+    """
+    For the quality of the tool, the image must be larger than 1000x1000
 
-    # Input image size validation
+    :param input_img: Prepared input PIL Image
+    :return: None
+    """
     input_img_w, input_img_h = input_img.size
     if input_img_w < 1000 or input_img_h < 1000:
         raise ValueError("Please provide an image size bigger than 1000x1000!")
 
-    # Secret length validation
-    if len(args.secret) > input_img_w // 100:
+
+def validate_secret_length(secret: str, input_img_w: int) -> None:
+    """
+    The secret phrase cannot be too long otherwise the puzzle will be too obvious
+
+    :param secret: Secret phrase
+    :param input_img_w: Width of the input image
+    :return: None
+    """
+    if len(secret) > input_img_w // 100:
         raise ValueError("The secret phrase provided is too long to be hidden in this image size.")
 
-    ascii_file_path = "ascii.txt"
 
+def generate_ascii_file(input_img: Image.Image, ascii_file_path: Path, dens: int) -> None:
+    """
+    Generate ascii file from image input
+
+    :param input_img: PIL prepared input image
+    :param ascii_file_path: Destination location of the ascii output
+    :param dens: Quality of the greyscale between range of 0,1,2
+    :return: None
+    """
     with open(ascii_file_path, "w") as f:
-        for row in img_to_ascii(input_img, int(args.dens)):
+        for row in img_to_ascii(input_img, dens):
             f.write(row + "\n")
-    seed_secret(ascii_file_path, args.secret, args.insane_mode)
-    output_img = ascii_to_img(ascii_file_path, args.output, coordinates)
-    output_img = output_img.resize(input_img.size)
-    output_img.save(args.output)
