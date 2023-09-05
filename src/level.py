@@ -21,6 +21,7 @@ class Level:
         :return: str
         """
         # This can be extended to retrieve images dynamically based on the level
+
         image_dir_path = Path(Path(__file__).parent, 'images')
         if self.level_number == 1:
             return Path(image_dir_path, 'sample.png')
@@ -48,6 +49,7 @@ class Level:
         :return: list
         """
         # This can be extended to provide filters dynamically based on the level
+
         icons_dir_path = Path(Path(__file__).parent, 'icons')
         if self.level_number == 1:
             filters = [
