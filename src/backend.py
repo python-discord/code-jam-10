@@ -1,9 +1,10 @@
-import string
 from difflib import ndiff
 from io import BytesIO
 from random import choices
 
 from PIL import Image, ImageDraw
+
+PRINTABLE = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~\t'
 
 
 class Palette:
@@ -11,17 +12,18 @@ class Palette:
 
     def __init__(self, key: str = None):
         """Maps all characters to colours using the key"""
-        self.palette = {}
+        self.palette = {' ': (0, 0, 0, 0)}
         self.rgbtocol = {(0, 0, 0): ' '}
 
-        if key:
-            self.key = self._generate_key(key)
-        else:
-            self.key = self._generate_key(''.join(choices(string.printable, k=16)))
+        if not key:
+            key = ''.join(choices(PRINTABLE, k=16))
+        self.keylen = len(key) * 8
+        self.key = self._generate_key(key)
 
-        for n, char in enumerate(string.printable):  # generate pallete
-            val = (self.key * (n + 1)) % 16777216  # 16777216=256^3
-            r, g, b = (val & 255), (val >> 8) & 255, (val >> 16) & 255
+        for n, char in enumerate(PRINTABLE):  # generate pallete
+            val = (self.key + (n * self.keylen))  # 16777216=256^3
+            sub = 255 + n
+            r, g, b = (val % sub), (val >> 8) % sub, (val >> 16) % sub
             color = (r, g, b, 255)
             self.palette[char] = color
             self.rgbtocol[(r, g, b)] = char
@@ -32,13 +34,15 @@ class Palette:
             raise ValueError("String for encryption cannot be empty")
         return int.from_bytes(key.encode(), 'little')
 
-    def __getitem__(self, char):
-        """Returns the color from char"""
-        if char == " ":  # transparent whitespace
-            color = (0, 0, 0, 0)
-        else:
-            color = self.palette[char]
-        return color
+    def __getitem__(self, item):
+        """Returns the color from char/char from color"""
+        if item in self.palette:  # char to colour
+            return self.palette[item]
+        if item in self.rgbtocol:  # colour to char
+            return self.rgbtocol[item]
+        if isinstance(item, str):  # unknown char (like emoji)
+            return self.palette['?']
+        raise KeyError  # invalid decryption
 
 
 class TypingColors:
@@ -76,7 +80,9 @@ class TypingColors:
         insertions = {}  # stores pixels to be inserted, process deletions first
 
         # deal with newlines - simply turn them to spaces
-        text = ''.join([i+(' '*(self.width-len(i))) for i in text.split('\n')]).rstrip()
+        text = ''.join([
+            i + (' ' * (self.width - len(i) % self.width)) for i in text.split('\n')
+        ]).rstrip()
 
         # loop through ndiff to get needed changes
         pos = 0

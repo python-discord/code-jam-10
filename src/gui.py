@@ -214,9 +214,8 @@ class Gui:
             elif event == 'Import':
                 # load png in backend
                 filename = sg.popup_get_file('Open', no_window=True, keep_on_top=True)
-                self.typingColors = loadsave.load(filename, self.typingColors.key)
+                self.typingColors, decoded_text = loadsave.load(filename, self.typingColors.key)
                 # load text and image in gui
-                decoded_text = self.typingColors.text
                 self.main_window['KEY-USER-INPUT'].update(value=decoded_text)
                 self.update_img(decoded_text)
             elif event == 'Export':

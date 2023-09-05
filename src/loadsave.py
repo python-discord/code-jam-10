@@ -14,16 +14,16 @@ def load(file_path, key):
     object = TypingColors(img.convert("RGBA"))  # load key
     object.set_encryption(key)
     decoded_text = "".join([
-        object.palette.rgbtocol[(r, g, b)]
+        object.palette[(r, g, b)]
         for r, g, b, a in img.getdata()
     ]).rstrip()
     # split into rows (getting the newlines back)
     decoded_chunks = [decoded_text[i:i+object.width]
                       for i in range(0, len(decoded_text), object.width)]
-    decoded_text = [(line.rstrip()+'\n') if line.endswith(' ') else line
-                    for line in decoded_chunks]
-    object.update(''.join(decoded_text))
-    return object
+    decoded_text = ''.join([(line.rstrip()+'\n') if line.endswith(' ') else line
+                            for line in decoded_chunks])
+    object.update(decoded_text)
+    return object, decoded_text
 
 
 def save(object, file_path="Untitled.png"):
