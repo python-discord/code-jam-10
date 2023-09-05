@@ -122,7 +122,7 @@ class Window(QMainWindow):
         # Clear secret code input field
         self.close = QPushButton()
         self.close.setMinimumSize(40, 40)
-        self.close.setIcon(QIcon('icons\\close.png'))
+        self.close.setIcon(QIcon('icons/close.png'))
         self.close.setIconSize(QSize(20, 20))
         self.close.pressed.connect(lambda: self.secret_code_input.setText(''))
         layout.addWidget(self.close)
