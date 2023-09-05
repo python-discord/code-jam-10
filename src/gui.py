@@ -6,7 +6,7 @@ import backend as backend  # noqa: F401
 import loadsave  # noqa: F401
 from menu import new_file, open_file, save_file, save_file_as
 
-WIN_W, WIN_H = (800, 600)
+WIN_W, WIN_H = (720, 480)
 POP_W, POP_H = (400, 300)
 
 
