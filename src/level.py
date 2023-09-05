@@ -1,6 +1,6 @@
 from PyQt6.QtCore import Qt
 
-from src.ControlPanel import ControlPanel
+from control_panel import ControlPanel
 
 
 class Level:

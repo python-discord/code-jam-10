@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (
     QMessageBox, QPushButton, QStackedLayout, QWidget
 )
 
-from src import Level
+from level import Level
 
 
 class Window(QMainWindow):

@@ -1,9 +1,10 @@
 import sys
+from pathlib import Path
 
 from PyQt6.QtWidgets import QApplication
 
-from src.Level import Level
-from src.Window import Window
+from level import Level
+from window import Window
 
 
 def main() -> None:
@@ -14,7 +15,7 @@ def main() -> None:
     window = Window(current_level)
 
     # Apply CSS (QSS) Styling
-    with open('styles/styles.css') as qss:
+    with open(Path('styles/styles.css')) as qss:
         app.setStyleSheet(qss.read())
 
     window.show()
