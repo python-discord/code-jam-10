@@ -2,7 +2,7 @@
 
 **Digital Shadows** transports players into the enthralling depths of the digital realm, bridging the gap
 between the online world and palpable real-world locations, ranging from underground hacker dens and
-abandoned warehouses to fortified safehouses.
+abandoned warehouses to fortified safe houses.
 
 In the game's opening cinematic, the narrative unfolds on a screen shrouded in darkness, gradually
 illuminated by cascading lines of mysterious code. As the climax of this digital downpour is reached,
@@ -35,41 +35,17 @@ Before you begin, ensure you have met the following requirements:
 
 ## Installation & Setup
 
-### With Docker
-
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/Flow-Glow/Code-Jam-2023-Async-Aggrogaters.git
-   cd Code-Jam-2023-Async-Aggrogaters
-    ```
-2. **Build the Docker image**
-    ```bash
-    docker build -t digital-shadows .
-    ```
-
-### Without Docker
-
-1. **Clone the repository:**
-
-   ```bash
-   git clone https://github.com/Flow-Glow/Code-Jam-2023-Async-Aggrogaters.git
-   cd Code-Jam-2023-Async-Aggrogaters
+   git clone https://github.com/Flow-Glow/Code-Jam-2023-Async-Aggregators.git
+   cd Code-Jam-2023-Async-Aggregators
     ```
 2. **Install dependencies:**
     ```bash
     poetry install
     ```
 ## Running the Project
-
-### With Docker
-
-1. **Run the Docker container**
-    ```bash
-    docker run -it --rm digital-shadows
-    ```
-
-### Without Docker
 
 1. Activate the poetry environment:
     ```bash
@@ -89,7 +65,7 @@ Before you begin, ensure you have met the following requirements:
 ## License
 MIT License
 
-Copyright (c) 2023 Async Aggrogaters
+Copyright (c) 2023 Async Aggregators
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
