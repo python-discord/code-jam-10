@@ -14,7 +14,13 @@ class Level:
         self.img_source = self.get_image_source()
         self.filters = self.get_filters()
 
-    def set_level(self, level_number: int):
+    def set_level(self, level_number: int) -> None:
+        """
+        Set the level
+
+        :param level_number:
+        :return:
+        """
         image_dir_path = Path(Path(__file__).parent, 'images')
 
         self.level_number = level_number
