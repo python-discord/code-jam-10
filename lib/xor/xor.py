@@ -3,23 +3,36 @@ from typing import Tuple
 import numpy as np
 
 
-def generate_image(alphanumeric: str) -> Image.Image:
+def generate_image(alphanumeric: str, difficulty: int) -> Image.Image:
     """
     Generate an image of the character
 
     :param alphanumeric: alphanumeric character
+    :param difficulty: difficulty level ranging from 1-3
     :return: Generated PIL image
     """
-    image_size = (100, 100)
+
+    difficulty_properties = {
+        1: {"image_size": (12, 12), "font_size": 14, "offset": (3, -2)},
+        2: {"image_size": (50, 50), "font_size": 64, "offset": (8, -10)},
+        3: {"image_size": (100, 100), "font_size": 130, "offset": (20, -20)},
+    }
+
+    # Get the image properties based on the difficulty level, default to level 3
+    properties = difficulty_properties.get(difficulty, difficulty_properties[3])
+
+    image_size = properties["image_size"]
+    font_size = properties["font_size"]
+    offset = properties["offset"]
+
     image = Image.new("L", image_size, "white")
-
     draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype("CarterOne-Regular.ttf", 120)
-
+    font = ImageFont.truetype("BebasNeue-Regular.ttf", font_size)
     # Draw the character in black on the image
-    draw.text((0, -40), alphanumeric, fill="black", font=font, spacing=0)
-    image.save(f"{alphanumeric}.png")
-    return image
+    draw.text(offset, alphanumeric, fill="black", font=font, spacing=0)
+    binary_image = image.point(lambda p: 255 if p > 128 else 0)
+    binary_image.save(f"{alphanumeric}.png")
+    return binary_image
 
 
 def generate_xor_pair(image: Image.Image, alphanumeric: str) -> Tuple[Image.Image, Image.Image]:
@@ -52,7 +65,7 @@ def generate_xor_pair(image: Image.Image, alphanumeric: str) -> Tuple[Image.Imag
             0 | 1 | 1
             1 | 1 | 0
             """
-            if original_array[i][j] == 255:
+            if original_array[i][j] >= 128:
                 # If the pixel is white
                 if np.random.randint(2) == 0:
                     image1_array[i][j] = 255
@@ -62,11 +75,11 @@ def generate_xor_pair(image: Image.Image, alphanumeric: str) -> Tuple[Image.Imag
                     image2_array[i][j] = 0
             else:
                 if np.random.randint(2) == 0:
-                    image1_array[i][j] = original_array[i][j]
+                    image1_array[i][j] = 0
                     image2_array[i][j] = 255
                 else:
                     image1_array[i][j] = 255
-                    image2_array[i][j] = original_array[i][j]
+                    image2_array[i][j] = 0
 
     # Convert numpy arrays back to images
     image1 = Image.fromarray(image1_array)
@@ -80,5 +93,5 @@ def generate_xor_pair(image: Image.Image, alphanumeric: str) -> Tuple[Image.Imag
 
 if __name__ == "__main__":
     for c in "PYTHON":
-        c_img = generate_image(c)
+        c_img = generate_image(c, 2)
         generate_xor_pair(c_img, c)
