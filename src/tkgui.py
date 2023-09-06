@@ -1,12 +1,13 @@
 import tkinter as tk  # noqa: F401
-import loadsave  # noqa: F401
-from menu import new_file, open_file, save_file, save_file_as  # noqa: F401
-from PIL import Image, ImageTk  # noqa: F401
 from tkinter import *  # noqa F406
 
+from PIL import Image, ImageTk  # noqa: F401
+
+import loadsave  # noqa: F401
+from backend import TypingColors
+from menu import new_file, open_file, save_file, save_file_as  # noqa: F401
 # from tkinter import PhotoImage, Frame, Button, Label, Menu, Tk, Text, OptionMenu, StringVar  # noqa: F401
 from modules import ImageLabel  # noqa: F401
-from backend import TypingColors
 
 WIN_W, WIN_H = (800, 600)
 POP_W, POP_H = (400, 300)
@@ -34,6 +35,22 @@ class GUI:
         # self.create_main_window([])
         self.ask_key()
 
+    def center(self, root: Tk):
+        """Centers a tkinter window"""
+        root.update_idletasks()
+        width = root.winfo_screenwidth()
+        height = root.winfo_screenheight()
+        x = int((width - WIN_W)/2)
+        y = int((height - WIN_H)/3)  # A bit off center to align it well with the taskbar
+        root.geometry(f"+{x}+{y}")
+
+    def callback(self, callback: callable, destroy: list[Widget] = None, *args):
+        """Callback a function while destroying existing widgets"""
+        if len(destroy) > 0:  # Destroy the previous image labels for a fresh home screen application.
+            for i in destroy:
+                i.destroy()
+        callback(*args)
+
     def ask_key(self):
         """Asks For encryption key from the user"""
         pass
@@ -44,6 +61,8 @@ class GUI:
         """The starting page for the application"""
         self.root.title("Pixel Studios")
         self.root.geometry(f"{WIN_W}x{WIN_H}")
+        # self.root.eval('tk::PlaceWindow . center')
+        self.center(self.root)
 
         gif = ImageLabel(self.root)
         gif.configure(bd=0, highlightbackground=None)
@@ -57,7 +76,7 @@ class GUI:
             loading.load(
                 "assets\\imgs\\loading.gif",
                 False,
-                lambda: self.create_main_window([loading, gif]),
+                lambda: self.callback(self.create_main_window, [loading, gif]),
             )
 
         gif.load("assets\\imgs\\title.gif", False, lambda: loading_animation(self.root))
@@ -130,13 +149,8 @@ class GUI:
             )
         self.root.configure(background=DARK_GRAY, menu=menubar)
 
-    def create_main_window(self, destroy: list[ImageLabel]):
+    def create_main_window(self):
         """Creates The Main Window Page for the application"""
-        if (
-            len(destroy) > 0
-        ):  # Destroy the previous image labels for a fresh home screen application.
-            for i in destroy:
-                i.destroy()
         self.create_menu_bar()
 
         # The Main Input Frame:
@@ -182,14 +196,15 @@ class GUI:
 
         # Encrypt / Decrypt Buttons Frame:
         buttons = Frame(main, background=DARK_GRAY, pady=50)
-        default = StringVar()
-        default.set("Encrypt")
-        opts = ["Typing Colors", "Use Masked Image", "Encrypt"]
+
+        # Encrypt OptionMenu
+        method = StringVar()
+        method.set("Encrypt ▼")
+        opts = ["Typing Colors", "Use Masked Image"]
         encrypt = OptionMenu(
             buttons,
-            default,
-            *opts[:-1],
-            command=self.check_key(True, opts.index(default.get())),
+            method,
+            *opts,
         )
         encrypt.configure(
             font=("Consolas", 12, "bold"),
@@ -198,6 +213,7 @@ class GUI:
             padx=5,
             pady=5,
             cursor="hand2",
+            indicatoron=0,
             bd=0,
             highlightbackground=RED,
             activeforeground=WHITE,
@@ -210,10 +226,10 @@ class GUI:
             activeforeground=WHITE,
             foreground=DARK_GRAY,
         )
-        #                  padx=5, pady=5, cursor="hand2", bd=0, command=lambda: self.check_key(True)))
-        # encrypt = Button(buttons, text="Encrypt", font=("Consolas", 12, "bold"), bg=RED, fg=WHITE,
-        #                  padx=5, pady=5, cursor="hand2", bd=0, command=lambda: self.check_key(False))
         encrypt.grid(row=0, column=0, padx=10, pady=10)
+        method.trace("w", lambda *args: self.check_key(True, opts.index(method.get())))
+
+        # Decrypt Button
         decrypt = Button(
             buttons,
             text="Decrypt",
@@ -221,10 +237,10 @@ class GUI:
             bg=GREEN,
             fg=WHITE,
             padx=5,
-            pady=5,
+            pady=3,
             cursor="hand2",
             bd=0,
-            command=lambda: self.check_key(True),
+            command=lambda: self.check_key(False),
         )
         decrypt.grid(row=0, column=10, padx=10, pady=10)
         buttons.pack()

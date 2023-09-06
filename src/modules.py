@@ -1,6 +1,7 @@
 import tkinter as tk
-from PIL import Image, ImageTk
 from itertools import count, cycle
+
+from PIL import Image, ImageTk
 
 
 # Source: https://pythonprogramming.altervista.org/animate-gif-in-tkinter/
