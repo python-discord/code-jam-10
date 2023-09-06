@@ -1,6 +1,6 @@
 from enum import IntEnum
 from string import whitespace
-from typing import Optional, SupportsFloat, SupportsInt, Union
+from typing import Optional, SupportsInt
 from warnings import warn
 
 import numpy as np
@@ -69,9 +69,9 @@ class PietStack:
 
     def push(self, item: ArrayLike) -> None:
         """Push an item (int) on to the top of the stack"""
-        if not isinstance(item, Union[SupportsInt, SupportsFloat]):
+        if not isinstance(item, SupportsInt):
             raise ValueError(f"The pushed item must be an integer, not `{type(item)}`!")
-        if isinstance(item, SupportsFloat):
+        if isinstance(item, float):
             warn(
                 "`PietStack.push()` expects an int, but float was recieved. Value will be rounded down.\n"
                 "If this is undesirable, please check your inputs and try again.",
@@ -114,7 +114,7 @@ class PietRuntime:
         self.stack.push(np.int64(not bool(self.stack.pop())))
 
     def p_greater(self):
-        self.stack.push(np.int64(np.greater(*np.flip(self.stack.popx()))))
+        self.stack.push(np.int64(np.greater(*self.stack.popx())))
 
     def p_pointer(self):
         self.pointer.set(np.mod(self.stack.pop(), 4))
