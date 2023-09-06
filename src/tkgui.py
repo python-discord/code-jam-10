@@ -1,13 +1,10 @@
-import tkinter as tk  # noqa: F401
-import backend as backend  # noqa: F401
-import loadsave  # noqa: F401
-from menu import new_file, open_file, save_file, save_file_as  # noqa: F401
-from PIL import Image, ImageTk  # noqa: F401
-from tkinter import PhotoImage, Frame, Button, Label, Menu, Tk  # noqa: F401
-from modules import ImageLabel  # noqa: F401
+import tkinter as tk
+from tkinter import Button, Entry, Label, Menu, Text, Tk
 
-WIN_W, WIN_H = (800, 600)
-POP_W, POP_H = (400, 300)
+from backend import TypingColors
+from modules import ImageLabel
+
+WIN_W, WIN_H = (640, 480)
 DARK_GRAY, GRAY = "#222831", "#393E46"
 AQUA, WHITE = "#00ADB5", "#EEEEEE"
 
@@ -15,29 +12,36 @@ AQUA, WHITE = "#00ADB5", "#EEEEEE"
 class GUI:
     """Main GUI class to interact with the backend"""
 
-    def __init__(self, typingColors: backend.TypingColors):
+    def __init__(self):
         """Initializes variables and window"""
-        # stores the backend class
-        self.typingColors = typingColors
-
-        # To delay invoking image updation when the user is continuously typing
-        self.last_time = 0
-        self.interval = 0.6
-        self.UPDATE_FLAG = False
-
-        self.file = None  # Opened files
-
         # Creates the window
         self.root = Tk()
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_rowconfigure(1, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_columnconfigure(1, weight=1)
         self.loading_screen()
         # self.popup_window = self.create_decrypt_encrypt_window()
         # self.main_window.hide()
 
-        self.ask_key()
-
     def ask_key(self):
         """Asks For encryption key from the user"""
-        pass
+        win = tk.Toplevel()
+        win.wm_title("Enter Secret Key")
+        win.geometry("250x100")
+        win.grid_rowconfigure(0, weight=1)
+        win.grid_rowconfigure(1, weight=1)
+        win.grid_columnconfigure(0, weight=1)
+        win.grid_columnconfigure(1, weight=1, uniform=1)
+
+        Label(win, text="Secret Key: ").grid(row=0, column=0, sticky="e")
+        self.keylabel = Entry(win)
+        self.keylabel.grid(row=0, column=1, sticky="w")
+
+        b = Button(win, text="Start Empty", command=lambda: self.main_typingcolors() or win.destroy())
+        b.grid(row=1, column=0)
+        b1 = Button(win, text="Use Mask Image", command=lambda: self.main_encodeimg() or win.destroy())
+        b1.grid(row=1, column=1)
 
     # function to create the place to write text to create image
 
@@ -58,30 +62,49 @@ class GUI:
             loading = ImageLabel(root)
             loading.configure(bd=0, highlightbackground=None)
             loading.place(relx=0.5, rely=0.55, anchor="center")
-            loading.load("assets\\imgs\\loading.gif", False, lambda: self.create_main_window([loading, gif]))
+            loading.load("assets\\imgs\\loading.gif", False, lambda: gif.destroy() or self.ask_key())
         gif.load("assets\\imgs\\title.gif", False, lambda: loading_animation(self.root))
         self.root.configure(background=DARK_GRAY)
-        self.root.mainloop()
 
-    def create_main_window(self, destroy: list[ImageLabel]):
+    def _typingcolors_update(self, prev_txt):
+        """Update loop for typingcolours"""
+        txt = self.text.get('1.0', 'end')
+        if txt != prev_txt:
+            self.typingColors.update(txt)
+            img = self.typingColors.img_tk()
+            self.canvas.configure(image=img)
+            self.canvas.image = img
+        self.root.after(50, lambda: self._typingcolors_update(txt))
+
+    def main_typingcolors(self):
+        """Main function for typingcolours layout"""
+        self.typingColors = TypingColors()
+        self.typingColors.set_encryption(self.keylabel.get())
+        self.text = Text(self.root, width=30, height=20)
+        self.text.grid(row=0, column=0)
+        self.canvas = tk.Label(self.root, image=self.typingColors.img_tk())
+        self.canvas.grid(row=0, column=1)
+        self._typingcolors_update('')
+
+    def main_encodeimg(self):
+        """Encode image method."""
+        pass
+
+    def run(self):
         """Creates The Main Window Page for the application"""
-        if len(destroy) > 0:  # Destroy the previous image labels for a fresh home screen application.
-            for i in destroy:
-                i.destroy()
-
-        file_layout = {'New': {'command': '', 'image': 'assets\\menubar\\demo.png',
+        file_layout = {'New': {'command': '',
                                'accelerator': 'Ctrl+N'},
-                       'Open': {'command': '', 'image': 'assets\\menubar\\demo.png',
+                       'Open': {'command': '',
                                 'accelerator': 'Ctrl+O'},
-                       'Save': {'command': '', 'image': 'assets\\menubar\\demo.png',
+                       'Save': {'command': '',
                                 'accelerator': 'Ctrl+S'},
-                       'Save As': {'command': '', 'image': 'assets\\menubar\\demo.png',
+                       'Save As': {'command': '',
                                    'accelerator': 'Ctrl+Shift+S'},
                        '---': '',
-                       'Exit': {'command': self.root.destroy, 'image': 'assets\\menubar\\demo.png',
+                       'Exit': {'command': self.root.destroy,
                                 'accelerator': 'Alt+F4'}
                        }
-        config_layout = ['Set Key']
+        config_layout = {'Set Key': {'command': self.ask_key}}
 
         # Main Menu Bar
         menubar = Menu(self.root, tearoff=0, font=("Consolas", 12))
@@ -93,12 +116,9 @@ class GUI:
             if name == "---":
                 fileMenu.add_separator()
             else:
-                img = Image.open(data['image'])
-                icon = ImageTk.PhotoImage(img)
                 fileMenu.add_command(label=name,
                                      command=data['command'],
                                      accelerator=data['accelerator'],
-                                     image=icon,
                                      compound="left",
                                      activeforeground=WHITE,
                                      activebackground=AQUA,
@@ -106,14 +126,7 @@ class GUI:
 
         configMenu = Menu(self.root, tearoff=0)
         menubar.add_cascade(label="Config", menu=configMenu)
-        for item in config_layout:
-            configMenu.add_command(label=item)
+        for item, data in config_layout.items():
+            configMenu.add_command(label=item, command=data['command'])
         self.root.configure(background=DARK_GRAY, menu=menubar)
         self.root.mainloop()
-
-# Testing
-
-
-if __name__ == "__main__":
-    gui = GUI(backend.TypingColors())
-    # gui.create_main_window()
