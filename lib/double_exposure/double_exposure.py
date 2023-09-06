@@ -24,7 +24,4 @@ def double_exposure(img1: Image, img2: Image, alpha: float = 0.5) -> Image:
     # Blend the images
     blended = Image.blend(img1, img2, alpha)
 
-    # Resize the resulting image to 450x450
-    blended = blended.resize((450, 450))
-
     return blended
