@@ -1,5 +1,5 @@
 import tkinter as tk  # noqa: F401
-from tkinter import *  # noqa F406
+from tkinter import *  # noqa: F403
 
 from PIL import Image, ImageTk  # noqa: F401
 
@@ -125,7 +125,7 @@ class GUI:
                 fileMenu.add_separator()
             else:
                 # img = Image.open(data['image'])
-                # icon = Image.open(data['image'])
+                # icon = ImageTk.PhotoImage(img)
                 # print(icon)
                 # Icon not reflecting as of now, causing the "menu" to not be visible
                 # This is a known error

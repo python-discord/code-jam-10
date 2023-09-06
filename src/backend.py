@@ -53,7 +53,6 @@ class Palette:
         return self.palette.get(item, "?")
 
 
-
 class TypingColors:
     """The main backend object."""
 
