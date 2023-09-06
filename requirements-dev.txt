@@ -1,4 +1,4 @@
 # This file contains all the development requirements for our linting toolchain.
 # Don't forget to pin your dependencies!
 
-pre-commit~=3.3.3
+pre-commit~=3.4.0

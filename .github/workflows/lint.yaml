@@ -20,5 +20,12 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Install dependencies.
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
       - name: Run pre-commit hooks.
         uses: pre-commit/action@v3.0.0
