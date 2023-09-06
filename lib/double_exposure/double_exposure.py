@@ -1,6 +1,15 @@
 from PIL import Image
 
-def double_exposure(img1, img2, alpha=0.5):
+
+def double_exposure(img1: Image, img2: Image, alpha: float = 0.5) -> Image:
+    """
+    Blend two images together using alpha blending
+
+    :param img1: PIL Image
+    :param img2: PIL Image
+    :param alpha: int
+    :return:
+    """
     # Ensure img1 is the smaller image, or swap if necessary
     if img1.size[0] > img2.size[0] or img1.size[1] > img2.size[1]:
         img1, img2 = img2, img1

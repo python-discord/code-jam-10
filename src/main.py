@@ -1,12 +1,13 @@
-import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from pathlib import Path
+import sys
 
 from PyQt6.QtWidgets import QApplication
 
 from level import Level
 from window import Window
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 
 def main() -> None:
     """Main function"""
@@ -17,6 +18,7 @@ def main() -> None:
 
     window.show()
     sys.exit(app.exec())
+
 
 if __name__ == '__main__':
     main()

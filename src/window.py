@@ -1,12 +1,12 @@
-from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import (
-    QFrame, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QMainWindow,
-    QMessageBox, QPushButton, QStackedLayout, QWidget
+    QFrame, QGridLayout, QHBoxLayout, QLabel, QMainWindow, QMessageBox,
+    QStackedLayout, QWidget
 )
 
-from level import Level
 from dock import Dock
+from level import Level
 
 
 class Window(QMainWindow):
@@ -104,6 +104,5 @@ class Window(QMainWindow):
 
     def update_image_label(self) -> None:
         """Update the image label with the new image"""
-
         img = QPixmap(str(self.level.img_source)).scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio)
         self.img_label.setPixmap(img.scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio))

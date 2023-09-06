@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (
 
 class ControlPanel(QWidget):
     """Control Panel"""
+
     # Define a new signal at the top of the class
     controlValueChanged = pyqtSignal(str, int)
 
@@ -28,7 +29,14 @@ class ControlPanel(QWidget):
 
         layout.addStretch()
 
-    def forward_signal(self, label, value):
+    def forward_signal(self, label: str, value: int) -> None:
+        """
+        Forward the signal from the slider to the main window
+
+        :param label:
+        :param value:
+        :return:
+        """
         # Emit the new signal
         self.controlValueChanged.emit(label, value)
 

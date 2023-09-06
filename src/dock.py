@@ -1,10 +1,15 @@
-from PIL import Image, ImageQt
+from typing import Callable
+
 from PyQt6.QtCore import QSize, pyqtSignal
-from PyQt6.QtGui import QIcon, QPixmap, QImage
-from PyQt6.QtWidgets import (QHBoxLayout, QPushButton, QWidget, QFrame,
-                             QLabel, QLineEdit, QStackedLayout)
+from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtWidgets import (
+    QFrame, QHBoxLayout, QLabel, QLineEdit, QPushButton, QStackedLayout,
+    QWidget
+)
 
 from filter import apply_filter
+from src.level import Level
+
 
 class Dock(QWidget):
     """Dock"""
@@ -12,7 +17,7 @@ class Dock(QWidget):
     # Define a new signal at the top of the class
     controlValueChanged = pyqtSignal(str, int)
 
-    def __init__(self, level, image_label, update_secret_code_callback):
+    def __init__(self, level: Level, image_label: QLabel, update_secret_code_callback: Callable) -> None:
         super().__init__()
 
         self.level = level
@@ -25,7 +30,7 @@ class Dock(QWidget):
             control_panel.controlValueChanged.connect(
                 lambda label, value, cp=control_panel: self.update_image_label(
                     apply_filter(
-                        self.level, cp.title, {
+                        cp.title, {
                             "img_path": self.level.filters[0],
                             "slider_label": label,
                             "slider_value": value,
@@ -103,7 +108,6 @@ class Dock(QWidget):
 
     def _create_filters(self) -> QHBoxLayout:
         """Create and return the filters layout"""
-
         layout = QHBoxLayout()
 
         for filter_item in self.level.filters:
@@ -128,12 +132,21 @@ class Dock(QWidget):
         return layout
 
     def _change_tab(self, index: int) -> None:
-        """Change the current index of the tabbed controls layout"""
+        """
+        Change the tabbed controls to the selected index
+
+        :param index:
+        :return:
+        """
         layout = self._create_tabbed_controls()
         layout.setCurrentIndex(index)
 
-    def update_image_label(self, new_image: QImage):
-        pixmap = QPixmap.fromImage(new_image)
+    def update_image_label(self, new_image: QPixmap) -> None:
+        """
+        Update the image label with a new image
 
+        :param new_image:
+        :return:
+        """
         # Update the label
-        self.img_label.setPixmap(pixmap)
+        self.img_label.setPixmap(new_image)

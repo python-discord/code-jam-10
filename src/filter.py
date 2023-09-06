@@ -1,4 +1,3 @@
-from PIL import Image
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import (
@@ -38,10 +37,23 @@ class Filter(QWidget):
 
         layout.addStretch()
 
-    def _on_slider_value_changed(self, label, value):
+    def _on_slider_value_changed(self, label: str, value: int) -> None:
+        """
+        Forward the signal from the slider to the main window
+
+        :param label:
+        :param value:
+        :return:
+        """
         self.sliderValueChanged.emit(label, value)
 
-    def get_slider_value(self, label):
+    def get_slider_value(self, label: str) -> int:
+        """
+        Get the value of a slider
+
+        :param label:
+        :return:
+        """
         return self.sliders[label].value()
 
     @staticmethod
@@ -95,7 +107,7 @@ class Filter(QWidget):
         return slider_frame
 
 
-def apply_filter(level, filter_name, args: dict) -> QPixmap:
+def apply_filter(filter_name: str, args: dict) -> QPixmap:
     """
     Apply a filter to an image
 
@@ -109,4 +121,3 @@ def apply_filter(level, filter_name, args: dict) -> QPixmap:
         return new_img
 
     pass
-
