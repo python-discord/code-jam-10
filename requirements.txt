@@ -1,2 +1,5 @@
 # This file contains all the dependencies required to run the project.
 # Don't forget to pin your dependencies!
+
+Pillow~=10.0.0
+numpy~=1.25.2
