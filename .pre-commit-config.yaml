@@ -24,11 +24,12 @@ repos:
     hooks:
       - id: pyright
 
-  - repo: local
-    hooks:
-      - id: pytest-check
-        name: pytest-check
-        entry: pytest
-        language: system
-        pass_filenames: false
-        always_run: true
+# TODO: figure out a way to get this working on github CI :(
+#  - repo: local
+#    hooks:
+#      - id: pytest-check
+#        name: pytest-check
+#        entry: pytest
+#        language: system
+#        pass_filenames: false
+#        always_run: true
