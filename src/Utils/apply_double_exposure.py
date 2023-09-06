@@ -4,10 +4,10 @@ from PIL import Image
 from PyQt6.QtCore import QBuffer
 from PyQt6.QtGui import QImage
 
-from lib.double_exposure.double_exposure import create_double_exposure
+from lib.double_exposure.double_exposure import double_exposure
 
 
-def apply_double_exposure(img1, img2, slider_value):
+def apply_double_exposure(img1, img2, slider_value) -> QImage:
     """
     Apply double exposure to an image
 
@@ -21,17 +21,18 @@ def apply_double_exposure(img1, img2, slider_value):
     img1 = Image.open(img1_path)
 
     # Get img2 from path and load as Image
-    img2_path = str(img2[0])
+    img2_path = str(img2)
     img2 = Image.open(img2_path)
 
     # Convert slider value to float between 0 and 1
     slider_value = slider_value / 100
 
     # Apply double exposure
-    pil_img = create_double_exposure(img1, img2, slider_value)
+    pil_img = double_exposure(img1, img2, slider_value)
 
     # Convert PIL Image to QPixMap
     qimage = QImage(pil_img.tobytes(), pil_img.width, pil_img.height, QImage.Format.Format_RGB888)
+
     return qimage
 
 

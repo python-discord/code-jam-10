@@ -99,4 +99,11 @@ class Window(QMainWindow):
             msg_box.exec()
 
             self.level.level_number += 1
+            self.update_image_label()
             self.setWindowTitle(f'{self.window_name} - Level {self.level.level_number}')
+
+    def update_image_label(self) -> None:
+        """Update the image label with the new image"""
+
+        img = QPixmap(str(self.level.img_source)).scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio)
+        self.img_label.setPixmap(img.scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio))

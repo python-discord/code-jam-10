@@ -20,9 +20,8 @@ class Dock(QWidget):
         self.img_label = image_label
         self.filters = []
 
-        for _, filter_item in self.level.filters:
+        for _, filter_item, args in self.level.filters:
             control_panel = filter_item
-            print(control_panel.title)
             control_panel.controlValueChanged.connect(
                 lambda label, value, cp=control_panel: self.update_image_label(
                     apply_filter(
@@ -30,7 +29,8 @@ class Dock(QWidget):
                             "img_path": self.level.filters[0],
                             "slider_label": label,
                             "slider_value": value,
-                            "img_to_edit": self.level.img_source,
+                            "image_to_edit": self.level.img_source,
+                            "second_image": args["second_image"]
                         }
                     )
                 )

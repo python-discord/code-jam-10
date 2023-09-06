@@ -51,6 +51,7 @@ class Level:
         # This can be extended to provide filters dynamically based on the level
 
         icons_dir_path = Path(Path(__file__).parent, 'icons')
+        image_dir_path = Path(Path(__file__).parent, 'images')
         if self.level_number == 1:
             filters = [
                 (
@@ -60,6 +61,7 @@ class Level:
                         [('X', (0, 100), Qt.Orientation.Horizontal),
                          ('Y', (0, 100), Qt.Orientation.Horizontal)]
                     ),
+                    {"second_image": Path(image_dir_path, 'desert.jpg')}
                 ),
                 (
                     Path(icons_dir_path, 'button_sample2.png'),
@@ -67,6 +69,7 @@ class Level:
                         'Double Exposure',
                         [('Exposure', ('Image 1', 'Image 2'), Qt.Orientation.Horizontal)]
                     ),
+                    {"second_image": Path(image_dir_path, 'desert.jpg')}
                 ),
                 (
                     Path(icons_dir_path, 'button_sample3.png'),
@@ -76,6 +79,7 @@ class Level:
                          ('Gap', (0, 100), Qt.Orientation.Horizontal),
                          ('Wave Height', (0, 100), Qt.Orientation.Horizontal)]
                     ),
+                    {"second_image": Path(image_dir_path, 'desert.jpg')}
                 )
             ]
             return filters
@@ -90,6 +94,7 @@ class Level:
                             ('Y', (0, 100), Qt.Orientation.Horizontal)
                         ]
                     ),
+                    {}
                 ),
                 (
                     Path(icons_dir_path, 'button_sample2.png'),
@@ -97,6 +102,7 @@ class Level:
                         'Double Exposure',
                         [('Exposure', ('Image 1', 'Image 2'), Qt.Orientation.Horizontal)]
                     ),
+                    {}
                 ),
                 (
                     Path(icons_dir_path, 'button_sample3.png'),
@@ -108,6 +114,7 @@ class Level:
                             ('Wave Height', (0, 100), Qt.Orientation.Horizontal)
                         ]
                     ),
+                    {}
                 )
             ]
 

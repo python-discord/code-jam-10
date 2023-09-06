@@ -104,11 +104,8 @@ def apply_filter(level, filter_name, args: dict) -> QPixmap:
     :param args:
     :return: img
     """
-    print("Type of args: ", type(args))
-    print("Args: ", args)
-
     if filter_name == "Double Exposure":
-        new_img = apply_double_exposure(args["img_to_edit"], args["img_path"], args["slider_value"])
+        new_img = apply_double_exposure(args["image_to_edit"], args["second_image"], args["slider_value"])
         return new_img
 
     pass
