@@ -5,8 +5,8 @@ from PyQt6.QtWidgets import (
     QStackedLayout, QWidget
 )
 
-from dock import Dock
-from level import Level
+from src.dock import Dock
+from src.level import Level
 
 
 class Window(QMainWindow):

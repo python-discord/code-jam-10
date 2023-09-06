@@ -1,12 +1,9 @@
-import os
 import sys
 
 from PyQt6.QtWidgets import QApplication
 
-from level import Level
-from window import Window
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from src.level import Level
+from src.window import Window
 
 
 def main() -> None:
@@ -18,7 +15,3 @@ def main() -> None:
 
     window.show()
     sys.exit(app.exec())
-
-
-if __name__ == '__main__':
-    main()

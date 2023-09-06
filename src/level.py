@@ -2,7 +2,7 @@ from pathlib import Path
 
 from PyQt6.QtCore import Qt
 
-from control_panel import ControlPanel
+from src.control_panel import ControlPanel
 
 
 class Level:

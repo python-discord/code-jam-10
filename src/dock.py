@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import (
     QWidget
 )
 
-from filter import apply_filter
+from src.filter import apply_filter
 from src.level import Level
 
 
