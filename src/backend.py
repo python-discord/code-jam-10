@@ -10,38 +10,48 @@ PRINTABLE = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%
 class Palette:
     """Pallete object to map chars to colours"""
 
+    palette = {" ": (0, 0, 0, 0), (0, 0, 0, 0): " "}
+
     def __init__(self, key: str = None):
         """Maps all characters to colours using the key"""
-        self.palette = {' ': (0, 0, 0, 0)}
-        self.rgbtocol = {(0, 0, 0, 0): ' '}
-
         if not key:
-            key = ''.join(choices(PRINTABLE, k=16))
-        self.keylen = len(key) * 8
+            key = "".join(choices(PRINTABLE, k=16))
+        if not (3 < len(key) < 25):
+            raise ValueError("key should be between 4 and 24 characters")
+
+        # self.keylen = len(key) * 8
         self.key = self._generate_key(key)
+        # print(self.key)
 
         for n, char in enumerate(PRINTABLE):  # generate pallete
-            val = (self.key * (n ** self.keylen)) % (255*255*255*64)
-            r, g, b, a = (val & 255), (val >> 8) & 255, (val >> 16) & 255, (val >> 20) & 63
-            color = (r, g, b, 255-a)
+            val = self.key + n**n  # * (n**self.keylen)  # % (255 * 255 * 255 * 64)
+            # print(val)
+            r, g, b, a = (
+                (val & 255),
+                (val >> 8) & 255,
+                (val >> 16) & 255,
+                (val >> 20) & 63,
+            )
+            # print(r, g, b, a)
+            color = (r, g, b, 255 - a)
             self.palette[char] = color
-            self.rgbtocol[color] = char
+            self.palette[color] = char
 
     def _generate_key(self, key):
         """Generates a int key from the string"""
         if not key:
             raise ValueError("String for encryption cannot be empty")
-        return int.from_bytes(key.encode(), 'little')
+        return int.from_bytes(key.encode(), "little")
 
     def __getitem__(self, item):
         """Returns the color from char/char from color"""
-        if item in self.palette:  # char to colour
-            return self.palette[item]
-        if item in self.rgbtocol:  # colour to char
-            return self.rgbtocol[item]
-        if isinstance(item, str):  # unknown char (like emoji)
-            return self.palette['?']
-        raise KeyError  # invalid decryption
+        if type(item) not in (
+            str,
+            tuple,  # will not work if the color is specified as ndarray
+        ):
+            raise KeyError  # invalid decryption
+        return self.palette.get(item, "?")
+
 
 
 class TypingColors:
