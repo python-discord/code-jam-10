@@ -14,6 +14,14 @@ class Level:
         self.img_source = self.get_image_source()
         self.filters = self.get_filters()
 
+    def set_level(self, level_number: int):
+        image_dir_path = Path(Path(__file__).parent, 'images')
+
+        self.level_number = level_number
+        self.img_source = Path(image_dir_path, 'clockwork.jpg')
+        self.secret_answer = self.get_secret_answer()
+        self.filters = self.get_filters()
+
     def get_image_source(self) -> Path:
         """
         Get the image source for the level
