@@ -45,6 +45,5 @@ class ImageLabel(tk.Label):
                 self.config(image=next(self.frames))
                 self.after(self.delay, self.next_frame)
             except StopIteration:
-                print("Hey")
                 if self.after_exec:
                     self.after_exec()
