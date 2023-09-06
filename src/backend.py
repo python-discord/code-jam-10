@@ -2,7 +2,7 @@ from difflib import ndiff
 from io import BytesIO
 from random import choices
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageTk
 
 PRINTABLE = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~\t'
 
@@ -159,3 +159,8 @@ class TypingColors:
         size = (self.ar_width * scale_factor, self.ar_height * scale_factor)
         self.canvas.resize(size, Image.BOX).save(bio, format='PNG')
         return bio.getvalue()
+
+    def img_tk(self, scale_factor=35):
+        """Same as img_scaled but for tkinter"""
+        size = (self.ar_width * scale_factor, self.ar_height * scale_factor)
+        return ImageTk.PhotoImage(self.canvas.resize(size, Image.BOX))
