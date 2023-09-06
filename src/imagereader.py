@@ -1,17 +1,23 @@
 import collections
-from typing import Tuple
+from typing import NamedTuple, Tuple
 
 import numpy as np
 from PIL import Image
 
 
+class CodelInfo(NamedTuple):
+    size: int
+    pixels: tuple
+    color: tuple
+
+
 class Reader:
     def __init__(self, im: Image.Image) -> None:
         self.im_rgb = im.convert("RGB")
-        self.current = self.im_rgb.getpixel((0, 0))
+        # self.current = self.im_rgb.getpixel((0, 0))
 
-    def color_block_size(self, pos: tuple[int, int]):
-        "returns size of a color block, given a codel in a color block with position [row, column]"
+    def codel_info(self, pos: tuple[int, int]) -> CodelInfo:
+        "returns information about the codel that contains pos(y,x)"
         im = self.im_rgb
         y, x = pos
         im_array = np.asarray(im)
@@ -39,7 +45,8 @@ class Reader:
                     visited.add((r, c))
                     size += 1
 
-        return size
+        flipped_pos: Tuple[int, int] = tuple(np.flip(pos))  # type: ignore
+        return CodelInfo(size, tuple(visited), self.im_rgb.getpixel(flipped_pos))
 
     def smallest_codel(self) -> int:
         "returns side-length in pixels of the smallest codel"
