@@ -1,6 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont
 from typing import Tuple
 import numpy as np
+from pathlib import Path
 
 
 def generate_image(alphanumeric: str, difficulty: int) -> Image.Image:
@@ -31,7 +32,7 @@ def generate_image(alphanumeric: str, difficulty: int) -> Image.Image:
     # Draw the character in black on the image
     draw.text(offset, alphanumeric, fill="black", font=font, spacing=0)
     binary_image = image.point(lambda p: 255 if p > 128 else 0)
-    binary_image.save(f"{alphanumeric}.png")
+    binary_image.save(Path(f"images/xor_mask/{alphanumeric}.png"))
     return binary_image
 
 
@@ -86,12 +87,6 @@ def generate_xor_pair(image: Image.Image, alphanumeric: str) -> Tuple[Image.Imag
     image2 = Image.fromarray(image2_array)
     
     # Save the two new images
-    image1.save(f"{alphanumeric}_1.png")
-    image2.save(f"{alphanumeric}_2.png")
+    image1.save(Path(f"images/xor_mask/{alphanumeric}_1.png"))
+    image2.save(f"images/xor_mask/{alphanumeric}_2.png")
     return image1, image2
-
-
-if __name__ == "__main__":
-    for c in "PYTHON":
-        c_img = generate_image(c, 2)
-        generate_xor_pair(c_img, c)
