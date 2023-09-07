@@ -2,9 +2,7 @@ import numpy as np
 from PIL import Image
 
 from backend.typingcolors import TypingColors
-from random import choices
-
-PRINTABLE = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\t"
+from gui.modules import *
 
 
 class Palette:
@@ -29,10 +27,7 @@ class Palette:
             self.palette[color] = char
 
     def _generate_key(self, key):
-        """Generates a int key from the string"""
-        if key == "":
-            key = ''.join(choices(PRINTABLE, k=16))
-            print(key)
+        """Generates a int key from the string"""        
         return int.from_bytes(key.encode(), "little")
 
     def __getitem__(self, item):

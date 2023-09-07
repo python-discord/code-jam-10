@@ -2,9 +2,9 @@ from tkinter import *
 from gui.modules import *
 
 
-class SteganographyWin(Tk):
-    """Window for steganography"""
+class DecryptWin(Tk):
+    """Window for decryption"""
 
     def __init__(self):
         """Creates the layout"""
-        print("Steganography")
+        print("Decrypt")

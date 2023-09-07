@@ -1,18 +1,15 @@
 from tkinter import *
 from tkinter import filedialog as fd
+from random import choices
 
 from backend.typingcolors import TypingColors
 from backend.typingcolors_utils import typingcolors_load
-from gui.modules import ImageLabel
+from gui.modules import *
 from gui.win_steganography import SteganographyWin
 from gui.win_typingcolors import TypingColorsWin
 
 WIN_W, WIN_H = (800, 600)
 POP_W, POP_H = (400, 300)
-DARK_GRAY, GRAY = "#222831", "#393E46"
-AQUA, WHITE = "#00ADB5", "#EEEEEE"
-RED, GREEN = "#cd0000", "#1BAA4A"
-BRIGHT_RED = "#ff0000"
 
 
 class GUI(Tk):
@@ -22,17 +19,6 @@ class GUI(Tk):
         """Initializes variables and window"""
         # Creates the window
         super().__init__()
-
-    def center(self, root: Tk):
-        """Centers a tkinter window"""
-        root.update_idletasks()
-        width = root.winfo_screenwidth()
-        height = root.winfo_screenheight()
-        x = int((width - WIN_W) / 2)
-        y = int(
-            (height - WIN_H) / 3
-        )  # A bit off center to align it well with the taskbar
-        root.geometry(f"+{x}+{y}")
 
     def callback(self, callback: callable, destroy: list[Widget] = None, *args):
         """Callback a function while destroying existing widgets"""
@@ -49,7 +35,7 @@ class GUI(Tk):
         """The starting page for the application"""
         self.title("Pixel Studios")
         self.geometry(f"{WIN_W}x{WIN_H}")
-        self.center(self)
+        center(self, WIN_W, WIN_H)
 
         gif = ImageLabel(self)
         gif.configure(bd=0, highlightbackground=None)
@@ -63,7 +49,7 @@ class GUI(Tk):
             loading.load(
                 "assets\\imgs\\loading.gif",
                 False,
-                lambda: self.callback(self.create_main_window, [loading, gif]),
+                lambda: callback(self.create_main_window, [loading, gif]),
             )
 
         gif.load("assets\\imgs\\title.gif", False, lambda: loading_animation(self))
@@ -159,14 +145,17 @@ class GUI(Tk):
     def check_key(self, encrypt: bool, mode: int = 0):
         """Checks if key length is between 4 and 24, and then opens the encrypt/decrypt page"""
         key = self.key.get(1.0, "end-1c")
-        if 4 <= len(key) <= 24 or len(key) == 0:
+        if not (4 <= len(key) <= 24 or len(key) == 0):
+            self.key.configure(bg=RED, fg=WHITE)
+            self.error.configure(text="Key must be between 4 and 24 characters long")
+        elif " " in key:
+            self.key.configure(bg=RED, fg=WHITE)
+            self.error.configure(text="Key can't contain whitespaces")
+        else:
             if encrypt:
                 self.encrypt(key, mode)
             else:
                 self.decrypt(key)
-        else:
-            self.key.configure(bg=RED, fg=WHITE)
-            self.error.configure(text="Key must be between 4 and 24 characters long")
 
     def encrypt(self, key: str = None, mode: int = 0):
         """Opens the encryption page with the secret key"""
@@ -174,8 +163,10 @@ class GUI(Tk):
         # Mode 1 is for Masked Image
         if mode == 0:
             self.typingColors = TypingColors()
+            if len(key) == 0:
+                key = ''.join(choices(PRINTABLE.replace("\t", ""), k=16))
             self.typingColors.set_encryption(key)
-            self.callback(lambda: TypingColorsWin(self, self.typingColors), [self.main])
+            callback(lambda: TypingColorsWin(self, self.typingColors, key), [self.main])
             # self.typingColorsWin = TypingColorsWin(self.typingColors)
         else:
             self.steganographyWin = SteganographyWin()
