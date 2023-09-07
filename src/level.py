@@ -25,14 +25,14 @@ class Level:
         :return: Path of the image file
         """
         # This can be extended to retrieve images dynamically based on the level
-        image_dir_path = Path(Path(__file__).parent, 'images')
+        image_dir_path = Path(Path(__file__).parent, "images")
         if self.level_number == 1:
-            return Path(image_dir_path, 'sample.png')
+            return Path(image_dir_path, "sample.png")
         if self.level_number == 2:
-            return Path(image_dir_path, 'clockwork.jpg')
+            return Path(image_dir_path, "clockwork.jpg")
         if self.level_number == 3:
-            return Path(image_dir_path, 'desert.png')
-        return Path(image_dir_path, 'default.png')
+            return Path(image_dir_path, "desert.png")
+        return Path(image_dir_path, "default.png")
 
     def get_secret_answer(self) -> str:
         """
@@ -42,12 +42,12 @@ class Level:
         """
         # This can be extended to provide answers dynamically based on the level
         if self.level_number == 1:
-            return 'secret'
+            return "secret"
         if self.level_number == 2:
-            return 'secret2'
+            return "secret2"
         if self.level_number == 3:
-            return 'Very secret'
-        return 'pythoncodejam2023'
+            return "Very secret"
+        return "pythoncodejam2023"
 
     def get_filters(self) -> FilterList:
         """
@@ -57,8 +57,8 @@ class Level:
         """
         # This can be extended to provide filters dynamically based on the level
 
-        icons_dir_path = Path(Path(__file__).parent, 'icons')
-        image_dir_path = Path(Path(__file__).parent, 'images')
+        icons_dir_path = Path(Path(__file__).parent, "icons")
+        image_dir_path = Path(Path(__file__).parent, "images")
         filters = [
             [
                 (
@@ -76,7 +76,13 @@ class Level:
                     Path(icons_dir_path, "button_sample2.png"),
                     ControlPanel(
                         "Double Exposure",
-                        [("Exposure", ("Image 1", "Image 2"), Qt.Orientation.Horizontal)],
+                        [
+                            (
+                                "Exposure",
+                                ("Image 1", "Image 2"),
+                                Qt.Orientation.Horizontal,
+                            )
+                        ],
                     ),
                     {"second_image": Path(image_dir_path, "desert.jpg")},
                 ),
@@ -109,7 +115,13 @@ class Level:
                     Path(icons_dir_path, "button_sample2.png"),
                     ControlPanel(
                         "Double Exposure",
-                        [("Exposure", ("Image 1", "Image 2"), Qt.Orientation.Horizontal)],
+                        [
+                            (
+                                "Exposure",
+                                ("Image 1", "Image 2"),
+                                Qt.Orientation.Horizontal,
+                            )
+                        ],
                     ),
                     {"second_image": Path(image_dir_path, "doggo.jpg")},
                 ),
@@ -125,6 +137,6 @@ class Level:
                     ),
                     {"second_image": Path(image_dir_path, "doggo.jpg")},
                 ),
-            ]
+            ],
         ]
-        return filters[self.level_number-1]
+        return filters[self.level_number - 1]
