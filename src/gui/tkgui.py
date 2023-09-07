@@ -1,13 +1,10 @@
-import tkinter as tk  # noqa: F401
+import tkinter as tk
 from tkinter import *  # noqa: F403
 
-from PIL import Image, ImageTk  # noqa: F401
-
-import loadsave  # noqa: F401
-from backend import TypingColors
-from menu import new_file, open_file, save_file, save_file_as  # noqa: F401
-# from tkinter import PhotoImage, Frame, Button, Label, Menu, Tk, Text, OptionMenu, StringVar  # noqa: F401
-from modules import ImageLabel  # noqa: F401
+from backend.typingcolors import TypingColors
+from backend.typingcolors_utils import load
+from gui.layouts import SteganographyWin, TypingColorsWin
+from gui.modules import ImageLabel
 
 WIN_W, WIN_H = (800, 600)
 POP_W, POP_H = (400, 300)
@@ -22,18 +19,11 @@ class GUI:
 
     def __init__(self):
         """Initializes variables and window"""
-        # To delay invoking image updation when the user is continuously typing
-        self.last_time = 0
-        self.interval = 0.6
-        self.UPDATE_FLAG = False
-
         self.file = None  # Opened files
 
         # Creates the window
         self.root = Tk()
         self.loading_screen()
-        # self.create_main_window([])
-        self.ask_key()
 
     def center(self, root: Tk):
         """Centers a tkinter window"""
@@ -50,10 +40,6 @@ class GUI:
             for i in destroy:
                 i.destroy()
         callback(*args)
-
-    def ask_key(self):
-        """Asks For encryption key from the user"""
-        pass
 
     # function to create the place to write text to create image
 
@@ -83,76 +69,8 @@ class GUI:
         self.root.configure(background=DARK_GRAY)
         self.root.mainloop()
 
-    def create_menu_bar(self):
-        """Packs the menu bar for the application"""
-        file_layout = {
-            "New": {
-                "command": "",
-                "image": "assets\\imgs\\new.png",
-                "accelerator": "Ctrl+N",
-            },
-            "Open": {
-                "command": "",
-                "image": "assets\\imgs\\open.png",
-                "accelerator": "Ctrl+O",
-            },
-            "Save": {
-                "command": "",
-                "image": "assets\\imgs\\save.png",
-                "accelerator": "Ctrl+S",
-            },
-            "Save As  ": {
-                "command": "",
-                "image": "assets\\imgs\\save_as.png",
-                "accelerator": "Ctrl+Shift+S",
-            },
-            "---": "",
-            "Exit": {
-                "command": tk.Frame.destroy,
-                "image": "assets\\imgs\\exit.png",
-                "accelerator": "Alt+F4",
-            },
-        }
-        config_layout = ["Set Key"]
-
-        # Main Menu Bar
-        menubar = Menu(self.root, tearoff=0, font=("Consolas", 12))
-        # File Menu Bar
-        fileMenu = Menu(self.root, tearoff=0, cursor="hand1", font=("Consolas", 10))
-        menubar.add_cascade(label="File", menu=fileMenu)
-        for name, data in file_layout.items():
-            if name == "---":
-                fileMenu.add_separator()
-            else:
-                # img = Image.open(data['image'])
-                # icon = ImageTk.PhotoImage(img)
-                # print(icon)
-                # Icon not reflecting as of now, causing the "menu" to not be visible
-                # This is a known error
-                fileMenu.add_command(
-                    label=name,
-                    command=data["command"],
-                    accelerator=data["accelerator"],
-                    #  image=icon,
-                    compound="left",
-                    activeforeground=WHITE,
-                    activebackground=GRAY,
-                )
-
-        configMenu = Menu(self.root, tearoff=0)
-        menubar.add_cascade(label="Config", menu=configMenu)
-        for item in config_layout:
-            configMenu.add_command(
-                label=item,
-                activeforeground=WHITE,
-                activebackground=GRAY,
-            )
-        self.root.configure(background=DARK_GRAY, menu=menubar)
-
     def create_main_window(self):
         """Creates The Main Window Page for the application"""
-        self.create_menu_bar()
-
         # The Main Input Frame:
         main = Frame(self.root, bg=DARK_GRAY)
         main.place(relx=0.5, rely=0.5, anchor="center")
@@ -174,16 +92,6 @@ class GUI:
         )
         self.key.pack()
 
-        random = Label(
-            input,
-            text="Note: You can keep it empty for a random key",
-            font=("Consolas", 10, "italic"),
-            bg=DARK_GRAY,
-            fg=WHITE,
-            pady=2,
-        )
-        random.pack()
-
         self.error = Label(
             input,
             text="",
@@ -195,7 +103,7 @@ class GUI:
         self.error.pack()
 
         # Encrypt / Decrypt Buttons Frame:
-        buttons = Frame(main, background=DARK_GRAY, pady=50)
+        buttons = Frame(main, background=DARK_GRAY, pady=15)
 
         # Encrypt OptionMenu
         method = StringVar()
@@ -249,9 +157,8 @@ class GUI:
 
     def check_key(self, encrypt: bool, mode: int = 0):
         """Checks if key length is between 4 and 24, and then opens the encrypt/decrypt page"""
-        print(encrypt, mode)
         key = self.key.get(1.0, "end-1c")
-        if 4 <= len(key) <= 24 or len(key) == 0:
+        if 4 <= len(key) <= 24:
             if encrypt:
                 self.encrypt(key, mode)
             else:
@@ -259,65 +166,21 @@ class GUI:
         else:
             self.key.configure(bg=RED, fg=WHITE)
             self.error.configure(
-                text="Key must be between 4 and 24 characters long (or empty)"
+                text="Key must be between 4 and 24 characters long"
             )
 
     def encrypt(self, key: str = None, mode: int = 0):
         """Opens the encryption page with the secret key"""
         # Mode 0 is for Typing Colors
         # Mode 1 is for Masked Image
-        self.root.grid_columnconfigure(0, weight=0)
-        self.root.grid_columnconfigure(1, weight=1)
         self.typingColors = TypingColors()
         self.typingColors.set_encryption(key)
 
-        self.text = Text(
-            self.root,
-            width=30,
-            height=15,
-            bg=DARK_GRAY,
-            fg="white",
-            font=("Consolas", 14),
-        )
-        self.text.grid(row=0, column=0)
-        self.canvas = tk.Label(
-            self.root, image=self.typingColors.img_tk(), bg=DARK_GRAY
-        )
-        self.canvas.grid(row=0, column=1, sticky="ne")
-        self._typingcolors_update("")
-        # self.typingColors.save("test.png")
-        # self.create_image_window("test.png")
+        self.typingColorsWin = TypingColorsWin(self.typingColors)
 
     def decrypt(self, key: str = None):
         """Opens the decryption page with the secret key"""
+        self.typingColors = TypingColors()
         self.typingColors.set_encryption(key)
 
-    def _typingcolors_update(self, prev_txt):
-        """Update loop for typingcolours"""
-        txt = self.text.get("1.0", "end")
-        if txt != prev_txt:  # only update if text changed
-            self.typingColors.update(txt)
-            img = self.typingColors.img_tk()
-            self.canvas.configure(image=img)
-            self.canvas.image = img
-        self.root.after(50, lambda: self._typingcolors_update(txt))
-
-    # def main_typingcolors(self):
-    #     """Main function for typingcolours layout"""
-    #     self.root.grid_columnconfigure(0, weight=0)
-    #     self.root.grid_columnconfigure(1, weight=1)
-    #     self._typingcolors_makemenu()
-
-    #     self.typingColors = TypingColors()
-    #     self.typingColors.set_encryption(self.keylabel.get())
-
-    #     self.text = Text(self.root, width=30, height=15, bg=DARK_GRAY, fg='white', font=("Consolas", 14))
-    #     self.text.grid(row=0, column=0)
-    #     self.canvas = tk.Label(self.root, image=self.typingColors.img_tk(), bg=DARK_GRAY)
-    #     self.canvas.grid(row=0, column=1, sticky='ne')
-    #     self._typingcolors_update('')
-
-
-if __name__ == "__main__":
-    gui = GUI()
-    # gui.create_main_window()
+        self.typingColorsWin = TypingColorsWin(self.typingColors)

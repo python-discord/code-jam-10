@@ -1,56 +1,8 @@
 from difflib import ndiff
-from io import BytesIO
-from random import choices
 
 from PIL import Image, ImageDraw, ImageTk
 
-PRINTABLE = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~\t'
-
-
-class Palette:
-    """Pallete object to map chars to colours"""
-
-    palette = {" ": (0, 0, 0, 0), (0, 0, 0, 0): " "}
-
-    def __init__(self, key: str = None):
-        """Maps all characters to colours using the key"""
-        if not key:
-            key = "".join(choices(PRINTABLE, k=16))
-        if not (3 < len(key) < 25):
-            raise ValueError("key should be between 4 and 24 characters")
-
-        # self.keylen = len(key) * 8
-        self.key = self._generate_key(key)
-        # print(self.key)
-
-        for n, char in enumerate(PRINTABLE):  # generate pallete
-            val = self.key + n**n  # * (n**self.keylen)  # % (255 * 255 * 255 * 64)
-            # print(val)
-            r, g, b, a = (
-                (val & 255),
-                (val >> 8) & 255,
-                (val >> 16) & 255,
-                (val >> 20) & 63,
-            )
-            # print(r, g, b, a)
-            color = (r, g, b, 255 - a)
-            self.palette[char] = color
-            self.palette[color] = char
-
-    def _generate_key(self, key):
-        """Generates a int key from the string"""
-        if not key:
-            raise ValueError("String for encryption cannot be empty")
-        return int.from_bytes(key.encode(), "little")
-
-    def __getitem__(self, item):
-        """Returns the color from char/char from color"""
-        if type(item) not in (
-            str,
-            tuple,  # will not work if the color is specified as ndarray
-        ):
-            raise KeyError  # invalid decryption
-        return self.palette.get(item, "?")
+import backend
 
 
 class TypingColors:
@@ -66,8 +18,6 @@ class TypingColors:
         self.ar_width, self.ar_height = self.size  # aspecct ratio
         self.width, self.height = self.size
         self.canvas_drawer = ImageDraw.Draw(self.canvas)
-        self.palette = None  # will be set later
-        self.key = None
 
     def _idx2coord(self, idx):
         """
@@ -77,10 +27,10 @@ class TypingColors:
         """
         return [idx % self.width, idx // self.width]
 
-    def set_encryption(self, key: str = None):
+    def set_encryption(self, key: str):
         """Sets the encryption key"""
         self.key = key
-        self.palette = Palette(key)
+        self.palette = backend.typingcolors_utils.Palette(key)
 
     def update(self, new_text):
         """Makes changes to the image from the new text"""
@@ -162,14 +112,14 @@ class TypingColors:
 
         self.text = text  # update old to new text
 
-    def img_scaled(self, scale_factor=35):  # size around half the gui window
-        """Returns scaled PNG bytes of image for GUI"""
-        bio = BytesIO()
-        size = (self.ar_width * scale_factor, self.ar_height * scale_factor)
-        self.canvas.resize(size, Image.BOX).save(bio, format='PNG')
-        return bio.getvalue()
+    # def img_scaled(self, scale_factor=35):  # size around half the gui window
+    #     """Returns scaled PNG bytes of image for GUI"""
+    #     bio = BytesIO()
+    #     size = (self.ar_width * scale_factor, self.ar_height * scale_factor)
+    #     self.canvas.resize(size, Image.BOX).save(bio, format='PNG')
+    #     return bio.getvalue()
 
-    def img_tk(self, scale_factor=35):
-        """Same as img_scaled but for tkinter"""
+    def img_scaled(self, scale_factor=35):
+        """Returns scaled TkImage for GUI"""
         size = (self.ar_width * scale_factor, self.ar_height * scale_factor)
         return ImageTk.PhotoImage(self.canvas.resize(size, Image.BOX))

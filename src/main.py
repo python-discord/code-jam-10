@@ -1,5 +1,5 @@
-from tkgui import GUI
+from gui.tkgui import GUI
 
 # run gui with canvas
 gui = GUI()
-gui.run()
+gui.root.mainloop()

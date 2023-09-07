@@ -4,9 +4,12 @@ from itertools import count, cycle
 from PIL import Image, ImageTk
 
 
-# Source: https://pythonprogramming.altervista.org/animate-gif-in-tkinter/
 class ImageLabel(tk.Label):
-    """A Label that displays images, and plays them if they are gifs"""
+    """
+    A Label that displays images, and plays them if they are gifs
+
+    Source: Source: https://pythonprogramming.altervista.org/animate-gif-in-tkinter/
+    """
 
     def load(self, im: str, repeat: bool = False, after_exec=None):
         """Loads an image"""
