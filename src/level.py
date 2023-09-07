@@ -1,8 +1,12 @@
 from pathlib import Path
+from typing import Dict, List, Tuple
 
 from PyQt6.QtCore import Qt
 
 from src.control_panel import ControlPanel
+
+FilterItem = Tuple[Path, ControlPanel, Dict[str, Path]]
+FilterList = List[FilterItem]
 
 
 class Level:
@@ -45,7 +49,7 @@ class Level:
             return 'Very secret'
         return 'pythoncodejam2023'
 
-    def get_filters(self) -> list:
+    def get_filters(self) -> FilterList:
         """
         Get the filters for the level
 
@@ -121,7 +125,6 @@ class Level:
                     ),
                     {"second_image": Path(image_dir_path, "doggo.jpg")},
                 ),
-            ],
-            []
+            ]
         ]
         return filters[self.level_number-1]

@@ -1,5 +1,6 @@
-from typing import Callable
 from pathlib import Path
+from typing import Callable
+
 from PyQt6.QtCore import QSize, pyqtSignal
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import (

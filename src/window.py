@@ -81,7 +81,6 @@ class Window(QMainWindow):
 
     def _update_secret_code(self, input_code: str) -> None:
         """Update the internal secret code and check against the answer."""
-
         if input_code != self.level.secret_answer:
             # If the input does not match the answer, show a notification
             msg_box = QMessageBox(self)
@@ -105,4 +104,3 @@ class Window(QMainWindow):
         """Update the image label with the new image"""
         img = QPixmap(str(self.level.img_source)).scaled(450, 450)
         self.img_label.setPixmap(img.scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio))
-
