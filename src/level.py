@@ -72,8 +72,8 @@ class Level:
                     Path(icons_dir_path, 'button_sample.png'),
                     ControlPanel(
                         'Image Differencing',
-                        [('X', (0, 100), Qt.Orientation.Horizontal),
-                         ('Y', (0, 100), Qt.Orientation.Horizontal)]
+                        [('X', (0, 20), Qt.Orientation.Horizontal),
+                         ('Y', (0, 20), Qt.Orientation.Horizontal)]
                     ),
                     {"second_image": Path(image_dir_path, 'desert.jpg')}
                 ),
@@ -89,9 +89,9 @@ class Level:
                     Path(icons_dir_path, 'button_sample3.png'),
                     ControlPanel(
                         'Motion Manipulation',
-                        [('Wavelength', (0, 100), Qt.Orientation.Horizontal),
-                         ('Gap', (0, 100), Qt.Orientation.Horizontal),
-                         ('Wave Height', (0, 100), Qt.Orientation.Horizontal)]
+                        [('Wavelength', (0, 20), Qt.Orientation.Horizontal),
+                         ('Gap', (0, 20), Qt.Orientation.Horizontal),
+                         ('Wave Height', (0, 20), Qt.Orientation.Horizontal)]
                     ),
                     {"second_image": Path(image_dir_path, 'desert.jpg')}
                 )
@@ -104,8 +104,8 @@ class Level:
                     ControlPanel(
                         'Image Differencing',
                         [
-                            ('X', (0, 100), Qt.Orientation.Horizontal),
-                            ('Y', (0, 100), Qt.Orientation.Horizontal)
+                            ('X', (0, 20), Qt.Orientation.Horizontal),
+                            ('Y', (0, 20), Qt.Orientation.Horizontal)
                         ]
                     ),
                     {}
@@ -123,9 +123,9 @@ class Level:
                     ControlPanel(
                         'Motion Manipulation',
                         [
-                            ('Wavelength', (0, 100), Qt.Orientation.Horizontal),
-                            ('Gap', (0, 100), Qt.Orientation.Horizontal),
-                            ('Wave Height', (0, 100), Qt.Orientation.Horizontal)
+                            ('Wavelength', (0, 20), Qt.Orientation.Horizontal),
+                            ('Gap', (0, 20), Qt.Orientation.Horizontal),
+                            ('Wave Height', (0, 20), Qt.Orientation.Horizontal)
                         ]
                     ),
                     {}

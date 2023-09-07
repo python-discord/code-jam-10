@@ -23,8 +23,11 @@ def apply_double_exposure(img1: tuple, img2: tuple, slider_value: int) -> QPixma
     img2_path = str(img2)
     img2 = Image.open(img2_path)
 
+    print(slider_value)
+
     # Convert slider value to float between 0 and 1
-    adjusted_slider_value = float(slider_value) / 100
+    adjusted_slider_value = float(slider_value*5) / 100
+    print(adjusted_slider_value)
 
     # Apply double exposure
     pil_img = double_exposure(img1, img2, adjusted_slider_value)

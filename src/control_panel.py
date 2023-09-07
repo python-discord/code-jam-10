@@ -22,6 +22,12 @@ class ControlPanel(QWidget):
             label, slider_range, orientation = info
             layout.addWidget(QLabel(label))
             slider = QSlider(orientation)
+            slider.setMinimum(0)
+            slider.setMaximum(20)
+            slider.setTickInterval(1)
+            slider.setSingleStep(1)  # arrow-key step-size
+            slider.setPageStep(1)  # mouse-wheel/page-key step-size
+            slider.setTickPosition(QSlider.TickPosition.TicksBelow)
             slider.valueChanged.connect(lambda value, lbl=label: self.forward_signal(lbl, value))
             slider_frame = self.style_slider(slider, slider_range, orientation == Qt.Orientation.Horizontal)
             slider_frame.setMaximumHeight(45)
