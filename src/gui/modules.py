@@ -77,9 +77,9 @@ def dynamic_menu_bar(root: tk.Tk, win: classmethod):
         root = Tk root object
         win = The class method to be called
     """
-    from gui.win_typingcolors import TypingColorsWin
-    from gui.win_steganography import SteganographyWin
     from gui.win_decrypt import DecryptWin
+    from gui.win_steganography import SteganographyWin
+    from gui.win_typingcolors import TypingColorsWin
 
     layouts = {
         "Import": {

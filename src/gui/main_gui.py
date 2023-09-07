@@ -1,15 +1,17 @@
+from pathlib import Path
+from random import choices
 from tkinter import *
 from tkinter import filedialog as fd
-from random import choices
 
 from backend.typingcolors import TypingColors
-from backend.typingcolors_utils import typingcolors_load
+from backend.utils import decrypt
 from gui.modules import *
 from gui.win_steganography import SteganographyWin
 from gui.win_typingcolors import TypingColorsWin
 
 WIN_W, WIN_H = (800, 600)
 POP_W, POP_H = (400, 300)
+IMGS = Path("assets") / "imgs"
 
 
 class GUI(Tk):
@@ -47,12 +49,12 @@ class GUI(Tk):
             loading.configure(bd=0, highlightbackground=None)
             loading.place(relx=0.5, rely=0.57, anchor="center")
             loading.load(
-                "assets\\imgs\\loading.gif",
+                IMGS / "loading.gif",
                 False,
                 lambda: callback(self.create_main_window, [loading, gif]),
             )
 
-        gif.load("assets\\imgs\\title.gif", False, lambda: loading_animation(self))
+        gif.load(IMGS / "title.gif", False, lambda: loading_animation(self))
         self.configure(background=DARK_GRAY)
         self.mainloop()
 
@@ -164,7 +166,7 @@ class GUI(Tk):
         if mode == 0:
             self.typingColors = TypingColors()
             if len(key) == 0:
-                key = ''.join(choices(PRINTABLE.replace("\t", ""), k=16))
+                key = "".join(choices(PRINTABLE.replace("\t", ""), k=16))
             self.typingColors.set_encryption(key)
             callback(lambda: TypingColorsWin(self, self.typingColors, key), [self.main])
             # self.typingColorsWin = TypingColorsWin(self.typingColors)
@@ -180,7 +182,7 @@ class GUI(Tk):
                 title="Select Image", filetypes=[("PNG", "*.png")]
             )
             try:
-                self.typingColors, decoded_text = typingcolors_load(filename, key)
+                self.typingColors, decoded_text = decrypt(filename, key)
             except KeyError:  # invalid decryption key
                 self.key.configure(bg=RED, fg=WHITE)
                 self.error.configure(text="Invalid secret key")

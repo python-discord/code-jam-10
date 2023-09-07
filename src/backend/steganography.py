@@ -12,10 +12,14 @@ class ExistingImage:
     """
 
     def __init__(
-        self, input_image: str | bytes | Path, key: str, text: str = None
+        self, input_image: str | bytes | Path | np.ndarray, key: str, text: str = None
     ) -> None:
         self.text = text
-        self.input_image = np.asarray(Image.open(input_image))
+        self.input_image = (
+            input_image
+            if isinstance(input_image, np.ndarray)
+            else np.asarray(Image.open(input_image))
+        )
         self.key = f"==={key}==="
 
     def __bin__(self, secret: str):
@@ -38,7 +42,7 @@ class ExistingImage:
         # rnum = []
 
         # for rownum, row in enumerate(image):
-        for row in image:
+        for row in image[:-1]:
             for pxl in row:
                 for i, clr in enumerate(pxl):
                     if data_index >= data_len:
@@ -51,6 +55,7 @@ class ExistingImage:
         # print(f"{rnum[0] = }")
 
         image[-1][-1][-1] = image[-1][-1][-1] >> 3 << 3 | n_bits
+        image[-1][-1][-2] = image[-1][-1][-2] >> 3 << 3 | 1
         return image
 
     def encode(self):
@@ -60,7 +65,7 @@ class ExistingImage:
 
         for i in range(1, 5):
             if (len(secret_data) + 1) <= (
-                self.input_image.shape[0] * self.input_image.shape[1] * 3 * i // 8
+                (self.input_image.shape[0] - 1) * self.input_image.shape[1] * 3 * i // 8
             ):
                 break
         else:

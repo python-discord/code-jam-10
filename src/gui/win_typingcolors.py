@@ -1,9 +1,10 @@
 from tkinter import *
 from tkinter import filedialog as fd
+
 from gui.modules import *
 
 
-class TypingColorsWin():
+class TypingColorsWin:
     """Window for typingcolors"""
 
     def __init__(self, root: Tk, typingcolors: classmethod, key: str):
@@ -24,7 +25,9 @@ class TypingColorsWin():
             fg="white",
             font=("Consolas", 14),
         )
-        self.canvas = Label(self.root, image=self.typingColors.img_scaled(), bg=DARK_GRAY)
+        self.canvas = Label(
+            self.root, image=self.typingColors.img_scaled(), bg=DARK_GRAY
+        )
         self.key = StringVar()
         self.key.set(f"Secret Key: {key}")
         self.info = StringVar()
@@ -68,7 +71,7 @@ class TypingColorsWin():
         """Exports the canvas to a PNG"""
         filename = fd.asksaveasfilename(title="Export As", filetypes=[("PNG", "*.png")])
         if filename:
-            self.typingColors.canvas.save(filename, format="PNG")
+            self.typingColors.save_as(filename)
 
     def edit_key(self):
         """Opens a new window to change the secret key"""

@@ -1,5 +1,6 @@
 from difflib import ndiff
 
+import numpy as np
 from PIL import Image, ImageDraw, ImageTk
 
 import backend
@@ -10,13 +11,20 @@ class TypingColors:
 
     def __init__(self, img=None):
         self.text = ""
-        self.size = (8, 9)
-        if img is None:  # start blank
-            self.canvas = Image.new("RGBA", self.size, (0, 0, 0, 0))
-        else:
-            self.canvas = img
-        self.ar_width, self.ar_height = self.size  # aspecct ratio
-        self.width, self.height = self.size
+        self.ar_width, self.ar_height = self.width, self.height = self.size = (
+            8,
+            9,
+        )  # aspect ratio & size
+        match img:
+            case Image.Image():
+                self.canvas = img
+            case np.ndarray():
+                self.imgarr = img
+                self.canvas = Image.fromarray(self.imgarr)
+            case None:
+                self.canvas = Image.new("RGBA", self.size, (0, 0, 0, 0))
+            case _:
+                raise TypeError("Invalid image")
         self.canvas_drawer = ImageDraw.Draw(self.canvas)
 
     def _idx2coord(self, idx):
@@ -30,7 +38,7 @@ class TypingColors:
     def set_encryption(self, key: str):
         """Sets the encryption key"""
         self.key = key
-        self.palette = backend.typingcolors_utils.Palette(key)
+        self.palette = backend.utils.Palette(key)
 
     def update(self, new_text):
         """Makes changes to the image from the new text"""
@@ -146,3 +154,40 @@ class TypingColors:
         """Returns scaled TkImage for GUI"""
         size = (self.ar_width * scale_factor, self.ar_height * scale_factor)
         return ImageTk.PhotoImage(self.canvas.resize(size, Image.BOX))
+
+    def save_as(self, filename):
+        """Export to png"""
+        self.canvas.load()[-1, -1] = (8, 8, 8, 8)
+        self.canvas.save(filename, format="PNG")
+
+    def decode(self):
+        """Decoder method"""
+        w, h = self.canvas.size
+        # get the text
+        chararr = np.zeros(self.imgarr.shape[0], dtype=str)
+        for key, val in self.palette.palette.items():
+            if isinstance(key, tuple):
+                r, g, b, a = key
+                cond = (
+                    (self.imgarr[:, 0] == r)
+                    & (self.imgarr[:, 1] == g)
+                    & (self.imgarr[:, 2] == b)
+                    & (self.imgarr[:, 3] == a)
+                )
+                chararr[cond.nonzero()[0]] = val
+        if (chararr == "").any():
+            raise KeyError
+        decoded_text = "".join(chararr).rstrip()
+        # split into rows and turning spaces to newlines
+        decoded_chunks = [
+            decoded_text[i : i + w] for i in range(0, len(decoded_text), w)
+        ]
+        decoded_text = "".join(
+            [
+                (line.rstrip() + "\n") if line.endswith(" ") else line
+                for line in decoded_chunks
+            ]
+        )
+        # print(decoded_text)
+        self.update(decoded_text)
+        return decoded_text
