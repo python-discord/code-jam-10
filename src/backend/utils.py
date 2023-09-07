@@ -1,4 +1,3 @@
-import numpy as np
 from PIL import Image
 
 from backend.steganography import ExistingImage
@@ -39,17 +38,14 @@ class Palette:
 
 
 def decrypt(file_path, key):
-    """
-    Returns the backend object created from loading image in file path.
-
-    Takes in a file path to the image and the decryption key
-    returns TypingColors object if key and image works, raises KeyError otherwise
-    """
+    """Calls the appropriate decryptor and returns the encryptor class and secret message"""
     img = Image.open(file_path)
-    imgarr = np.array(img)
-    if imgarr[-1][-1][-2] & 7 == 1:
-        object = ExistingImage(imgarr, key)
+    lastPixel = img.load()[-1, -1]
+
+    if lastPixel[-2] & 7 == 1:
+        object = ExistingImage(img, key)
     else:
-        object = TypingColors(imgarr.convert("RGBA").reshape(-1, 4))
-        object.set_encryption(key)  # load the key
+        img.convert("RGBA")
+        object = TypingColors(img)
+        object.set_key(key)  # load the key
     return object, object.decode()  # return the text for the gui

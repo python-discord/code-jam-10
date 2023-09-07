@@ -167,7 +167,7 @@ class GUI(Tk):
             self.typingColors = TypingColors()
             if len(key) == 0:
                 key = "".join(choices(PRINTABLE.replace("\t", ""), k=16))
-            self.typingColors.set_encryption(key)
+            self.typingColors.set_key(key)
             callback(lambda: TypingColorsWin(self, self.typingColors, key), [self.main])
             # self.typingColorsWin = TypingColorsWin(self.typingColors)
         else:

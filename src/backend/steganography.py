@@ -12,12 +12,12 @@ class ExistingImage:
     """
 
     def __init__(
-        self, input_image: str | bytes | Path | np.ndarray, key: str, text: str = None
+        self, input_image: str | bytes | Path | Image.Image, key: str, text: str = None
     ) -> None:
         self.text = text
         self.input_image = (
-            input_image
-            if isinstance(input_image, np.ndarray)
+            np.asarray(input_image)
+            if isinstance(input_image, Image.Image)
             else np.asarray(Image.open(input_image))
         )
         self.key = f"==={key}==="
@@ -35,24 +35,15 @@ class ExistingImage:
             binary_secret_data[i : i + n_bits]
             for i in range(0, len(binary_secret_data), n_bits)
         ]
-        # print(f"{data_len = }")
-        # print(f"{len(bin_parts) = }")
 
-        # print(f"{image.shape = }")
-        # rnum = []
-
-        # for rownum, row in enumerate(image):
         for row in image[:-1]:
             for pxl in row:
                 for i, clr in enumerate(pxl):
                     if data_index >= data_len:
-                        # rnum.append(rownum)
                         break
 
-                    # print(data_index)
                     pxl[i] = clr >> n_bits << n_bits | int(bin_parts[data_index], 2)
                     data_index += 1
-        # print(f"{rnum[0] = }")
 
         image[-1][-1][-1] = image[-1][-1][-1] >> 3 << 3 | n_bits
         image[-1][-1][-2] = image[-1][-1][-2] >> 3 << 3 | 1
@@ -69,7 +60,7 @@ class ExistingImage:
             ):
                 break
         else:
-            print("Image size too small for given secret")
+            print("Image too small for given secret")
             return
 
         return self.__encode(self.input_image.copy(), self.__bin__(secret_data), i)
@@ -102,7 +93,7 @@ class ExistingImage:
 
     def decode(self):
         """Decode the given img to reveeal the secret text"""
-        # print("[+] Decoding...")
+        # print("[+] Decoding image...")
 
         n_bits = self.input_image[-1][-1][-1] & 7
 

@@ -17,14 +17,10 @@ class TypingColors:
         )  # aspect ratio & size
         match img:
             case Image.Image():
-                self.canvas = img
-            case np.ndarray():
-                self.imgarr = img
-                self.canvas = Image.fromarray(self.imgarr)
+                self.canvas = img.convert("RGBA")
+                self.imgarr = np.asarray(self.canvas).reshape(-1, 4)
             case None:
                 self.canvas = Image.new("RGBA", self.size, (0, 0, 0, 0))
-            case _:
-                raise TypeError("Invalid image")
         self.canvas_drawer = ImageDraw.Draw(self.canvas)
 
     def _idx2coord(self, idx):
@@ -35,7 +31,7 @@ class TypingColors:
         """
         return [idx % self.width, idx // self.width]
 
-    def set_encryption(self, key: str):
+    def set_key(self, key: str):
         """Sets the encryption key"""
         self.key = key
         self.palette = backend.utils.Palette(key)
