@@ -15,18 +15,19 @@ class ImageLabel(tk.Label):
         """Loads an image"""
         self.im = im
         self.after_exec = after_exec
-        if isinstance(im, str):
-            im = Image.open(im)
+        im = Image.open(im)
         self.og_frames = []
         try:
             for i in count(1):
-                self.og_frames.append(ImageTk.PhotoImage(im.copy()))
+                self.og_frames.append(ImageTk.PhotoImage(im))
                 im.seek(i)
         except EOFError:
             pass
-        self.frames = cycle(self.og_frames) if repeat else iter(self.og_frames)  # If img needs to be cycled
+        self.frames = (
+            cycle(self.og_frames) if repeat else iter(self.og_frames)
+        )  # If img needs to be cycled
         try:
-            self.delay = im.info['duration']
+            self.delay = im.info["duration"]
         except Exception:
             self.delay = 100
         if len(self.og_frames) == 1:  # If image is not a gif

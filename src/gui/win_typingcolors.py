@@ -1,10 +1,12 @@
 from tkinter import *
 from tkinter import filedialog as fd
+from pathlib import Path
 
 DARK_GRAY, GRAY = "#222831", "#393E46"
 AQUA, WHITE = "#00ADB5", "#EEEEEE"
 RED, GREEN = "#cd0000", "#1BAA4A"
 BRIGHT_RED = "#ff0000"
+IMGS = Path("assets") / "imgs"
 
 
 class TypingColorsWin(Toplevel):
@@ -95,33 +97,33 @@ class TypingColorsWin(Toplevel):
             "File": {
                 "New": {
                     "command": self.new,
-                    "image": "assets\\imgs\\new.png",
+                    "image": IMGS / "new.png",
                     "accelerator": "Ctrl+N",
                 },
                 "Open": {
                     "command": self.open,
-                    "image": "assets\\imgs\\save.png",
+                    "image": IMGS / "save.png",
                     "accelerator": "Ctrl+O",
                 },
                 "Save": {
                     "command": self.save,
-                    "image": "assets\\imgs\\save.png",
+                    "image": IMGS / "save.png",
                     "accelerator": "Ctrl+S",
                 },
                 "Save As": {
                     "command": self.saveas,
-                    "image": "assets\\imgs\\save.png",
+                    "image": IMGS / "save.png",
                     "accelerator": "Ctrl+Shift+S",
                 },
                 "Export": {
                     "command": self.export,
-                    "image": "assets\\imgs\\save.png",
+                    "image": IMGS / "save.png",
                     "accelerator": "Ctrl+I",
                 },
                 "---": "",
                 "Exit": {
                     "command": self.destroy,
-                    "image": "assets\\imgs\\exit.png",
+                    "image": IMGS / "exit.png",
                     "accelerator": "Alt+F4",
                 },
             }

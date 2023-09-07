@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import filedialog as fd
+from pathlib import Path
 
 from backend.typingcolors import TypingColors
 from backend.typingcolors_utils import typingcolors_load
@@ -13,6 +14,7 @@ DARK_GRAY, GRAY = "#222831", "#393E46"
 AQUA, WHITE = "#00ADB5", "#EEEEEE"
 RED, GREEN = "#cd0000", "#1BAA4A"
 BRIGHT_RED = "#ff0000"
+IMGS = Path("assets") / "imgs"
 
 
 class GUI(Tk):
@@ -61,12 +63,12 @@ class GUI(Tk):
             loading.configure(bd=0, highlightbackground=None)
             loading.place(relx=0.5, rely=0.57, anchor="center")
             loading.load(
-                "assets\\imgs\\loading.gif",
+                IMGS / "loading.gif",
                 False,
                 lambda: self.callback(self.create_main_window, [loading, gif]),
             )
 
-        gif.load("assets\\imgs\\title.gif", False, lambda: loading_animation(self))
+        gif.load(IMGS / "title.gif", False, lambda: loading_animation(self))
         self.configure(background=DARK_GRAY)
         self.mainloop()
 
