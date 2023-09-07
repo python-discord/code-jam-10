@@ -72,8 +72,9 @@ class Level:
                     Path(icons_dir_path, 'button_sample.png'),
                     ControlPanel(
                         'Image Differencing',
-                        [('X', (0, 100), Qt.Orientation.Horizontal),
-                         ('Y', (0, 100), Qt.Orientation.Horizontal)]
+                        [
+                            ('X', (0, 100), Qt.Orientation.Horizontal),
+                            ('Y', (0, 100), Qt.Orientation.Horizontal)]
                     ),
                     {"second_image": Path(image_dir_path, 'desert.jpg')}
                 ),
@@ -98,17 +99,16 @@ class Level:
             ]
             return filters
         if self.level_number == 2:
-            return [
+            filters = [
                 (
                     Path(icons_dir_path, 'button_sample.png'),
                     ControlPanel(
                         'Image Differencing',
                         [
                             ('X', (0, 100), Qt.Orientation.Horizontal),
-                            ('Y', (0, 100), Qt.Orientation.Horizontal)
-                        ]
+                            ('Y', (0, 100), Qt.Orientation.Horizontal)]
                     ),
-                    {"second_image": Path(image_dir_path, 'clockwork.jpg')}
+                    {"second_image": Path(image_dir_path, 'doggo.jpg')}
                 ),
                 (
                     Path(icons_dir_path, 'button_sample2.png'),
@@ -116,20 +116,19 @@ class Level:
                         'Double Exposure',
                         [('Exposure', ('Image 1', 'Image 2'), Qt.Orientation.Horizontal)]
                     ),
-                    {}
+                    {"second_image": Path(image_dir_path, 'doggo.jpg')}
                 ),
                 (
                     Path(icons_dir_path, 'button_sample3.png'),
                     ControlPanel(
                         'Motion Manipulation',
-                        [
-                            ('Wavelength', (0, 100), Qt.Orientation.Horizontal),
-                            ('Gap', (0, 100), Qt.Orientation.Horizontal),
-                            ('Wave Height', (0, 100), Qt.Orientation.Horizontal)
-                        ]
+                        [('Wavelength', (0, 100), Qt.Orientation.Horizontal),
+                         ('Gap', (0, 100), Qt.Orientation.Horizontal),
+                         ('Wave Height', (0, 100), Qt.Orientation.Horizontal)]
                     ),
-                    {}
+                    {"second_image": Path(image_dir_path, 'doggo.jpg')}
                 )
             ]
-
-        return []
+            return filters
+        else:
+            return []
