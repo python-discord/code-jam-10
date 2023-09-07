@@ -33,7 +33,6 @@ class Dock(QWidget):
                     apply_filter(
                         cp.title,
                         {
-                            "img_path": self.level.filters[0],
                             "slider_label": label,
                             "slider_value": value,
                             "image_to_edit": self.level.img_source,
