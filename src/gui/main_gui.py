@@ -1,6 +1,6 @@
+from pathlib import Path
 from tkinter import *
 from tkinter import filedialog as fd
-from pathlib import Path
 
 from backend.typingcolors import TypingColors
 from backend.typingcolors_utils import typingcolors_load

@@ -1,6 +1,6 @@
+from pathlib import Path
 from tkinter import *
 from tkinter import filedialog as fd
-from pathlib import Path
 
 DARK_GRAY, GRAY = "#222831", "#393E46"
 AQUA, WHITE = "#00ADB5", "#EEEEEE"
