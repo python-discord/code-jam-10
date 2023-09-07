@@ -2,8 +2,9 @@ import numpy as np
 from PIL import Image
 
 from backend.typingcolors import TypingColors
+from random import choices
 
-PRINTABLE = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~\t'
+PRINTABLE = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\t"
 
 
 class Palette:
@@ -13,9 +14,6 @@ class Palette:
 
     def __init__(self, key: str):
         """Maps all characters to colours using the key"""
-        if not (3 < len(key) < 25):
-            raise ValueError("key should be between 4 and 24 characters")
-
         self.key = self._generate_key(key)
 
         for n, char in enumerate(PRINTABLE):  # generate pallete
@@ -32,12 +30,15 @@ class Palette:
 
     def _generate_key(self, key):
         """Generates a int key from the string"""
+        if key == "":
+            key = ''.join(choices(PRINTABLE, k=16))
+            print(key)
         return int.from_bytes(key.encode(), "little")
 
     def __getitem__(self, item):
         """Returns the color from char/char from color"""
         if item not in self.palette and isinstance(item, str):
-            return self.palette['?']
+            return self.palette["?"]
         return self.palette[item]  # raise keyerror if invalid decryption key
 
 
@@ -58,15 +59,23 @@ def typingcolors_load(file_path, key):
     for key, val in object.palette.palette.items():
         if isinstance(key, tuple):
             r, g, b, a = key
-            cond = (imgarr[:, 0] == r) & (imgarr[:, 1] == g) & (imgarr[:, 2] == b) & (imgarr[:, 3] == a)
+            cond = (
+                (imgarr[:, 0] == r)
+                & (imgarr[:, 1] == g)
+                & (imgarr[:, 2] == b)
+                & (imgarr[:, 3] == a)
+            )
             chararr[cond.nonzero()[0]] = val
-    if (chararr == '').any():
+    if (chararr == "").any():
         raise KeyError
     decoded_text = "".join(chararr).rstrip()
     # split into rows and turning spaces to newlines
-    decoded_chunks = [decoded_text[i:i+w]
-                      for i in range(0, len(decoded_text), w)]
-    decoded_text = ''.join([(line.rstrip()+'\n') if line.endswith(' ') else line
-                            for line in decoded_chunks])
+    decoded_chunks = [decoded_text[i : i + w] for i in range(0, len(decoded_text), w)]
+    decoded_text = "".join(
+        [
+            (line.rstrip() + "\n") if line.endswith(" ") else line
+            for line in decoded_chunks
+        ]
+    )
     object.update(decoded_text)
     return object, decoded_text  # return the text for the gui

@@ -35,43 +35,66 @@ class TypingColors:
     def update(self, new_text):
         """Makes changes to the image from the new text"""
         # deal with newlines - simply turn them to spaces
-        text = ''.join([
-            i + (' ' * (self.width - len(i) % self.width)) for i in new_text.split('\n')
-        ]).rstrip()
+        text = "".join(
+            [
+                i + (" " * (self.width - len(i) % self.width))
+                for i in new_text.split("\n")
+            ]
+        ).rstrip()
         textlen = len(text)
 
         # check if text too big
-        if textlen/self.width > self.height:
+        if textlen / self.width > self.height:
             # expand till fit
-            while textlen/self.width > self.height:
+            while textlen / self.width > self.height:
                 self.width += self.ar_width
                 self.height += self.ar_height
                 self.size = (self.width, self.height)
-                textlen = sum([max(len(i), self.width) for i in new_text.split('\n')])
+                textlen = sum([max(len(i), self.width) for i in new_text.split("\n")])
             # redraw the canvas
             self.canvas = Image.new("RGBA", self.size)
             self.canvas_drawer = ImageDraw.Draw(self.canvas)
-            self.text = ''
-            text = ''.join([
-                i + (' ' * (self.width - len(i) % self.width)) for i in new_text.split('\n')
-            ]).rstrip()
+            self.text = ""
+            text = "".join(
+                [
+                    i + (" " * (self.width - len(i) % self.width))
+                    for i in new_text.split("\n")
+                ]
+            ).rstrip()
 
         # check if text too small
-        textlen = sum([max(len(i), self.width-self.ar_width) for i in new_text.split('\n')])
-        if self.height > self.ar_height and (textlen/(self.width-self.ar_width)) < self.height-self.ar_height:
+        textlen = sum(
+            [max(len(i), self.width - self.ar_width) for i in new_text.split("\n")]
+        )
+        if (
+            self.height > self.ar_height
+            and (textlen / (self.width - self.ar_width)) < self.height - self.ar_height
+        ):
             # shrink till fit
-            while self.height > self.ar_height and (textlen/(self.width-self.ar_width)) < self.height-self.ar_height:
+            while (
+                self.height > self.ar_height
+                and (textlen / (self.width - self.ar_width))
+                < self.height - self.ar_height
+            ):
                 self.width -= self.ar_width
                 self.height -= self.ar_height
                 self.size = (self.width, self.height)
-                textlen = sum([max(len(i), self.width-self.ar_width) for i in new_text.split('\n')])
+                textlen = sum(
+                    [
+                        max(len(i), self.width - self.ar_width)
+                        for i in new_text.split("\n")
+                    ]
+                )
             # redraw the canvas
             self.canvas = Image.new("RGBA", self.size)
             self.canvas_drawer = ImageDraw.Draw(self.canvas)
-            self.text = ''
-            text = ''.join([
-                i + (' ' * (self.width - len(i) % self.width)) for i in new_text.split('\n')
-            ]).rstrip()
+            self.text = ""
+            text = "".join(
+                [
+                    i + (" " * (self.width - len(i) % self.width))
+                    for i in new_text.split("\n")
+                ]
+            ).rstrip()
 
         # stores pixels to be updated, process deletions first
         insertions = {}
@@ -83,10 +106,10 @@ class TypingColors:
             original_char = self.text[pos] if pos < len(self.text) else None
             coords = self._idx2coord(pos)
 
-            if operation == '-':  # remove char (make it transparent again)
+            if operation == "-":  # remove char (make it transparent again)
                 deletions += coords
                 pos -= 1  # shift the rest of the pixels left
-            elif operation == '+':  # add char
+            elif operation == "+":  # add char
                 insertions.setdefault(char, [])
                 insertions[char] += coords
             elif original_pos != pos or original_char != char:

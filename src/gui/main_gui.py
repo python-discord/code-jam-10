@@ -73,9 +73,9 @@ class GUI(Tk):
     def create_main_window(self):
         """Creates The Main Window Page for the application"""
         # The Main Input Frame:
-        main = Frame(self, bg=DARK_GRAY)
-        main.place(relx=0.5, rely=0.5, anchor="center")
-        input = Frame(main, bg=DARK_GRAY)
+        self.main = Frame(self, bg=DARK_GRAY)
+        self.main.place(relx=0.5, rely=0.5, anchor="center")
+        input = Frame(self.main, bg=DARK_GRAY)
         input.pack()
 
         label = Label(
@@ -104,7 +104,7 @@ class GUI(Tk):
         self.error.pack()
 
         # Encrypt / Decrypt Buttons Frame:
-        buttons = Frame(main, background=DARK_GRAY, pady=15)
+        buttons = Frame(self.main, background=DARK_GRAY, pady=15)
 
         # Encrypt OptionMenu
         method = StringVar()
@@ -159,7 +159,7 @@ class GUI(Tk):
     def check_key(self, encrypt: bool, mode: int = 0):
         """Checks if key length is between 4 and 24, and then opens the encrypt/decrypt page"""
         key = self.key.get(1.0, "end-1c")
-        if 4 <= len(key) <= 24:
+        if 4 <= len(key) <= 24 or len(key) == 0:
             if encrypt:
                 self.encrypt(key, mode)
             else:
@@ -175,7 +175,7 @@ class GUI(Tk):
         if mode == 0:
             self.typingColors = TypingColors()
             self.typingColors.set_encryption(key)
-            self.typingColorsWin = TypingColorsWin(self.typingColors)
+            self.callback(lambda: TypingColorsWin(), [self.main])
         else:
             self.steganographyWin = SteganographyWin()
 
@@ -193,6 +193,6 @@ class GUI(Tk):
                 self.key.configure(bg=RED, fg=WHITE)
                 self.error.configure(text="Invalid secret key")
                 return
-            self.typingColorsWin = TypingColorsWin(self.typingColors)
+            self.typingColorsWin = TypingColorsWin()
             self.typingColorsWin.text.delete(1.0, "end")
             self.typingColorsWin.text.insert("end", decoded_text)
