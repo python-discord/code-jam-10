@@ -106,5 +106,5 @@ class Window(QMainWindow):
 
     def update_image_label(self) -> None:
         """Update the image label with the new image"""
-        img = QPixmap(str(self.level.img_source)).scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio)
+        img = QPixmap(str(self.level.img_source)).scaled(450, 450)
         self.img_label.setPixmap(img.scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio))

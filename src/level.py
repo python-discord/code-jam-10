@@ -108,7 +108,7 @@ class Level:
                             ('Y', (0, 100), Qt.Orientation.Horizontal)
                         ]
                     ),
-                    {}
+                    {"second_image": Path(image_dir_path, 'clockwork.jpg')}
                 ),
                 (
                     Path(icons_dir_path, 'button_sample2.png'),
