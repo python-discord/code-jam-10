@@ -39,6 +39,7 @@ class Dock(QWidget):
                             "image_to_edit": self.level.img_source,
                             "second_image": args["second_image"],
                         },
+                        level.secret_answer
                     )
                 )
             )

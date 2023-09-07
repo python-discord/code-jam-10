@@ -138,5 +138,15 @@ class Level:
                     {"second_image": Path(image_dir_path, "doggo.jpg")},
                 ),
             ],
+            [
+                (
+                    Path(icons_dir_path, "button_sample.png"),
+                    ControlPanel(
+                        "Hidden in ASCII",
+                        []
+                    ),
+                    {"second_image": Path(image_dir_path, "doggo.jpg")},
+                )
+            ]
         ]
         return filters[self.level_number - 1]

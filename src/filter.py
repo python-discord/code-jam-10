@@ -1,10 +1,15 @@
+from pathlib import Path
+
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtWidgets import (
     QFrame, QHBoxLayout, QLabel, QSlider, QVBoxLayout, QWidget
 )
 
-from src.Utils.apply_double_exposure import apply_double_exposure
+from lib.hidden_in_ascii.hidden_in_ascii import (
+    ascii_to_img, generate_ascii_file, prepare_input, seed_secret
+)
+from src.utils.apply_double_exposure import apply_double_exposure
 
 
 class Filter(QWidget):
@@ -113,17 +118,35 @@ class Filter(QWidget):
         return slider_frame
 
 
-def apply_filter(filter_name: str, args: dict) -> QPixmap:
+def apply_filter(filter_name: str, args: dict, secret: str) -> QPixmap:
     """
     Apply a filter to an image
 
     :param filter_name:
     :param args:
+    :param secret: level secret
     :return: img
     """
     if filter_name == "Double Exposure":
-        new_img = apply_double_exposure(
+        return apply_double_exposure(
             args["image_to_edit"], args["second_image"], args["slider_value"]
         )
-        return new_img
+    if filter_name == "Hidden in ASCII":
+        input_img, coordinates = prepare_input(args["image_to_edit"])
+        lib_dir_path = Path(Path(__file__).parent.parent, "lib")
+        image_dir_path = Path(Path(__file__).parent, "images")
+        ascii_file_path = Path(lib_dir_path, "hidden_in_ascii/ascii.txt")
+        output_img_path = Path(image_dir_path, "ascii_output.png")
+        generate_ascii_file(input_img, ascii_file_path, 2)   # TODO density should be read from args
+        seed_secret(ascii_file_path, secret, False)  # TODO binary mode should be read from args
+        output_img = ascii_to_img(ascii_file_path, coordinates, input_img.size, output_img_path)
+        qimage = QImage(
+            output_img.tobytes(),
+            output_img.width,
+            output_img.height,
+            output_img.width * 3,  # Assuming RGB color mode
+            QImage.Format_RGB888,
+        )
+        return QPixmap.fromImage(qimage)
+
     pass
