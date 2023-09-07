@@ -1,4 +1,3 @@
-from pathlib import Path
 from tkinter import *
 from tkinter import filedialog as fd
 
@@ -14,7 +13,6 @@ DARK_GRAY, GRAY = "#222831", "#393E46"
 AQUA, WHITE = "#00ADB5", "#EEEEEE"
 RED, GREEN = "#cd0000", "#1BAA4A"
 BRIGHT_RED = "#ff0000"
-IMGS = Path("assets") / "imgs"
 
 
 class GUI(Tk):
@@ -63,21 +61,21 @@ class GUI(Tk):
             loading.configure(bd=0, highlightbackground=None)
             loading.place(relx=0.5, rely=0.57, anchor="center")
             loading.load(
-                IMGS / "loading.gif",
+                "assets\\imgs\\loading.gif",
                 False,
                 lambda: self.callback(self.create_main_window, [loading, gif]),
             )
 
-        gif.load(IMGS / "title.gif", False, lambda: loading_animation(self))
+        gif.load("assets\\imgs\\title.gif", False, lambda: loading_animation(self))
         self.configure(background=DARK_GRAY)
         self.mainloop()
 
     def create_main_window(self):
         """Creates The Main Window Page for the application"""
         # The Main Input Frame:
-        main = Frame(self, bg=DARK_GRAY)
-        main.place(relx=0.5, rely=0.5, anchor="center")
-        input = Frame(main, bg=DARK_GRAY)
+        self.main = Frame(self, bg=DARK_GRAY)
+        self.main.place(relx=0.5, rely=0.5, anchor="center")
+        input = Frame(self.main, bg=DARK_GRAY)
         input.pack()
 
         label = Label(
@@ -106,7 +104,7 @@ class GUI(Tk):
         self.error.pack()
 
         # Encrypt / Decrypt Buttons Frame:
-        buttons = Frame(main, background=DARK_GRAY, pady=15)
+        buttons = Frame(self.main, background=DARK_GRAY, pady=15)
 
         # Encrypt OptionMenu
         method = StringVar()
@@ -161,7 +159,7 @@ class GUI(Tk):
     def check_key(self, encrypt: bool, mode: int = 0):
         """Checks if key length is between 4 and 24, and then opens the encrypt/decrypt page"""
         key = self.key.get(1.0, "end-1c")
-        if 4 <= len(key) <= 24:
+        if 4 <= len(key) <= 24 or len(key) == 0:
             if encrypt:
                 self.encrypt(key, mode)
             else:
@@ -177,7 +175,8 @@ class GUI(Tk):
         if mode == 0:
             self.typingColors = TypingColors()
             self.typingColors.set_encryption(key)
-            self.typingColorsWin = TypingColorsWin(self.typingColors)
+            self.callback(lambda: TypingColorsWin(self, self.typingColors), [self.main])
+            # self.typingColorsWin = TypingColorsWin(self.typingColors)
         else:
             self.steganographyWin = SteganographyWin()
 
