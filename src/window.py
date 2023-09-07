@@ -3,8 +3,8 @@ from pathlib import Path
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import (
-    QFrame, QGridLayout, QHBoxLayout, QLabel, QMainWindow,
-    QMessageBox, QStackedLayout, QWidget
+    QFrame, QGridLayout, QHBoxLayout, QLabel, QMainWindow, QMessageBox,
+    QStackedLayout, QWidget
 )
 
 from src.dock import Dock
