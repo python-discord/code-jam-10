@@ -1,8 +1,9 @@
+from pathlib import Path
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QPixmap, QIcon
 from PyQt6.QtWidgets import (
     QFrame, QGridLayout, QHBoxLayout, QLabel, QMainWindow, QMessageBox,
-    QStackedLayout, QWidget
+    QStackedLayout, QWidget, QDialog
 )
 
 from src.dock import Dock
@@ -21,6 +22,9 @@ class Window(QMainWindow):
         """Initialize the User Interface"""
         self.window_name = "Digital Shadows - Async Aggregators"
         self.setWindowTitle(f"{self.window_name} - Level {self.level.level_number}")
+
+        icons_dir_path = Path(Path(__file__).parent, "icons")
+        self.setWindowIcon(QIcon(str(Path(icons_dir_path, "logo.png"))))
         layout = self._create_main_layout()
 
         widget = QWidget()
@@ -87,16 +91,18 @@ class Window(QMainWindow):
             # If the input does not match the answer, show a notification
             msg_box = QMessageBox(self)
             msg_box.setWindowTitle("Error")
-            msg_box.setText("Incorrect secret code.")
+            msg_box.setText("\nIncorrect secret code.\n")
             msg_box.setIcon(QMessageBox.Icon.Warning)
             msg_box.exec()
         else:
             # If the input matches the answer, show a notification
             msg_box = QMessageBox(self)
             msg_box.setWindowTitle("Success")
-            msg_box.setText("Correct secret code.")
+            msg_box.setText("\nCorrect secret code.\n")
             msg_box.setIcon(QMessageBox.Icon.Information)
             msg_box.exec()
+
+            dialog = CustomDialog(self)
 
             self.level.level_up()
             self.update_image_label()
