@@ -3,7 +3,7 @@ from pathlib import Path
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import (
-    QDialog, QFrame, QGridLayout, QHBoxLayout, QLabel, QMainWindow,
+    QFrame, QGridLayout, QHBoxLayout, QLabel, QMainWindow,
     QMessageBox, QStackedLayout, QWidget
 )
 
