@@ -1,22 +1,27 @@
 from PIL import Image
 
 
-def double_exposure(image1: Image.Image, image2: Image.Image, alpha: float = 0.50) -> Image:
+def double_exposure(img1: Image, img2: Image, alpha: float = 0.5) -> Image:
     """
-    Blend two images together to create a double exposure effect.
+    Blend two images together using alpha blending
 
-    :param image1: The first image.
-    :param image2: The second image.
-    :param alpha: The blending factor (0.0 for image1, 1.0 for image2, 0.5 for an equal blend).
-    :return: The blended image.
+    :param img1: PIL Image
+    :param img2: PIL Image
+    :param alpha: int
+    :return:
     """
-    image1.convert('RGB')
-    image2.convert('RGB')
-    w1, h1 = image1.size
-    w2, h2 = image2.size
-    if (w1 != w2) or (h1 != h2):
-        image2 = image2.resize((w1, h1))
+    # Ensure img1 is the smaller image, or swap if necessary
+    if img1.size[0] > img2.size[0] or img1.size[1] > img2.size[1]:
+        img1, img2 = img2, img1
 
-    new_image = Image.blend(image1, image2, alpha)
+    # Convert both images to RGB
+    img1 = img1.convert("RGB")
+    img2 = img2.convert("RGB")
 
-    return new_image
+    # Resize img2 to match img1's size
+    img2 = img2.resize(img1.size)
+
+    # Blend the images
+    blended = Image.blend(img1, img2, alpha)
+
+    return blended
