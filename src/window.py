@@ -27,7 +27,7 @@ class Window(QMainWindow):
 
         widget = QWidget()
         widget.setLayout(layout)
-        widget.setMinimumSize(850, 450)
+        widget.setMinimumSize(850, 650)
         widget.setMaximumHeight(450)
         self.setCentralWidget(widget)
 
@@ -44,7 +44,7 @@ class Window(QMainWindow):
         main_layout.addWidget(image_display, 1, 1)
 
         # Central dock
-        self.dock = Dock(self.level, self.img_label, self._update_secret_code)  # Pass img_label as an argument
+        self.dock = Dock(self.level, self.img_label, self._update_secret_code)
         main_layout.addWidget(self.dock, 2, 1)
 
         return main_layout
@@ -57,12 +57,14 @@ class Window(QMainWindow):
                             'border: 1px solid "black"; '
                             'border-radius: 6px; '
                             'background-color: "#e4e0e0"; }')
+        frame.setMinimumSize(450, 450)
 
         layout = QHBoxLayout(frame)
-        img = QPixmap(str(self.level.img_source)).scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio)
+        img = QPixmap(str(self.level.img_source)).scaled(450, 450)
 
         # Convert img_label to an instance variable
         self.img_label = QLabel(self)
+        self.img_label.setFixedSize(450, 450)
         self.img_label.setPixmap(img)
 
         layout.addWidget(self.img_label)
@@ -104,5 +106,5 @@ class Window(QMainWindow):
 
     def update_image_label(self) -> None:
         """Update the image label with the new image"""
-        img = QPixmap(str(self.level.img_source)).scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio)
+        img = QPixmap(str(self.level.img_source)).scaled(450, 450)
         self.img_label.setPixmap(img.scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio))
