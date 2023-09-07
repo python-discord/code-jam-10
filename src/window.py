@@ -103,8 +103,6 @@ class Window(QMainWindow):
             msg_box.setIcon(QMessageBox.Icon.Information)
             msg_box.exec()
 
-            dialog = CustomDialog(self)
-
             self.level.level_up()
             self.update_image_label()
             self.setWindowTitle(f"{self.window_name} - Level {self.level.level_number}")
