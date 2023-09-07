@@ -19,7 +19,7 @@ class Palette:
         self.key = self._generate_key(key)
 
         for n, char in enumerate(PRINTABLE):  # generate pallete
-            val = self.key + n**n
+            val = self.key * n
             r, g, b, a = (
                 (val & 255),
                 (val >> 8) & 255,
@@ -32,21 +32,16 @@ class Palette:
 
     def _generate_key(self, key):
         """Generates a int key from the string"""
-        if not key:
-            raise ValueError("String for encryption cannot be empty")
         return int.from_bytes(key.encode(), "little")
 
     def __getitem__(self, item):
         """Returns the color from char/char from color"""
-        if type(item) not in (
-            str,
-            tuple,  # will not work if the color is specified as ndarray
-        ):
-            raise KeyError  # invalid decryption
-        return self.palette.get(item, "?")
+        if item not in self.palette and isinstance(item, str):
+            return self.palette['?']
+        return self.palette[item]  # raise keyerror if invalid decryption key
 
 
-def load(file_path, key):
+def typingcolors_load(file_path, key):
     """
     Returns the backend object created from loading image in file path.
 
@@ -57,10 +52,17 @@ def load(file_path, key):
     w, h = img.size
     object = TypingColors(img)
     object.set_encryption(key)  # load the key
-    decoded_text = "".join([
-        object.palette[(r, g, b, a)]
-        for r, g, b, a in np.array(img)[0]
-    ]).rstrip()  # get the text
+    imgarr = np.array(img).reshape(-1, 4)
+    # get the text
+    chararr = np.zeros(imgarr.shape[0], dtype=str)
+    for key, val in object.palette.palette.items():
+        if isinstance(key, tuple):
+            r, g, b, a = key
+            cond = (imgarr[:, 0] == r) & (imgarr[:, 1] == g) & (imgarr[:, 2] == b) & (imgarr[:, 3] == a)
+            chararr[cond.nonzero()[0]] = val
+    if (chararr == '').any():
+        raise KeyError
+    decoded_text = "".join(chararr).rstrip()
     # split into rows and turning spaces to newlines
     decoded_chunks = [decoded_text[i:i+w]
                       for i in range(0, len(decoded_text), w)]

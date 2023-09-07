@@ -1,5 +1,5 @@
-from gui.tkgui import GUI
+from gui.main_gui import GUI
 
 # run gui with canvas
 gui = GUI()
-gui.root.mainloop()
+gui.loading_screen()
