@@ -175,7 +175,8 @@ class GUI(Tk):
         if mode == 0:
             self.typingColors = TypingColors()
             self.typingColors.set_encryption(key)
-            self.callback(lambda: TypingColorsWin(), [self.main])
+            self.callback(lambda: TypingColorsWin(self, self.typingColors), [self.main])
+            # self.typingColorsWin = TypingColorsWin(self.typingColors)
         else:
             self.steganographyWin = SteganographyWin()
 
