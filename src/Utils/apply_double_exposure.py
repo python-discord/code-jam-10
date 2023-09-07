@@ -71,11 +71,8 @@ def apply_double_exposure(img1: tuple, img2: tuple, slider_value: int) -> QPixma
         _image_cache.put(img2_path, _img)
     img2 = _img
 
-    print(slider_value)
-
     # Convert slider value to float between 0 and 1
     adjusted_slider_value = float(slider_value*5) / 100
-    print(adjusted_slider_value)
 
     # Apply double exposure
     blended_image = double_exposure(img1, img2, adjusted_slider_value)
