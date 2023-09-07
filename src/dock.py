@@ -1,5 +1,5 @@
 from typing import Callable
-
+from pathlib import Path
 from PyQt6.QtCore import QSize, pyqtSignal
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import (
@@ -92,7 +92,7 @@ class Dock(QWidget):
         # Clear secret code input field
         self.close = QPushButton()
         self.close.setMinimumSize(40, 40)
-        self.close.setIcon(QIcon('icons\\close.png'))
+        self.close.setIcon(QIcon(str(Path('icons/close.png'))))
         self.close.setIconSize(QSize(20, 20))
         self.close.pressed.connect(lambda: self.secret_code_input.setText(''))
         layout.addWidget(self.close)

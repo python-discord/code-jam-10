@@ -14,9 +14,7 @@ class Window(QMainWindow):
 
     def __init__(self, level: Level) -> None:
         super().__init__()
-        self.secret_answer = level.secret_answer
         self.level = level
-        self.secret_code = ""
         self._init_ui()
 
     def _init_ui(self) -> None:
@@ -83,9 +81,8 @@ class Window(QMainWindow):
 
     def _update_secret_code(self, input_code: str) -> None:
         """Update the internal secret code and check against the answer."""
-        self.secret_code = input_code
 
-        if self.secret_code != self.secret_answer:
+        if input_code != self.level.secret_answer:
             # If the input does not match the answer, show a notification
             msg_box = QMessageBox(self)
             msg_box.setWindowTitle('Error')
@@ -100,7 +97,7 @@ class Window(QMainWindow):
             msg_box.setIcon(QMessageBox.Icon.Information)
             msg_box.exec()
 
-            self.level.set_level(self.level.level_number + 1)
+            self.level = Level(self.level.level_number+1)
             self.update_image_label()
             self.setWindowTitle(f'{self.window_name} - Level {self.level.level_number}')
 
@@ -108,3 +105,4 @@ class Window(QMainWindow):
         """Update the image label with the new image"""
         img = QPixmap(str(self.level.img_source)).scaled(450, 450)
         self.img_label.setPixmap(img.scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio))
+
