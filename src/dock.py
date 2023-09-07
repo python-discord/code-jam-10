@@ -92,13 +92,13 @@ class Dock(QWidget):
             "background-color: 'white'; "
             "padding: 0px 10px;"
         )
-
+        icons_dir_path = Path(Path(__file__).parent, "icons")
         layout.addWidget(self.secret_code_input)
 
         # Clear secret code input field
         self.close = QPushButton()
         self.close.setMinimumSize(40, 40)
-        self.close.setIcon(QIcon(str(Path("icons/close.png"))))
+        self.close.setIcon(QIcon(str(Path(icons_dir_path, "close.png"))))
         self.close.setIconSize(QSize(20, 20))
         self.close.pressed.connect(lambda: self.secret_code_input.setText(""))
         layout.addWidget(self.close)
