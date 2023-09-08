@@ -1,6 +1,5 @@
 from tkinter import *
 from tkinter import filedialog as fd
-
 from gui.modules import *
 
 
@@ -9,44 +8,46 @@ class DecryptWin(Frame):
 
     def __init__(self, root, object, text, key):
         """Creates the layout"""
+        print(root, object, text, key)
+        self.root = root
         super().__init__(root, bg=DARK_GRAY)
         dynamic_menu_bar(root, self)
         root.title("Decrypted - Typing Colors")
-        self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1, minsize=280)
-        self.grid_rowconfigure(0, weight=1)
-        root.bind("<Configure>", self.updatecanvas)
+        self.root.columnconfigure(0, weight=1)
+        self.root.columnconfigure(1, weight=1, minsize=280)
+        self.root.grid_rowconfigure(0, weight=1)
 
         self.object = object  # the main backend
         self.file = None  # open files
         # split layout
-        self.mainframe = Frame(self, bg=DARK_GRAY)
-        self.text = Text(
-            self.mainframe,
+        self.root.mainframe = Frame(self, bg=DARK_GRAY)
+        self.root.text = Text(
+            self.root.mainframe,
             width=30,
             height=15,
             bg=DARK_GRAY,
             fg="white",
             font=("Consolas", 14),
         )
-        self.text.insert("end", text)
-        self.text.configure(state="disabled")
+        self.root.text.insert("end", text)
+        self.root.text.configure(state="disabled")
         self.canvas = Label(
-            self.mainframe, image=self.object.img_scaled(), bg=DARK_GRAY
+            self.root.mainframe, image=self.object.img_scaled(), bg=DARK_GRAY
         )
-        self.key = StringVar()
-        self.key.set(f"Secret Key: {key}")
-        self.info = StringVar()
-        self.info.set("0 characters   |   8px x 9px")
+        self.root.key = StringVar()
+        self.root.key.set(f"Secret Key: {key}")
+        self.root.info = StringVar()
+        self.root.info.set("0 characters   |   8px x 9px")
         self.canvas.pack(side="left", fill="both", anchor="w")
-        self.text.pack(side="right", expand=True, fill="both", anchor="ne")
-        self.mainframe.grid(row=0, column=0, columnspan=2, sticky='nsew')
-        Label(self, textvariable=self.key, bg=DARK_GRAY, fg="white").grid(
+        self.root.text.pack(side="right", expand=True, fill="both", anchor="ne")
+        self.root.mainframe.grid(row=0, column=0, columnspan=2, sticky='nsew')
+        Label(self.root, textvariable=self.root.key, bg=DARK_GRAY, fg="white").grid(
             row=1, column=0, sticky="w"
         )
-        Label(self, textvariable=self.info, bg=DARK_GRAY, fg="white").grid(
+        Label(self.root, textvariable=self.root.info, bg=DARK_GRAY, fg="white").grid(
             row=1, column=1, sticky="e"
         )
+        root.bind("<Configure>", self.updatecanvas)
 
     def updatecanvas(self, event=None):
         """Updates the canvas to fill the screen"""
@@ -61,9 +62,9 @@ class DecryptWin(Frame):
         if filename:
             content = open(filename, "r").read()
             self.file = filename
-            self.winfo_toplevel().title(f"{filename} - Typing Colors")
-            self.text.delete(1.0, "end")
-            self.text.insert("end", content)
+            self.root.winfo_toplevel().title(f"{filename} - Typing Colors")
+            self.root.text.delete(1.0, "end")
+            self.root.text.insert("end", content)
             self.typingColors.update(content)
 
     def export(self):

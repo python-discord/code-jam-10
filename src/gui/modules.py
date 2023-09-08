@@ -1,8 +1,6 @@
 from tkinter import *
 from itertools import count, cycle
 from tkinter import filedialog as fd
-from gui.win_decrypt import DecryptWin
-import backend
 
 from PIL import Image, ImageTk
 
@@ -11,7 +9,7 @@ AQUA, WHITE = "#00ADB5", "#EEEEEE"
 RED, GREEN = "#cd0000", "#1BAA4A"
 BRIGHT_RED = "#ff0000"
 
-KEY = ""
+KEY = ""  # key for switching between encrypt and decrypt
 
 PRINTABLE = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\t"
 
@@ -84,7 +82,6 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
     """
     from gui.win_steganography import SteganographyWin
     from gui.win_typingcolors import TypingColorsWin
-
     layouts = {
         "Import": {
             "command": win.open,
@@ -107,19 +104,19 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
                 "Typing Colors": {
                     "command": lambda: TypingColorsWin.__init__(TypingColorsWin),
                     "accelerator": "Ctrl+T",
-                    "state": "disabled" if win.__class__.__name__ == "TypingColorsWin" else "active"
+                    "state": "disabled" if win.__class__.__name__ == "TypingColorsWin" else "normal"
                 },
                 "Steganograpy": {
                     "command": lambda: SteganographyWin.__init__(SteganographyWin),
                     "accelerator": "Ctrl+S",
-                    "state": "disabled" if win.__class__.__name__ == "SteganographyWin" else "active"
+                    "state": "disabled" if win.__class__.__name__ == "SteganographyWin" else "normal"
                 }
             }
         },
         "Decrypt": {
-            "command": lambda: switch_to_decrypt(win),
+            "command": lambda: switch_to_decrypt(root),
             "accelerator": "Ctrl+D",
-            "state": "disabled" if win.__class__.__name__ == "DecryptWin" else "active"
+            "state": "disabled" if win.__class__.__name__ == "DecryptWin" else "normal"
         }
     }
 
@@ -145,8 +142,8 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
                             command=layout["command"],
                             accelerator=layout["accelerator"],
                             state=layout["state"],
-                            activeforeground=WHITE if layout["state"] == "active" else GRAY,
-                            activebackground=GRAY if layout["state"] == "active" else WHITE,
+                            activeforeground=WHITE if layout["state"] == "normal" else GRAY,
+                            activebackground=GRAY if layout["state"] == "normal" else WHITE,
                         )
                     menubar.add_cascade(
                         label=name,
@@ -164,6 +161,7 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
                     activeforeground=WHITE,
                     activebackground=GRAY,
                 )
+
     root.configure(background=DARK_GRAY, menu=menubar)
 
 
@@ -177,9 +175,8 @@ def callback(callback: callable, destroy: list[Widget] = None, *args):
     callback(*args)
 
 
-def edit_key(root: Tk, after_exec: callable = None):
+def edit_key(root: Tk, after_exec: callable = None, *args):
     """Opens up an edit key window"""
-    print(after_exec)
     root.popup = Toplevel(root, bg=DARK_GRAY)
     root.popup.geometry("350x200")
     root.key_method = Text(
@@ -196,7 +193,7 @@ def edit_key(root: Tk, after_exec: callable = None):
         pady=2,
     )
     root.error.pack()
-    ok = Button(
+    submit = Button(
         root.popup,
         text="Edit Key",
         font=("Consolas", 12, "bold"),
@@ -207,16 +204,15 @@ def edit_key(root: Tk, after_exec: callable = None):
         cursor="hand2",
         bd=0,
         command=lambda: _valid_key(root, root.key_method.get("1.0", "end-1c"),
-                                   root.key_method, root.error, True, after_exec)
+                                   root.key_method, root.error, True, after_exec, *args)
     )
-    print(after_exec)
-    ok.pack()
+    submit.pack()
 
 
 def _valid_key(root: Tk, key: str, key_method: Text, error: Label,
-               switch_to_decrypt: bool = False, after_exec: callable = None):
+               switch_to_decrypt: bool = False, after_exec: callable = None, *args):
     """Checks if key is valid"""
-    global KEY
+    print(key)
     status = False
     if not (4 <= len(key) <= 24 or len(key) == 0):
         key_method.configure(bg=RED, fg=WHITE)
@@ -226,12 +222,11 @@ def _valid_key(root: Tk, key: str, key_method: Text, error: Label,
         error.configure(text="Key can't contain whitespaces")
     else:
         status = True
-    KEY = key
     if after_exec:
         if switch_to_decrypt:  # checks if the decrypt window needs to open
-            after_exec(root, key_method, error)
+            after_exec(*args, key, root, key_method, error)
         else:
-            after_exec()
+            after_exec(*args, key)
     return status
 
 
@@ -241,20 +236,21 @@ def switch_to_decrypt(win):
         title="Select Image", filetypes=[("PNG", "*.png")]
     )
 
-    edit_key(win, lambda: decrypt(filename, KEY))
+    edit_key(win, decrypt, filename)
 
 
 def decrypt(filename, key: str, root: Tk = None, key_method: Text = None, error: Label = None):
     """Opens the decryption page with the secret key"""
+    from gui.win_decrypt import DecryptWin
+    from backend import utils
     # TODO: find out what method used to encrypt here
     # decrypting typingcolors image
     try:
-        typingColors, decoded_text = backend.utils.decrypt(filename, key)
+        typingColors, decoded_text = utils.decrypt(filename, key)
     except KeyError:  # invalid decryption key
         key_method.configure(bg=RED, fg=WHITE)
         error.configure(text="Invalid secret key")
         return
-
     callback(
         lambda: DecryptWin(root, typingColors, decoded_text, key).pack(expand=True, fill='both'), []
     )

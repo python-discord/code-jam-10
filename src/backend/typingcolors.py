@@ -146,7 +146,8 @@ class TypingColors:
     def save_as(self, filename):
         """Export to png"""
         self.canvas.load()[-1, -1] = (8, 8, 8, 8)
-        self.canvas.save(filename, format="PNG")
+        self.canvas.save(filename)
+        # self.canvas.save(filename, format="PNG")
 
     def decode(self):
         """Decoder method"""

@@ -82,4 +82,4 @@ class TypingColorsWin(Frame):
         """Exports the canvas to a PNG"""
         filename = fd.asksaveasfilename(title="Export As", filetypes=[("PNG", "*.png")])
         if filename:
-            self.typingColors.save_as(filename)
+            self.typingColors.save_as(filename+".png")

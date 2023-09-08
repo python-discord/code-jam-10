@@ -6,7 +6,7 @@ from . import modules
 from tkinter import filedialog as fd
 
 from backend.typingcolors import TypingColors
-from backend.utils import decrypt
+from backend import utils
 from gui.modules import *
 from gui.win_decrypt import DecryptWin
 from gui.win_steganography import SteganographyWin
@@ -196,7 +196,7 @@ class GUI(Tk):
             title="Select Image", filetypes=[("PNG", "*.png")]
         )
         try:
-            self.typingColors, decoded_text = decrypt(filename, key)
+            self.typingColors, decoded_text = utils.decrypt(filename, key)
         except KeyError:  # invalid decryption key
             self.key_method.configure(bg=RED, fg=WHITE)
             self.error.configure(text="Invalid secret key")
