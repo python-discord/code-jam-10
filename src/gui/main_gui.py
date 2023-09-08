@@ -6,6 +6,7 @@ from tkinter import filedialog as fd
 from backend.typingcolors import TypingColors
 from backend.utils import decrypt
 from gui.modules import *
+from gui.win_decrypt import DecryptWin
 from gui.win_steganography import SteganographyWin
 from gui.win_typingcolors import TypingColorsWin
 
@@ -158,15 +159,11 @@ class GUI(Tk):
     def check_key(self, encrypt: bool, mode: int = 0):
         """Opens the encrypt/decrypt page"""
         key = self._valid_key()
-        if encrypt:
-            if key is not False:
+        if key:
+            if encrypt:
                 self.encrypt(key, mode)
-        else:
-            if key:
-                self.decrypt(key)
             else:
-                self.key.configure(bg=RED, fg=WHITE)
-                self.error.configure(text="Invalid secret key")
+                self.decrypt(key)
 
     def encrypt(self, key: str = None, mode: int = 0):
         """Opens the encryption page with the secret key"""
@@ -198,9 +195,10 @@ class GUI(Tk):
                 self.key.configure(bg=RED, fg=WHITE)
                 self.error.configure(text="Invalid secret key")
                 return
-            self.typingColorsWin = TypingColorsWin()
-            self.typingColorsWin.text.delete(1.0, "end")
-            self.typingColorsWin.text.insert("end", decoded_text)
+
+            callback(
+                lambda: DecryptWin(self, self.typingColors, decoded_text, key
+                                   ).pack(expand=True, fill='both'), [self.main])
 
     def edit_key(self):
         """Opens up an edit key window"""
