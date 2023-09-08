@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, cast
 
 from PyQt6.QtCore import Qt
 
@@ -69,8 +69,8 @@ class Level:
                         "Image Differencing",
                         {
                             "sliders": [
-                            ("X", (0, 100), Qt.Orientation.Horizontal),
-                            ("Y", (0, 100), Qt.Orientation.Horizontal),
+                                ("X", (0, 100), Qt.Orientation.Horizontal),
+                                ("Y", (0, 100), Qt.Orientation.Horizontal),
                             ]
                         }
                     ),
@@ -88,9 +88,9 @@ class Level:
                                     Qt.Orientation.Horizontal,
                                 )
                             ],
-                            "dropdowns":[]
+                            "dropdowns": []
                         }
-                        
+
                     ),
                     {"second_image": Path(image_dir_path, "desert.jpg")},
                 ),
@@ -120,7 +120,7 @@ class Level:
                                 ("Y", (0, 100), Qt.Orientation.Horizontal),
                             ],
 
-                            "dropdowns":[]
+                            "dropdowns": []
                         }
                     ),
                     {"second_image": Path(image_dir_path, "doggo.jpg")},
@@ -176,7 +176,7 @@ class Level:
                                 ]
                             ],
                             "buttons": [
-                                1 # TODO MAKE THIS HAVE INFO
+                                1  # TODO MAKE THIS HAVE INFO
                             ]
                         }
                     ),
@@ -184,7 +184,7 @@ class Level:
                 )
             ]
         ]
-        return filters[self.level_number - 1]
+        return cast(FilterList, filters[self.level_number - 1])
 
     def level_up(self) -> None:
         """

@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import (
     QFrame, QHBoxLayout, QLabel, QSlider, QVBoxLayout, QWidget
 )
 
+from src.Utils.apply_color_swap import apply_color_swap
 from src.Utils.apply_double_exposure import apply_double_exposure
 
 
@@ -124,6 +125,11 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
     if filter_name == "Double Exposure":
         new_img = apply_double_exposure(
             args["image_to_edit"], args["second_image"], args["slider_value"]
+        )
+        return new_img
+    if filter_name == "Color Swap":
+        new_img = apply_color_swap(
+            args["image_to_edit"], args["first_color"], args["second_color"]
         )
         return new_img
     pass
