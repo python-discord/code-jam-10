@@ -105,7 +105,7 @@ class Window(QMainWindow):
 
             self.level.level_up()
             self.update_image_label()
-            self.setWindowTitle(f"{self.window_name} - Level {self.level.level_number}")
+            self._init_ui()
 
     def update_image_label(self) -> None:
         """Update the image label with the new image"""

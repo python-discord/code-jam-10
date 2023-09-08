@@ -12,6 +12,5 @@ def main() -> None:
     # Assuming the player is at level 1
     current_level = Level(1)
     window = Window(current_level)
-
     window.show()
     sys.exit(app.exec())

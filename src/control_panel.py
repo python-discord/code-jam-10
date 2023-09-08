@@ -1,6 +1,6 @@
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
-    QFrame, QHBoxLayout, QLabel, QSlider, QVBoxLayout, QWidget
+    QFrame, QHBoxLayout, QLabel, QSlider, QVBoxLayout, QWidget, QComboBox, QPushButton
 )
 
 
@@ -10,7 +10,7 @@ class ControlPanel(QWidget):
     # Define a new signal at the top of the class
     controlValueChanged = pyqtSignal(str, int)
 
-    def __init__(self, title: str, sliders_info: list):
+    def __init__(self, title: str, widget_info: dict):
         super().__init__()
         layout = QVBoxLayout(self)
         self.title = title
@@ -18,7 +18,7 @@ class ControlPanel(QWidget):
         title_box = self.create_panel_title(title)
         layout.addWidget(title_box)
 
-        for info in sliders_info:
+        for info in widget_info.get('sliders', []):
             label, slider_range, orientation = info
             layout.addWidget(QLabel(label))
             slider = QSlider(orientation)
@@ -32,6 +32,20 @@ class ControlPanel(QWidget):
             slider_frame = self.style_slider(slider, slider_range, orientation == Qt.Orientation.Horizontal)
             slider_frame.setMaximumHeight(45)
             layout.addWidget(slider_frame)
+
+        for info in widget_info.get('dropdowns', []):
+            combo_box1 = QComboBox()
+            combo_box2 = QComboBox()
+            combo_box1.addItems(info)
+            combo_box2.addItems(info)
+
+            layout.addWidget(combo_box1)
+            layout.addWidget(combo_box2)
+
+        for info in widget_info.get('buttons', []):
+            button = QPushButton()
+            button.setText("swap")
+            layout.addWidget(button)
 
         layout.addStretch()
 
