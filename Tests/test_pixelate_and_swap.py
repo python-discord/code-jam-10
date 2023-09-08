@@ -3,7 +3,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from .pixelate_and_swap import pixelate_and_group_colors_sampled, swap_colors
+from lib.pixelate_and_swap.pixelate_and_swap import pixelate_and_group_colors_sampled, swap_colors
 
 
 class TestPixelate(unittest.TestCase):
@@ -15,13 +15,8 @@ class TestPixelate(unittest.TestCase):
 
         :return: None
         """
-        # Get the directory of the current script using pathlib.
-        script_dir = Path(__file__).parent
 
-        # Construct a relative path to the image file using pathlib.
-        image_path = script_dir / "dahlias.jpg"
-
-        image = Image.open(image_path)
+        image = Image.open(Path("./Test_Assets/dahlias.jpg"))
 
         # Count the number of colors in the image before pixelation
         colors_before = len(set(image.getdata()))
