@@ -164,7 +164,6 @@ class Level:
             # Return an empty FilterList if out-of-bounds
             return []
 
-
     def level_up(self) -> None:
         """
         Level up the game
