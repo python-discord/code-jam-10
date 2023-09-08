@@ -18,11 +18,11 @@ def apply_color_swap(image: tuple, first_color: str, second_color: str) -> QPixm
     :return: QPixmap
     """
     colors = {
-        "Casablanca": (242, 217, 143),
         "Rust": (164, 43, 17),
         "Chocolate": (229, 95, 24),
         "Flamenco": (236, 135, 67),
-        "Buff": (238, 171, 98)
+        "Casablanca": (238, 171, 98),
+        "Buff": (242, 217, 143)
     }
     img_path = str(image)
     if not (_img := _image_cache.get(img_path)):
