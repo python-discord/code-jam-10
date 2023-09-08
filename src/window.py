@@ -1,8 +1,8 @@
 from pathlib import Path
-
+from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import (
-    QFrame, QGridLayout, QHBoxLayout, QLabel, QMainWindow, QMessageBox,
+    QFrame, QGridLayout, QHBoxLayout, QLabel, QMainWindow, QMessageBox, QApplication,
     QStackedLayout, QWidget
 )
 
@@ -16,7 +16,9 @@ class Window(QMainWindow):
     def __init__(self, level: Level) -> None:
         super().__init__()
         self.level = level
+        self.screen_size = QApplication.primaryScreen().size()
         self._init_ui()
+        print(self.screen_size)
 
     def _init_ui(self) -> None:
         """Initialize the User Interface"""
@@ -29,8 +31,8 @@ class Window(QMainWindow):
 
         widget = QWidget()
         widget.setLayout(layout)
-        widget.setMinimumSize(850, 650)
-        widget.setMaximumHeight(450)
+        # widget.setMinimumSize(1200, 900)
+        # widget.setMaximumHeight(450)
         self.setCentralWidget(widget)
 
     def _create_main_layout(self) -> QGridLayout:
@@ -61,15 +63,24 @@ class Window(QMainWindow):
             "border-radius: 6px; "
             "background-color: '#e4e0e0'; }"
         )
-        frame.setMinimumSize(450, 450)
 
         layout = QHBoxLayout(frame)
-        img = QPixmap(str(self.level.img_source)).scaled(450, 450)
+        img = QPixmap(str(self.level.img_source))
+
+        # Define max image size constraints (80% of height and 70% of width of the user's primary screen size)
+        max_height = self.screen_size.height() * 0.8
+        max_width = self.screen_size.width() * 0.7
+
+        # Calculate the scaling factors for width and height
+        img_size = img.size()
+        width_scale = max_width / img_size.width()
+        height_scale = max_height / img_size.height()
+        scale_factor = min(width_scale, height_scale)
+        scaled_img = img.scaled(QSize(int(img_size.width() * scale_factor), int(img_size.height() * scale_factor)))
 
         # Convert img_label to an instance variable
         self.img_label = QLabel(self)
-        self.img_label.setFixedSize(450, 450)
-        self.img_label.setPixmap(img)
+        self.img_label.setPixmap(scaled_img)
 
         layout.addWidget(self.img_label)
         layout.addLayout(self._create_tabbed_controls())
