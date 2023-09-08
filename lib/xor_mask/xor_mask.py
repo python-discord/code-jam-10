@@ -28,7 +28,7 @@ def generate_image(alphanumeric: str, difficulty: int) -> Image.Image:
 
     image = Image.new("L", image_size, "white")
     draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype(str(Path("./BebasNeue-Regular.ttf")), font_size)
+    font = ImageFont.truetype(str(Path("lib/xor_mask/BebasNeue-Regular.ttf")), font_size)
     # Draw the character in black on the image
     draw.text(offset, alphanumeric, fill="black", font=font, spacing=0)
     binary_image = image.point(lambda p: 255 if p > 128 else 0)
