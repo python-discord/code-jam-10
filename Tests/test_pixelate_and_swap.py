@@ -7,6 +7,7 @@ from lib.pixelate_and_swap.pixelate_and_swap import (
     pixelate_and_group_colors_sampled, swap_colors
 )
 
+Test_Assets_Path = Path(__file__).parent / "Test_Assets"
 
 class TestPixelate(unittest.TestCase):
     """Test cases for pixelate_and_swap.py"""
@@ -17,7 +18,7 @@ class TestPixelate(unittest.TestCase):
 
         :return: None
         """
-        image = Image.open(Path("./Test_Assets/dahlias.jpg"))
+        image = Image.open(Test_Assets_Path / "doggo.jpg")
 
         # Count the number of colors in the image before pixelation
         colors_before = len(set(image.getdata()))
