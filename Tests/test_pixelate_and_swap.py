@@ -9,6 +9,7 @@ from lib.pixelate_and_swap.pixelate_and_swap import (
 
 Test_Assets_Path = Path(__file__).parent / "Test_Assets"
 
+
 class TestPixelate(unittest.TestCase):
     """Test cases for pixelate_and_swap.py"""
 

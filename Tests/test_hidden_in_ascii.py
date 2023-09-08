@@ -11,6 +11,7 @@ from lib.hidden_in_ascii.hidden_in_ascii import (
 
 Test_Assets_Path = Path(__file__).parent / "Test_Assets"
 
+
 def string_exists_in_file(file_path: Path, target_string: str) -> bool:
     """
     Checks if given string exists in the file
