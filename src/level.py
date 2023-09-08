@@ -157,8 +157,21 @@ class Level:
                 ),
             ],
         ]
+
         if 0 <= self.level_number - 1 < len(filters):
             return cast(FilterList, filters[self.level_number - 1])
         else:
             # Return an empty FilterList if out-of-bounds
             return []
+
+
+    def level_up(self) -> None:
+        """
+        Level up the game
+
+        :return: None
+        """
+        self.level_number += 1
+        self.secret_answer = self.get_secret_answer()
+        self.img_source = self.get_image_source()
+        self.filters = self.get_filters()

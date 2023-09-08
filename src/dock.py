@@ -30,6 +30,7 @@ class Dock(QWidget):
         for _, filter_item, args in self.level.filters:
             control_panel = filter_item
             control_panel.controlValueChanged.connect(
+
                 lambda label, value, cp=control_panel: self.update_args_and_image(
                     cp.title,
                     label,
