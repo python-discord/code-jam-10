@@ -26,38 +26,38 @@ class Dock(QWidget):
         self.img_label = image_label
         self.filters = []
 
-        for _, filter_item, args in self.level.filters:
-            control_panel = filter_item
-            control_panel.sliderValueChanged.connect(
-                lambda label, value, cp=control_panel: self.update_image_label(
-                    apply_filter(
-                        cp.title,
-                        {
-                            "slider_label": label,
-                            "slider_value": value,
-                            "image_to_edit": self.level.img_source,
-                            "second_image": args["second_image"],
-                        },
-                        level.secret_answer
+        for _, control_panel, args in self.level.filters:
+            if control_panel is not None:
+                control_panel.sliderValueChanged.connect(
+                    lambda label, value, cp=control_panel: self.update_image_label(
+                        apply_filter(
+                            cp.title,
+                            {
+                                "slider_label": label,
+                                "slider_value": value,
+                                "image_to_edit": self.level.img_source,
+                                "second_image": args["second_image"],
+                            },
+                            level.secret_answer
+                        )
                     )
                 )
-            )
 
-            # Handle the comboBoxesSwapped signal here
-            control_panel.comboBoxesSwapped.connect(
-                lambda value1, value2, cp=control_panel: self.update_image_label(
-                    apply_filter(
-                        cp.title,
-                        {
-                            "image_to_edit": self.level.img_source,
-                            "first_color": value1,
-                            "second_color": value2,
-                        },
-                        level.secret_answer
+                # Handle the comboBoxesSwapped signal here
+                control_panel.comboBoxesSwapped.connect(
+                    lambda value1, value2, cp=control_panel: self.update_image_label(
+                        apply_filter(
+                            cp.title,
+                            {
+                                "image_to_edit": self.level.img_source,
+                                "first_color": value1,
+                                "second_color": value2,
+                            },
+                            level.secret_answer
+                        )
                     )
                 )
-            )
-            self.filters.append(control_panel)
+                self.filters.append(control_panel)
 
         layout = self._create_central_dock()
         self.setLayout(layout)

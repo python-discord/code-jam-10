@@ -3,8 +3,10 @@ from typing import Dict, List, Tuple, cast
 
 from PyQt6.QtCore import Qt
 
+from lib.hidden_in_ascii.hidden_in_ascii import (
+    ascii_to_img, generate_ascii_file, prepare_input, seed_secret
+)
 from src.control_panel import ControlPanel
-from lib.hidden_in_ascii.hidden_in_ascii import prepare_input, generate_ascii_file, seed_secret, ascii_to_img
 
 FilterItem = Tuple[Path, ControlPanel, Dict[str, Path]]
 FilterList = List[FilterItem]
@@ -195,13 +197,7 @@ class Level:
             [
                 (
                     Path(icons_dir_path, "magnifying_glass.png"),
-                    ControlPanel(
-                        "Hidden in ASCII",
-                        {
-                            "sliders": [],
-                            "dropdowns": []
-                        }
-                    ),
+                    None,
                     {"second_image": Path(image_dir_path, "doggo.jpg")},
                 )
             ]

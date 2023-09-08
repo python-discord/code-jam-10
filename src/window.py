@@ -1,6 +1,5 @@
 from pathlib import Path
 
-from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import (
     QFrame, QGridLayout, QHBoxLayout, QLabel, QMainWindow, QMessageBox,
@@ -82,7 +81,8 @@ class Window(QMainWindow):
         layout = QStackedLayout()
 
         for filter_item in self.level.filters:
-            layout.addWidget(filter_item[1])
+            if filter_item[1] is not None:
+                layout.addWidget(filter_item[1])
 
         return layout
 
