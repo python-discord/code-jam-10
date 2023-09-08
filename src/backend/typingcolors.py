@@ -15,12 +15,9 @@ class TypingColors:
             8,
             9,
         )  # aspect ratio & size
-        match img:
-            case Image.Image():
-                self.canvas = img.convert("RGBA")
-                self.imgarr = np.asarray(self.canvas).reshape(-1, 4)
-            case None:
-                self.canvas = Image.new("RGBA", self.size, (0, 0, 0, 0))
+        self.canvas = (
+            img.convert("RGBA") if img else Image.new("RGBA", self.size, (0, 0, 0, 0))
+        )
         self.canvas_drawer = ImageDraw.Draw(self.canvas)
 
     def _idx2coord(self, idx):
@@ -154,6 +151,8 @@ class TypingColors:
     def decode(self):
         """Decoder method"""
         w, h = self.canvas.size
+        self.canvas.load()[-1, -1] = (0, 0, 0, 0)
+        self.imgarr = np.array(self.canvas).reshape(-1, 4)
         # get the text
         chararr = np.zeros(self.imgarr.shape[0], dtype=str)
         for key, val in self.palette.palette.items():
@@ -167,6 +166,7 @@ class TypingColors:
                 )
                 chararr[cond.nonzero()[0]] = val
         if (chararr == "").any():
+            # print(chararr)
             raise KeyError
         decoded_text = "".join(chararr).rstrip()
         # split into rows and turning spaces to newlines
