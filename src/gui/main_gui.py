@@ -158,11 +158,15 @@ class GUI(Tk):
     def check_key(self, encrypt: bool, mode: int = 0):
         """Opens the encrypt/decrypt page"""
         key = self._valid_key()
-        if key:
-            if encrypt:
+        if encrypt:
+            if key is not False:
                 self.encrypt(key, mode)
-            else:
+        else:
+            if key:
                 self.decrypt(key)
+            else:
+                self.key.configure(bg=RED, fg=WHITE)
+                self.error.configure(text="Invalid secret key")
 
     def encrypt(self, key: str = None, mode: int = 0):
         """Opens the encryption page with the secret key"""

@@ -92,14 +92,8 @@ def dynamic_menu_bar(root: tk.Tk, win: classmethod):
             "accelerator": "Ctrl+I",
             "state": "normal"
         },
-<<<<<<< Updated upstream
         "Set Key": {
             "command": root.edit_key,
-=======
-        "-": "",
-        "Edit Key": {
-            "command": lambda: edit_key(root),
->>>>>>> Stashed changes
             "accelerator": "Ctrl+K",
             "state": "normal"
         },
