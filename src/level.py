@@ -150,3 +150,14 @@ class Level:
             ]
         ]
         return filters[self.level_number - 1]
+
+    def level_up(self) -> None:
+        """
+        Level up the game
+
+        :return: None
+        """
+        self.level_number += 1
+        self.secret_answer = self.get_secret_answer()
+        self.img_source = self.get_image_source()
+        self.filters = self.get_filters()
