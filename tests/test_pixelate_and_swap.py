@@ -7,7 +7,7 @@ from lib.pixelate_and_swap.pixelate_and_swap import (
     pixelate_and_group_colors_sampled, swap_colors
 )
 
-Test_Assets_Path = Path(__file__).parent / "Test_Assets"
+Test_Assets_Path = Path(__file__).parent / "test_assets"
 
 
 class TestPixelate(unittest.TestCase):

@@ -9,7 +9,7 @@ from lib.hidden_in_ascii.hidden_in_ascii import (
     seed_secret, validate_image_size, validate_secret_length
 )
 
-Test_Assets_Path = Path(__file__).parent / "Test_Assets"
+Test_Assets_Path = Path(__file__).parent / "test_assets"
 
 
 def string_exists_in_file(file_path: Path, target_string: str) -> bool:
