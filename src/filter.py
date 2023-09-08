@@ -1,9 +1,11 @@
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QPixmap, QImage
 from PyQt6.QtWidgets import (
     QFrame, QHBoxLayout, QLabel, QSlider, QVBoxLayout, QWidget
 )
 
+from pathlib import Path
+from lib.hidden_in_ascii.hidden_in_ascii import prepare_input, generate_ascii_file, seed_secret, ascii_to_img
 from src.utils.apply_color_swap import apply_color_swap
 from src.utils.apply_double_exposure import apply_double_exposure
 

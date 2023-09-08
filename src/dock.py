@@ -52,7 +52,8 @@ class Dock(QWidget):
                             "image_to_edit": self.level.img_source,
                             "first_color": value1,
                             "second_color": value2,
-                        }
+                        },
+                        level.secret_answer
                     )
                 )
             )
