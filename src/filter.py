@@ -133,22 +133,4 @@ def apply_filter(filter_name: str, args: dict, secret: str) -> QPixmap:
         return apply_color_swap(
             args["image_to_edit"], args["first_color"], args["second_color"]
         )
-    if filter_name == "Hidden in ASCII":
-        input_img, coordinates = prepare_input(args["image_to_edit"])
-        lib_dir_path = Path(Path(__file__).parent.parent, "lib")
-        image_dir_path = Path(Path(__file__).parent, "images")
-        ascii_file_path = Path(lib_dir_path, "hidden_in_ascii/ascii.txt")
-        output_img_path = Path(image_dir_path, "ascii_output.png")
-        generate_ascii_file(input_img, ascii_file_path, 2)  # TODO density should be read from args
-        seed_secret(ascii_file_path, secret, False)  # TODO binary mode should be read from args
-        output_img = ascii_to_img(ascii_file_path, coordinates, input_img.size, output_img_path)
-        qimage = QImage(
-            output_img.tobytes(),
-            output_img.width,
-            output_img.height,
-            output_img.width * 3,  # Assuming RGB color mode
-            QImage.Format_RGB888,
-        )
-        return QPixmap.fromImage(qimage)
-
     pass
