@@ -12,16 +12,18 @@ class TypingColorsWin(Frame):
         super().__init__(root, bg=DARK_GRAY)
         dynamic_menu_bar(root, self)
         root.title("New File - Typing Colors")
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=1, minsize=280)
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1, minsize=280)
         self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=0, minsize=25)
         root.bind("<Configure>", self.updatecanvas)
 
         self.typingColors = typingcolors  # the main backend
         self.file = None  # open files
         # split layout
+        self.mainframe = Frame(self, bg=DARK_GRAY)
         self.text = Text(
-            self,
+            self.mainframe,
             width=30,
             height=16,
             bg=DARK_GRAY,
@@ -29,19 +31,20 @@ class TypingColorsWin(Frame):
             font=("Consolas", 14),
         )
         self.canvas = Label(
-            self, image=self.typingColors.img_scaled(), bg=DARK_GRAY
+            self.mainframe, image=self.typingColors.img_scaled(), bg=DARK_GRAY
         )
         self.key = StringVar()
         self.key.set(f"Secret Key: {key}")
         self.info = StringVar()
         self.info.set("0 characters   |   8px x 9px")
-        self.text.grid(row=0, column=0, sticky="nsew")
-        self.canvas.grid(row=0, column=1, sticky="e")
+        self.text.pack(side="left", expand=True, fill="both", anchor="w")
+        self.canvas.pack(side="right", fill="both", anchor="e")
+        self.mainframe.grid(row=0, column=0, columnspan=2, sticky='nsew')
         Label(self, textvariable=self.key, bg=DARK_GRAY, fg="white").grid(
-            row=1, column=0, sticky="nsw"
+            row=1, column=0, sticky="w"
         )
         Label(self, textvariable=self.info, bg=DARK_GRAY, fg="white").grid(
-            row=1, column=1, sticky="nse"
+            row=1, column=1, sticky="e"
         )
         # start the loop
         self._typingcolors_update("")
@@ -59,15 +62,9 @@ class TypingColorsWin(Frame):
 
     def updatecanvas(self, event=None):
         """Updates the canvas to fill the screen"""
-        w, h = self.grid_bbox(1, 0)[2:]
-        w *= .99
-        h *= .99
-        if w > h:
-            sf = h / self.typingColors.ar_height
-        else:
-            sf = w / self.typingColors.ar_width
+        sf = max(1, (self.grid_bbox(0, 0)[3]) // self.typingColors.ar_height)
         img = self.typingColors.img_scaled(int(sf))
-        self.canvas.configure(image=img)
+        self.canvas.configure(image=img, width=self.typingColors.ar_width*sf, height=self.typingColors.ar_height*sf)
         self.canvas.image = img
 
     def open(self):
@@ -86,9 +83,3 @@ class TypingColorsWin(Frame):
         filename = fd.asksaveasfilename(title="Export As", filetypes=[("PNG", "*.png")])
         if filename:
             self.typingColors.save_as(filename)
-
-    def edit_key(self):
-        """Opens a new window to change the secret key"""
-        popup = Toplevel(self)
-        popup.geometry("300x100")
-        center(popup)
