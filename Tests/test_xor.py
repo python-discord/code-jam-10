@@ -3,7 +3,9 @@ import unittest
 from pathlib import Path
 from typing import Any
 
-from lib.xor_mask.xor_mask import generate_image, generate_xor_pair, mask_images
+from lib.xor_mask.xor_mask import (
+    generate_image, generate_xor_pair, mask_images
+)
 
 
 class TestXorMask(unittest.TestCase):
