@@ -1,6 +1,8 @@
 from pathlib import Path
 from random import choices
 from tkinter import *
+# from .modules import *
+from . import modules
 from tkinter import filedialog as fd
 
 from backend.typingcolors import TypingColors
@@ -9,14 +11,13 @@ from gui.modules import *
 from gui.win_decrypt import DecryptWin
 from gui.win_steganography import SteganographyWin
 from gui.win_typingcolors import TypingColorsWin
-from gui.main_win import MainWin
 
 WIN_W, WIN_H = (800, 600)
 POP_W, POP_H = (400, 300)
 IMGS = Path("assets") / "imgs"
 
 
-class GUI(MainWin):
+class GUI(Tk):
     """Main GUI class to interact with the backend"""
 
     def __init__(self):
@@ -160,7 +161,8 @@ class GUI(MainWin):
 
     def check_key(self, encrypt: bool, mode: int = 0):
         """Opens the encrypt/decrypt page"""
-        if self._valid_key():
+        self.key = self.key_method.get(1.0, "end-1c")
+        if modules._valid_key(self, self.key, self.key_method, self.error):
             self.key_method.configure(bg=DARK_GRAY, fg=WHITE)
             self.error.configure(text="")
             if encrypt:
@@ -189,50 +191,17 @@ class GUI(MainWin):
     def decrypt(self, key: str = None):
         """Opens the decryption page with the secret key"""
         # TODO: find out what method used to encrypt here
-        method = 0
-        if method == 0:  # decrypting typingcolors image
-            filename = fd.askopenfilename(
-                title="Select Image", filetypes=[("PNG", "*.png")]
-            )
-            try:
-                self.typingColors, decoded_text = decrypt(filename, key)
-            except KeyError:  # invalid decryption key
-                self.key_method.configure(bg=RED, fg=WHITE)
-                self.error.configure(text="Invalid secret key")
-                return
-
-            callback(
-                lambda: DecryptWin(self, self.typingColors, decoded_text, key
-                                   ).pack(expand=True, fill='both'), [self.main])
-
-    def edit_key(self):
-        """Opens up an edit key window"""
-        self.popup = Toplevel(self, bg=DARK_GRAY)
-        self.popup.geometry("350x200")
-        self.key_method = Text(
-            self.popup, height=1, width=25, padx=2, pady=2, font=("Consolas", 12), bd=0
+        # decrypting typingcolors image
+        filename = fd.askopenfilename(
+            title="Select Image", filetypes=[("PNG", "*.png")]
         )
-        self.key_method.pack(pady=30)
+        try:
+            self.typingColors, decoded_text = decrypt(filename, key)
+        except KeyError:  # invalid decryption key
+            self.key_method.configure(bg=RED, fg=WHITE)
+            self.error.configure(text="Invalid secret key")
+            return
 
-        self.error = Label(
-            self.popup,
-            text="",
-            font=("Consolas", 10, "bold"),
-            bg=DARK_GRAY,
-            fg=BRIGHT_RED,
-            pady=2,
+        callback(
+            lambda: DecryptWin(self, self.typingColors, decoded_text, key).pack(expand=True, fill='both'), [self.main]
         )
-        self.error.pack()
-        ok = Button(
-            self.popup,
-            text="Edit Key",
-            font=("Consolas", 12, "bold"),
-            bg=GREEN,
-            fg=WHITE,
-            padx=5,
-            pady=3,
-            cursor="hand2",
-            bd=0,
-            command=lambda: self._valid_key(),
-        )
-        ok.pack()
