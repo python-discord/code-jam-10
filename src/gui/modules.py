@@ -113,7 +113,7 @@ def dynamic_menu_bar(root: tk.Tk, win: classmethod):
             }
         },
         "Decrypt": {
-            "command": lambda: DecryptWin.__init__(DecryptWin),
+            "command": lambda: DecryptWin.__init__(DecryptWin, root),
             "accelerator": "Ctrl+D",
             "state": "disabled" if win.__class__.__name__ == "DecryptWin" else "active"
         }

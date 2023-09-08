@@ -9,13 +9,14 @@ from gui.modules import *
 from gui.win_decrypt import DecryptWin
 from gui.win_steganography import SteganographyWin
 from gui.win_typingcolors import TypingColorsWin
+from gui.main_win import MainWin
 
 WIN_W, WIN_H = (800, 600)
 POP_W, POP_H = (400, 300)
 IMGS = Path("assets") / "imgs"
 
 
-class GUI(Tk):
+class GUI(MainWin):
     """Main GUI class to interact with the backend"""
 
     def __init__(self):
@@ -53,7 +54,8 @@ class GUI(Tk):
                 lambda: callback(self.create_main_window, [loading, gif]),
             )
 
-        gif.load(IMGS / "title.gif", False, lambda: loading_animation(self))
+        # gif.load(IMGS / "title.gif", False, lambda: loading_animation(self))
+        gif.load(IMGS / "title.gif", False, lambda: callback(self.create_main_window, [gif]))
         self.configure(background=DARK_GRAY)
         self.mainloop()
 
@@ -75,10 +77,10 @@ class GUI(Tk):
         )
         label.pack()
 
-        self.key = Text(
+        self.key_method = Text(
             input, height=1, width=25, padx=2, pady=2, font=("Consolas", 12), bd=0
         )
-        self.key.pack()
+        self.key_method.pack()
 
         self.error = Label(
             input,
@@ -145,25 +147,29 @@ class GUI(Tk):
 
     def _valid_key(self):
         """Checks if key is valid"""
-        key = self.key.get(1.0, "end-1c")
-        if not (4 <= len(key) <= 24 or len(key) == 0):
-            self.key.configure(bg=RED, fg=WHITE)
+        self.key = self.key_method.get(1.0, "end-1c")
+        if not (4 <= len(self.key) <= 24 or len(self.key) == 0):
+            self.key_method.configure(bg=RED, fg=WHITE)
             self.error.configure(text="Key must be between 4 and 24 characters long")
             return False
-        if " " in key:
-            self.key.configure(bg=RED, fg=WHITE)
+        elif " " in self.key:
+            self.key_method.configure(bg=RED, fg=WHITE)
             self.error.configure(text="Key can't contain whitespaces")
             return False
-        return key
+        return True
 
     def check_key(self, encrypt: bool, mode: int = 0):
         """Opens the encrypt/decrypt page"""
-        key = self._valid_key()
-        if key:
+        if self._valid_key():
+            self.key_method.configure(bg=DARK_GRAY, fg=WHITE)
+            self.error.configure(text="")
             if encrypt:
-                self.encrypt(key, mode)
+                self.encrypt(self.key, mode)
+            elif len(self.key) > 0:  # checks if key is not empty for decryption
+                self.decrypt(self.key)
             else:
-                self.decrypt(key)
+                self.key_method.configure(bg=RED, fg=WHITE)
+                self.error.configure(text="Invalid secret key")
 
     def encrypt(self, key: str = None, mode: int = 0):
         """Opens the encryption page with the secret key"""
@@ -177,7 +183,6 @@ class GUI(Tk):
             callback(
                 lambda: TypingColorsWin(self, self.typingColors, key
                                         ).pack(expand=True, fill='both'), [self.main])
-            # self.typingColorsWin = TypingColorsWin(self.typingColors)
         else:
             self.steganographyWin = SteganographyWin()
 
@@ -192,7 +197,7 @@ class GUI(Tk):
             try:
                 self.typingColors, decoded_text = decrypt(filename, key)
             except KeyError:  # invalid decryption key
-                self.key.configure(bg=RED, fg=WHITE)
+                self.key_method.configure(bg=RED, fg=WHITE)
                 self.error.configure(text="Invalid secret key")
                 return
 
@@ -204,10 +209,10 @@ class GUI(Tk):
         """Opens up an edit key window"""
         self.popup = Toplevel(self, bg=DARK_GRAY)
         self.popup.geometry("350x200")
-        self.key = Text(
+        self.key_method = Text(
             self.popup, height=1, width=25, padx=2, pady=2, font=("Consolas", 12), bd=0
         )
-        self.key.pack(pady=30)
+        self.key_method.pack(pady=30)
 
         self.error = Label(
             self.popup,
