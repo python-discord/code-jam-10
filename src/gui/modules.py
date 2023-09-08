@@ -92,11 +92,18 @@ def dynamic_menu_bar(root: tk.Tk, win: classmethod):
             "accelerator": "Ctrl+I",
             "state": "normal"
         },
+<<<<<<< Updated upstream
         "Set Key": {
             "command": root.edit_key,
+=======
+        "-": "",
+        "Edit Key": {
+            "command": lambda: edit_key(root),
+>>>>>>> Stashed changes
             "accelerator": "Ctrl+K",
             "state": "normal"
         },
+        "--": "",
         "Encrypt": {
             "dropdown": {
                 "Typing Colors": {
@@ -123,21 +130,20 @@ def dynamic_menu_bar(root: tk.Tk, win: classmethod):
 
     # Add to menu bars
     for name, data in layouts.items():
+        menu = tk.Menu(
+            root,
+            tearoff=0,
+            cursor="hand1",
+            font=("Consolas", 10),
+        )
         if "-" in name:
             menubar.add_separator()
         else:
             try:
                 if dropdown := data["dropdown"]:
-                    menu = tk.Menu(
-                        root,
-                        tearoff=0,
-                        cursor="hand1",
-                        font=("Consolas", 10),
-                    )
                     for label, layout in dropdown.items():
                         menu.add_command(
                             label=label,
-                            compound="left",
                             command=layout["command"],
                             accelerator=layout["accelerator"],
                             state=layout["state"],
@@ -154,7 +160,6 @@ def dynamic_menu_bar(root: tk.Tk, win: classmethod):
             except KeyError:
                 menubar.add_command(
                     label=name,
-                    compound="left",
                     command=data["command"],
                     accelerator=data["accelerator"],
                     state=data["state"],
@@ -162,6 +167,15 @@ def dynamic_menu_bar(root: tk.Tk, win: classmethod):
                     activebackground=GRAY,
                 )
     root.configure(background=DARK_GRAY, menu=menubar)
+
+
+def edit_key(root):
+    """Opens a new window to change the secret key"""
+    popup = tk.Toplevel(root)
+    popup.title("Edit Key - Pixel Studios")
+    popup.geometry("350x150")
+    popup.configure(background=GRAY)
+    center(popup, 350, 150)
 
 
 def callback(callback: callable, destroy: list[tk.Widget] = None, *args):

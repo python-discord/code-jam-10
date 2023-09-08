@@ -11,6 +11,7 @@ class TypingColors:
 
     def __init__(self, img=None):
         self.text = ""
+<<<<<<< Updated upstream
         self.ar_width, self.ar_height = self.width, self.height = self.size = (
             8,
             9,
@@ -18,6 +19,15 @@ class TypingColors:
         self.canvas = (
             img.convert("RGBA") if img else Image.new("RGBA", self.size, (0, 0, 0, 0))
         )
+=======
+        self.size = (8, 9)
+        if img is None:  # start blank
+            self.canvas = Image.new("RGBA", self.size, (0, 0, 0, 0))
+        else:
+            self.canvas = img
+        self.ar_width, self.ar_height = self.size  # aspect ratio
+        self.width, self.height = self.size
+>>>>>>> Stashed changes
         self.canvas_drawer = ImageDraw.Draw(self.canvas)
 
     def _idx2coord(self, idx):

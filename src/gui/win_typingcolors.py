@@ -23,7 +23,7 @@ class TypingColorsWin(Frame):
         self.text = Text(
             self,
             width=30,
-            height=15,
+            height=16,
             bg=DARK_GRAY,
             fg="white",
             font=("Consolas", 14),
@@ -36,12 +36,24 @@ class TypingColorsWin(Frame):
         self.info = StringVar()
         self.info.set("0 characters   |   8px x 9px")
         self.text.grid(row=0, column=0, sticky="nsew")
+<<<<<<< Updated upstream
         self.canvas.grid(row=0, column=1, sticky="e")
         Label(self, textvariable=self.key, bg=DARK_GRAY, fg="white").grid(
             row=1, column=0, sticky="nsw"
         )
         Label(self, textvariable=self.info, bg=DARK_GRAY, fg="white").grid(
             row=1, column=1, sticky="nse"
+=======
+        self.canvas.grid(row=0, column=1, sticky="nsew")
+        self.root.grid_columnconfigure(0, weight=1, uniform="group1")
+        self.root.grid_columnconfigure(1, weight=1, uniform="group1")
+        self.root.grid_rowconfigure(0, weight=1)
+        Label(self.root, textvariable=self.key, bg=DARK_GRAY, fg="white").grid(
+            row=1, column=0, sticky="w", padx=5, pady=5
+        )
+        Label(self.root, textvariable=self.info, bg=DARK_GRAY, fg="white").grid(
+            row=1, column=1, sticky="e", padx=5, pady=5
+>>>>>>> Stashed changes
         )
         # start the loop
         self._typingcolors_update("")
@@ -85,6 +97,7 @@ class TypingColorsWin(Frame):
         """Exports the canvas to a PNG"""
         filename = fd.asksaveasfilename(title="Export As", filetypes=[("PNG", "*.png")])
         if filename:
+<<<<<<< Updated upstream
             self.typingColors.save_as(filename)
 
     def edit_key(self):
@@ -92,3 +105,6 @@ class TypingColorsWin(Frame):
         popup = Toplevel(self)
         popup.geometry("300x100")
         center(popup)
+=======
+            self.typingColors.canvas.save(filename, format="PNG")
+>>>>>>> Stashed changes
