@@ -55,19 +55,21 @@ class ControlPanel(QWidget):
         :return: QFrame panel title
         """
         title_box = QFrame()
-        object_name = '_'.join(name.lower().split())
+        object_name = "_".join(name.lower().split())
 
-        title_box.setObjectName(object_name + '_box')
+        title_box.setObjectName(object_name + "_box")
         title_box.setMinimumSize(200, 0)
-        title_box.setStyleSheet(f'QFrame#{object_name + "_box"}'
-                                '{ border: 1px solid "black"; '
-                                'border-radius: 6px; '
-                                'background-color: "white"; }')
+        title_box.setStyleSheet(
+            f"QFrame#{object_name + '_box'}"
+            "{ border: 1px solid 'black'; "
+            "border-radius: 6px; "
+            "background-color: 'white'; }"
+        )
 
         title_centre = QHBoxLayout(title_box)
 
         title = QLabel(name)
-        title.setStyleSheet('font-size: 22px')
+        title.setStyleSheet("font-size: 22px")
 
         title_centre.addWidget(QLabel())
         title_centre.addWidget(title)
@@ -86,11 +88,13 @@ class ControlPanel(QWidget):
         :return: QFrame slider
         """
         slider_frame = QFrame()
-        slider_frame.setObjectName('sliderframe')
-        slider_frame.setStyleSheet('QFrame#sliderframe { '
-                                   'border: 1px solid "black";'
-                                   'border-radius: 6px;'
-                                   'background-color: "white"; }')
+        slider_frame.setObjectName("sliderframe")
+        slider_frame.setStyleSheet(
+            "QFrame#sliderframe { "
+            "border: 1px solid 'black';"
+            "border-radius: 6px;"
+            "background-color: 'white'; }"
+        )
 
         if horizontal:
             slider_layout = QHBoxLayout(slider_frame)

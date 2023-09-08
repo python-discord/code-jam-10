@@ -65,17 +65,19 @@ class Filter(QWidget):
         :return: QFrame panel title
         """
         title_box = QFrame()
-        object_name = '_'.join(name.lower().split())
-        title_box.setObjectName(object_name + '_box')
+        object_name = "_".join(name.lower().split())
+        title_box.setObjectName(object_name + "_box")
         title_box.setMinimumSize(200, 0)
-        title_box.setStyleSheet(f'QFrame#{object_name + "_box"}'
-                                '{ border: 1px solid "black"; '
-                                'border-radius: 6px; '
-                                'background-color: "white"; }')
+        title_box.setStyleSheet(
+            f"QFrame#{object_name + '_box'}"
+            "{ border: 1px solid 'black'; "
+            "border-radius: 6px; "
+            "background-color: 'white'; }"
+        )
 
         title_centre = QHBoxLayout(title_box)
         title_label = QLabel(name)
-        title_label.setStyleSheet('font-size: 22px')
+        title_label.setStyleSheet("font-size: 22px")
         title_centre.addWidget(QLabel())
         title_centre.addWidget(title_label)
         title_centre.addWidget(QLabel())
@@ -93,13 +95,17 @@ class Filter(QWidget):
         :return: QFrame slider
         """
         slider_frame = QFrame()
-        slider_frame.setObjectName('sliderframe')
-        slider_frame.setStyleSheet('QFrame#sliderframe { '
-                                   'border: 1px solid "black";'
-                                   'border-radius: 6px;'
-                                   'background-color: "white"; }')
+        slider_frame.setObjectName("sliderframe")
+        slider_frame.setStyleSheet(
+            "QFrame#sliderframe { "
+            "border: 1px solid 'black';"
+            "border-radius: 6px;"
+            "background-color: 'white'; }"
+        )
 
-        slider_layout = QHBoxLayout(slider_frame) if horizontal else QVBoxLayout(slider_frame)
+        slider_layout = (
+            QHBoxLayout(slider_frame) if horizontal else QVBoxLayout(slider_frame)
+        )
         slider_layout.addWidget(QLabel(str(range_value[0])))
         slider_layout.addWidget(slider)
         slider_layout.addWidget(QLabel(str(range_value[-1])))
@@ -111,12 +117,13 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
     """
     Apply a filter to an image
 
-    :param level:
     :param filter_name:
     :param args:
     :return: img
     """
     if filter_name == "Double Exposure":
-        new_img = apply_double_exposure(args["image_to_edit"], args["second_image"], args["slider_value"])
+        new_img = apply_double_exposure(
+            args["image_to_edit"], args["second_image"], args["slider_value"]
+        )
         return new_img
     pass

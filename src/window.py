@@ -1,5 +1,7 @@
+from pathlib import Path
+
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import (
     QFrame, QGridLayout, QHBoxLayout, QLabel, QMainWindow, QMessageBox,
     QStackedLayout, QWidget
@@ -14,15 +16,16 @@ class Window(QMainWindow):
 
     def __init__(self, level: Level) -> None:
         super().__init__()
-        self.secret_answer = level.secret_answer
         self.level = level
-        self.secret_code = ""
         self._init_ui()
 
     def _init_ui(self) -> None:
         """Initialize the User Interface"""
-        self.window_name = 'Digital Shadows - Async Aggregators'
+        self.window_name = "Digital Shadows - Async Aggregators"
         self.setWindowTitle(f"{self.window_name} - Level {self.level.level_number}")
+
+        icons_dir_path = Path(Path(__file__).parent, "icons")
+        self.setWindowIcon(QIcon(str(Path(icons_dir_path, "logo.png"))))
         layout = self._create_main_layout()
 
         widget = QWidget()
@@ -53,10 +56,12 @@ class Window(QMainWindow):
         """Create and return the image display area."""
         frame = QFrame(self)
         frame.setObjectName("image_display_frame")
-        frame.setStyleSheet('QFrame#image_display_frame {'
-                            'border: 1px solid "black"; '
-                            'border-radius: 6px; '
-                            'background-color: "#e4e0e0"; }')
+        frame.setStyleSheet(
+            "QFrame#image_display_frame {"
+            "border: 1px solid 'black'; "
+            "border-radius: 6px; "
+            "background-color: '#e4e0e0'; }"
+        )
         frame.setMinimumSize(450, 450)
 
         layout = QHBoxLayout(frame)
@@ -83,28 +88,28 @@ class Window(QMainWindow):
 
     def _update_secret_code(self, input_code: str) -> None:
         """Update the internal secret code and check against the answer."""
-        self.secret_code = input_code
-
-        if self.secret_code != self.secret_answer:
+        if input_code != self.level.secret_answer:
             # If the input does not match the answer, show a notification
             msg_box = QMessageBox(self)
-            msg_box.setWindowTitle('Error')
-            msg_box.setText('Incorrect secret code.')
+            msg_box.setWindowTitle("Error")
+            msg_box.setText("\nIncorrect secret code.\n")
             msg_box.setIcon(QMessageBox.Icon.Warning)
             msg_box.exec()
         else:
             # If the input matches the answer, show a notification
             msg_box = QMessageBox(self)
-            msg_box.setWindowTitle('Success')
-            msg_box.setText('Correct secret code.')
+            msg_box.setWindowTitle("Success")
+            msg_box.setText("\nCorrect secret code.\n")
             msg_box.setIcon(QMessageBox.Icon.Information)
             msg_box.exec()
 
-            self.level.set_level(self.level.level_number + 1)
+            self.level.level_up()
             self.update_image_label()
-            self.setWindowTitle(f'{self.window_name} - Level {self.level.level_number}')
+            self.setWindowTitle(f"{self.window_name} - Level {self.level.level_number}")
 
     def update_image_label(self) -> None:
         """Update the image label with the new image"""
         img = QPixmap(str(self.level.img_source)).scaled(450, 450)
-        self.img_label.setPixmap(img.scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio))
+        self.img_label.setPixmap(
+            img.scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio)
+        )
