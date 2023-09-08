@@ -121,11 +121,3 @@ def mask_images(image1: Image.Image, image2: Image.Image) -> Image.Image:
     # Convert numpy arrays back to images
     result = Image.fromarray(result_array)
     return result
-
-if __name__ == "__main__":
-    #test
-    image = generate_image("A",1)
-    image1, image2 = generate_xor_pair(image, "A")
-    result = mask_images(image1, image2)
-    result.show()
-    print("Done")
