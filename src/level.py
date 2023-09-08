@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, cast
 
 from PyQt6.QtCore import Qt
 
@@ -184,13 +184,16 @@ class Level:
                     ),
                     {}
                 )
-            ]
+            ],
             [
                 (
                     Path(icons_dir_path, "magnifying_glass.png"),
                     ControlPanel(
                         "Hidden in ASCII",
-                        []
+                        {
+                            "sliders": [],
+                            "dropdowns": []
+                        }
                     ),
                     {"second_image": Path(image_dir_path, "doggo.jpg")},
                 )

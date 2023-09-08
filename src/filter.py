@@ -4,8 +4,8 @@ from PyQt6.QtWidgets import (
     QFrame, QHBoxLayout, QLabel, QSlider, QVBoxLayout, QWidget
 )
 
-from src.Utils.apply_color_swap import apply_color_swap
-from src.Utils.apply_double_exposure import apply_double_exposure
+from src.utils.apply_color_swap import apply_color_swap
+from src.utils.apply_double_exposure import apply_double_exposure
 
 
 class Filter(QWidget):
@@ -137,7 +137,7 @@ def apply_filter(filter_name: str, args: dict, secret: str) -> QPixmap:
         image_dir_path = Path(Path(__file__).parent, "images")
         ascii_file_path = Path(lib_dir_path, "hidden_in_ascii/ascii.txt")
         output_img_path = Path(image_dir_path, "ascii_output.png")
-        generate_ascii_file(input_img, ascii_file_path, 2)   # TODO density should be read from args
+        generate_ascii_file(input_img, ascii_file_path, 2)  # TODO density should be read from args
         seed_secret(ascii_file_path, secret, False)  # TODO binary mode should be read from args
         output_img = ascii_to_img(ascii_file_path, coordinates, input_img.size, output_img_path)
         qimage = QImage(

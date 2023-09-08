@@ -3,7 +3,7 @@ from PIL import Image
 from PyQt6.QtGui import QImage, QPixmap
 
 from lib.pixelate_and_swap.pixelate_and_swap import swap_colors
-from src.Utils.apply_double_exposure import LRUCache
+from src.utils.apply_double_exposure import LRUCache
 
 _image_cache = LRUCache(capacity=10)  # Cache capacity of 10 images
 
