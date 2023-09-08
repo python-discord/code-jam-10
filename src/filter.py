@@ -1,15 +1,11 @@
-from pathlib import Path
-
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QImage, QPixmap
+from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import (
     QFrame, QHBoxLayout, QLabel, QSlider, QVBoxLayout, QWidget
 )
 
-from lib.hidden_in_ascii.hidden_in_ascii import (
-    ascii_to_img, generate_ascii_file, prepare_input, seed_secret
-)
-from src.utils.apply_double_exposure import apply_double_exposure
+from src.Utils.apply_color_swap import apply_color_swap
+from src.Utils.apply_double_exposure import apply_double_exposure
 
 
 class Filter(QWidget):
@@ -130,6 +126,10 @@ def apply_filter(filter_name: str, args: dict, secret: str) -> QPixmap:
     if filter_name == "Double Exposure":
         return apply_double_exposure(
             args["image_to_edit"], args["second_image"], args["slider_value"]
+        )
+    if filter_name == "Color Swap":
+        return apply_color_swap(
+            args["image_to_edit"], args["first_color"], args["second_color"]
         )
     if filter_name == "Hidden in ASCII":
         input_img, coordinates = prepare_input(args["image_to_edit"])

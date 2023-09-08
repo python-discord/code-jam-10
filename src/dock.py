@@ -28,12 +28,11 @@ class Dock(QWidget):
 
         for _, filter_item, args in self.level.filters:
             control_panel = filter_item
-            control_panel.controlValueChanged.connect(
+            control_panel.sliderValueChanged.connect(
                 lambda label, value, cp=control_panel: self.update_image_label(
                     apply_filter(
                         cp.title,
                         {
-                            "img_path": self.level.filters[0],
                             "slider_label": label,
                             "slider_value": value,
                             "image_to_edit": self.level.img_source,
@@ -44,6 +43,19 @@ class Dock(QWidget):
                 )
             )
 
+            # Handle the comboBoxesSwapped signal here
+            control_panel.comboBoxesSwapped.connect(
+                lambda value1, value2, cp=control_panel: self.update_image_label(
+                    apply_filter(
+                        cp.title,
+                        {
+                            "image_to_edit": self.level.img_source,
+                            "first_color": value1,
+                            "second_color": value2,
+                        }
+                    )
+                )
+            )
             self.filters.append(control_panel)
 
         layout = self._create_central_dock()
