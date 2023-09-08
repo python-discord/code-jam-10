@@ -140,7 +140,7 @@ class Level:
             ],
             [
                 (
-                    Path(icons_dir_path, "button_sample.png"),
+                    Path(icons_dir_path, "magnifying_glass.png"),
                     ControlPanel(
                         "Hidden in ASCII",
                         []
