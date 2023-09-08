@@ -139,16 +139,11 @@ class TypingColors:
 
         self.text = text  # update old to new text
 
-    # def img_scaled(self, scale_factor=35):  # size around half the gui window
-    #     """Returns scaled PNG bytes of image for GUI"""
-    #     bio = BytesIO()
-    #     size = (self.ar_width * scale_factor, self.ar_height * scale_factor)
-    #     self.canvas.resize(size, Image.BOX).save(bio, format='PNG')
-    #     return bio.getvalue()
-
     def img_scaled(self, scale_factor=35):
         """Returns scaled TkImage for GUI"""
-        size = (self.ar_width * scale_factor, self.ar_height * scale_factor)
+        if not scale_factor:
+            scale_factor = 35
+        size = (int(self.ar_width * scale_factor), int(self.ar_height * scale_factor))
         return ImageTk.PhotoImage(self.canvas.resize(size, Image.BOX))
 
     def save_as(self, filename):

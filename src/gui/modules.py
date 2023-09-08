@@ -93,7 +93,7 @@ def dynamic_menu_bar(root: tk.Tk, win: classmethod):
             "state": "normal"
         },
         "Set Key": {
-            "command": win.edit_key,
+            "command": root.edit_key,
             "accelerator": "Ctrl+K",
             "state": "normal"
         },

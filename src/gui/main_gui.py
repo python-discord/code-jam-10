@@ -24,11 +24,9 @@ class GUI(Tk):
 
     def callback(self, callback: callable, destroy: list[Widget] = None, *args):
         """Callback a function while destroying existing widgets"""
-        if (
-            len(destroy) > 0
-        ):  # Destroy the previous image labels for a fresh home screen application.
-            for i in destroy:
-                i.destroy()
+        # Destroy the previous image labels for a fresh home screen application.
+        for i in destroy:
+            i.destroy()
         callback(*args)
 
     # function to create the place to write text to create image
@@ -144,16 +142,23 @@ class GUI(Tk):
         # buttons.place(relx=0.5, rely=0.5, anchor="center")
         self.mainloop()
 
-    def check_key(self, encrypt: bool, mode: int = 0):
-        """Checks if key length is between 4 and 24, and then opens the encrypt/decrypt page"""
+    def _valid_key(self):
+        """Checks if key is valid"""
         key = self.key.get(1.0, "end-1c")
         if not (4 <= len(key) <= 24 or len(key) == 0):
             self.key.configure(bg=RED, fg=WHITE)
             self.error.configure(text="Key must be between 4 and 24 characters long")
-        elif " " in key:
+            return False
+        if " " in key:
             self.key.configure(bg=RED, fg=WHITE)
             self.error.configure(text="Key can't contain whitespaces")
-        else:
+            return False
+        return key
+
+    def check_key(self, encrypt: bool, mode: int = 0):
+        """Opens the encrypt/decrypt page"""
+        key = self._valid_key()
+        if key:
             if encrypt:
                 self.encrypt(key, mode)
             else:
@@ -168,7 +173,9 @@ class GUI(Tk):
             if len(key) == 0:
                 key = "".join(choices(PRINTABLE.replace("\t", ""), k=16))
             self.typingColors.set_key(key)
-            callback(lambda: TypingColorsWin(self, self.typingColors, key), [self.main])
+            callback(
+                lambda: TypingColorsWin(self, self.typingColors, key
+                                        ).pack(expand=True, fill='both'), [self.main])
             # self.typingColorsWin = TypingColorsWin(self.typingColors)
         else:
             self.steganographyWin = SteganographyWin()
@@ -190,3 +197,35 @@ class GUI(Tk):
             self.typingColorsWin = TypingColorsWin()
             self.typingColorsWin.text.delete(1.0, "end")
             self.typingColorsWin.text.insert("end", decoded_text)
+
+    def edit_key(self):
+        """Opens up an edit key window"""
+        self.popup = Toplevel(self, bg=DARK_GRAY)
+        self.popup.geometry("350x200")
+        self.key = Text(
+            self.popup, height=1, width=25, padx=2, pady=2, font=("Consolas", 12), bd=0
+        )
+        self.key.pack(pady=30)
+
+        self.error = Label(
+            self.popup,
+            text="",
+            font=("Consolas", 10, "bold"),
+            bg=DARK_GRAY,
+            fg=BRIGHT_RED,
+            pady=2,
+        )
+        self.error.pack()
+        ok = Button(
+            self.popup,
+            text="Edit Key",
+            font=("Consolas", 12, "bold"),
+            bg=GREEN,
+            fg=WHITE,
+            padx=5,
+            pady=3,
+            cursor="hand2",
+            bd=0,
+            command=lambda: self._valid_key(),
+        )
+        ok.pack()

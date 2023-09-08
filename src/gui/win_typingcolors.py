@@ -4,21 +4,24 @@ from tkinter import filedialog as fd
 from gui.modules import *
 
 
-class TypingColorsWin:
+class TypingColorsWin(Frame):
     """Window for typingcolors"""
 
     def __init__(self, root: Tk, typingcolors: classmethod, key: str):
         """Creates the layout"""
-        # super().__init__()
-        self.root = root
-        dynamic_menu_bar(self.root, self)
-        # self.create_menu_bar()
+        super().__init__(root, bg=DARK_GRAY)
+        dynamic_menu_bar(root, self)
+        root.title("New File - Typing Colors")
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1, minsize=280)
+        self.grid_rowconfigure(0, weight=1)
+        root.bind("<Configure>", self.updatecanvas)
+
         self.typingColors = typingcolors  # the main backend
         self.file = None  # open files
-        self.root.title("New File - Typing Colors")
         # split layout
         self.text = Text(
-            self.root,
+            self,
             width=30,
             height=15,
             bg=DARK_GRAY,
@@ -26,19 +29,19 @@ class TypingColorsWin:
             font=("Consolas", 14),
         )
         self.canvas = Label(
-            self.root, image=self.typingColors.img_scaled(), bg=DARK_GRAY
+            self, image=self.typingColors.img_scaled(), bg=DARK_GRAY
         )
         self.key = StringVar()
         self.key.set(f"Secret Key: {key}")
         self.info = StringVar()
         self.info.set("0 characters   |   8px x 9px")
-        self.text.grid(row=0, column=0, sticky="nsew", rowspan=2)
-        self.canvas.grid(row=0, column=1, sticky="ne")
-        Label(self.root, textvariable=self.key, bg=DARK_GRAY, fg="white").grid(
-            row=0, column=1, sticky="e"
+        self.text.grid(row=0, column=0, sticky="nsew")
+        self.canvas.grid(row=0, column=1, sticky="e")
+        Label(self, textvariable=self.key, bg=DARK_GRAY, fg="white").grid(
+            row=1, column=0, sticky="nsw"
         )
-        Label(self.root, textvariable=self.info, bg=DARK_GRAY, fg="white").grid(
-            row=1, column=1, sticky="e"
+        Label(self, textvariable=self.info, bg=DARK_GRAY, fg="white").grid(
+            row=1, column=1, sticky="nse"
         )
         # start the loop
         self._typingcolors_update("")
@@ -48,13 +51,24 @@ class TypingColorsWin:
         txt = self.text.get("1.0", "end")
         if txt != prev_txt:  # only update if text changed
             self.typingColors.update(txt)
-            img = self.typingColors.img_scaled()
-            self.canvas.configure(image=img)
-            self.canvas.image = img
+            self.updatecanvas()
             self.info.set(
                 f"{len(txt) - 1} characters   |   {self.typingColors.width}px x {self.typingColors.height}px"
             )
-        self.root.after(50, lambda: self._typingcolors_update(txt))
+        self.after(50, lambda: self._typingcolors_update(txt))
+
+    def updatecanvas(self, event=None):
+        """Updates the canvas to fill the screen"""
+        w, h = self.grid_bbox(1, 0)[2:]
+        w *= .99
+        h *= .99
+        if w > h:
+            sf = h / self.typingColors.ar_height
+        else:
+            sf = w / self.typingColors.ar_width
+        img = self.typingColors.img_scaled(int(sf))
+        self.canvas.configure(image=img)
+        self.canvas.image = img
 
     def open(self):
         """Opens and loads a selected text file"""
@@ -62,7 +76,7 @@ class TypingColorsWin:
         if filename:
             content = open(filename, "r").read()
             self.file = filename
-            self.root.title(f"{filename} - Typing Colors")
+            self.winfo_toplevel().title(f"{filename} - Typing Colors")
             self.text.delete(1.0, "end")
             self.text.insert("end", content)
             self.typingColors.update(content)
@@ -75,6 +89,6 @@ class TypingColorsWin:
 
     def edit_key(self):
         """Opens a new window to change the secret key"""
-        popup = Toplevel(self.root)
+        popup = Toplevel(self)
         popup.geometry("300x100")
         center(popup)
