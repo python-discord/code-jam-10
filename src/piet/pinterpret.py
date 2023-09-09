@@ -10,7 +10,7 @@ from warnings import warn
 import numpy as np
 from PIL import Image
 
-from imagereader import CodelInfo, Reader
+from piet.imagereader import CodelInfo, Reader
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)

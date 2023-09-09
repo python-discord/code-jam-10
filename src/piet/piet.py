@@ -5,7 +5,7 @@ from typing import NamedTuple
 import numpy as np
 from PIL import Image
 
-from pinterpret import PietInterpreter, PietRuntime, PointerDirection, StepLimitReached
+from piet.pinterpret import PietInterpreter, PietRuntime, PointerDirection, StepLimitReached
 
 
 def color_to_int(color) -> int:

@@ -5,7 +5,7 @@ from io import StringIO
 
 import pytest
 
-from pinterpret import CodelChooserDirection, PietRuntime, PointerDirection
+from piet.pinterpret import CodelChooserDirection, PietRuntime, PointerDirection
 
 
 @pytest.fixture(name="piet_runtime")
