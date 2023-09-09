@@ -70,9 +70,9 @@ class DecryptWin(Frame):
             w, h = int(self.ar_width*sf), int(self.ar_height*sf)
         else:
             if self.aspect_ratio < 1:  # tall image, use width
-                sf = max(.01, round(self.grid_bbox(0, 0)[2] / self.image.width, 2))
+                sf = max(1, self.grid_bbox(0, 0)[2] // self.image.width)
             else:  # opposite
-                sf = max(.01, round(self.grid_bbox(0, 0)[3] / self.image.height, 2))
+                sf = max(1, self.grid_bbox(0, 0)[3] // self.image.height)
             w, h = int(self.image.width*sf), int(self.image.height*sf)
         img = ImageTk.PhotoImage(self.image.resize((w, h), BOX))
         self.canvas.configure(image=img, width=w, height=h)
