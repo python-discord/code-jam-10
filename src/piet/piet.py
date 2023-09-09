@@ -7,7 +7,6 @@ import time
 from collections import deque
 from copy import deepcopy
 from enum import Enum, IntEnum
-from io import StringIO
 from typing import Callable, Iterable, NamedTuple, TypeVar, overload
 from warnings import warn
 
@@ -848,25 +847,3 @@ def generate_image(data: bytes, cols: int = 4) -> Image.Image:
             generator.set_offset_command(PietCommand.BLOCK, DirectionOffset.RIGHT)
 
     return generator.image
-
-
-def main():
-    # Run this file to generate a Piet program.
-    # Test using https://piet.bubbler.one.
-
-    with open(__file__, "rb") as file:
-        data = file.read()
-    # data = b"AB"
-    encoded = generate_image(data, 12)
-    encoded.save(f"{__file__}.png")
-    encoded.show()
-    output_buffer = StringIO()
-    interpreter = PietInterpreter(encoded, debug=True, runtime=PietRuntime(output_buffer=output_buffer))
-    exc = interpreter.run()
-    if isinstance(exc, StepLimitReached):
-        raise exc
-    assert output_buffer.getvalue().encode() == data, f"Output does not match input.\n{output_buffer.getvalue()}"
-
-
-if __name__ == "__main__":
-    main()
