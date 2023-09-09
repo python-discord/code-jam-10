@@ -178,29 +178,32 @@ class PietRuntime:
     @pass_on_empty_stack
     def p_roll(self):
         first, second = self.stack.pop_multiple()
-        values = deque(self.stack.pop_multiple(second))
+        values = deque(reversed(self.stack.pop_multiple(second)))
         values.rotate(first)
         self.stack.extend(values)
 
     def p_input_num(self):
         buffer = ""
-        for char in self.input_buffer:
+        pos = self.input.tell()
+        while True:
+            char = self.input.read(1)
             if char in string.whitespace and buffer:
+                self.input.seek(pos + len(buffer))
                 break
-            self.input_buffer = self.input_buffer[1:]
             buffer += char
             if char in string.whitespace and not buffer:
+                self.input.seek(pos + len(buffer))
                 break
         try:
             self.stack.push(int(buffer))
         except ValueError:
-            self.input_buffer = buffer + self.input_buffer
+            self.input.seek(pos)
             warn(f"Conversion of '{buffer}' to integer failed. Check input.", RuntimeWarning)
 
     def p_input_char(self):
-        char = self.input_buffer[0]
-        self.input_buffer = self.input_buffer[1:]
-        self.stack.push(ord(char))
+        char = self.input.read(1)
+        if char:
+            self.stack.push(ord(char))
 
     @pass_on_empty_stack
     def p_output_num(self):
