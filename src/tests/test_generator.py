@@ -2,8 +2,9 @@ from io import StringIO
 
 import pytest
 
-from src.piet import PietInterpreter, PietProgramGenerator, PietRuntime
+from src.piet import ImageGenerator, PietInterpreter
 from src.piet.interpreter import StepLimitReached
+from src.piet.runtime import PietRuntime
 
 
 @pytest.mark.parametrize(
@@ -14,7 +15,7 @@ from src.piet.interpreter import StepLimitReached
     ],
 )
 def test_generator(data: bytes, cols: int):
-    generator = PietProgramGenerator()
+    generator = ImageGenerator()
     encoded = generator.generate_image(data, cols)
     encoded.save(f"{__file__}.png")
     output_buffer = StringIO()
@@ -22,4 +23,5 @@ def test_generator(data: bytes, cols: int):
     exc = interpreter.run()
     if isinstance(exc, StepLimitReached):
         raise exc
-    assert output_buffer.getvalue().encode() == data, f"Output does not match input.\n{output_buffer.getvalue()}"
+    result = output_buffer.getvalue().encode()
+    assert result == data, f"Output does not match input.\n{result}"
