@@ -3,7 +3,8 @@ import string
 import sys
 from collections import deque
 from enum import Enum, IntEnum
-from typing import Callable, Iterable
+from io import StringIO
+from typing import Callable, Iterable, TextIO
 from warnings import warn
 
 from .common import OrderedPair
@@ -95,12 +96,17 @@ def pass_on_empty_stack(func: Callable) -> Callable:
 
 
 class PietRuntime:
-    def __init__(self, output_buffer=sys.stdout, input_buffer: str = "", stack: PietStack | None = None):
+    def __init__(
+        self,
+        output_buffer: TextIO = sys.stdout,
+        input_buffer: TextIO | None = None,
+        stack: PietStack | None = None,
+    ):
         self.output = output_buffer
+        self.input = input_buffer or StringIO("")
         self.stack = stack or PietStack()
         self.pointer = DirectionPointer()
         self.codel_chooser = CodelChooser()
-        self.input_buffer = input_buffer
         self.delta_map: dict[tuple[int, int], Callable] = {
             (0, 0): self.p_noop,
             (0, 1): self.p_add,
