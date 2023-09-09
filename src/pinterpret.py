@@ -301,18 +301,20 @@ class PietInterpreter:
             )
 
     @staticmethod
-    def _find_color_position(c: tuple):
-        row = next(i for i, x in enumerate((c in PIET_COLORS[0], c in PIET_COLORS[1], c in PIET_COLORS[2])) if x)
+    def _find_color_position(color: tuple):
+        row = next(
+            i for i, x in enumerate((color in PIET_COLORS[0], color in PIET_COLORS[1], color in PIET_COLORS[2])) if x
+        )
         column = next(
             i
             for i, x in enumerate(
                 (
-                    c == PIET_COLORS[row][0],
-                    c == PIET_COLORS[row][1],
-                    c == PIET_COLORS[row][2],
-                    c == PIET_COLORS[row][3],
-                    c == PIET_COLORS[row][4],
-                    c == PIET_COLORS[row][5],
+                    color == PIET_COLORS[row][0],
+                    color == PIET_COLORS[row][1],
+                    color == PIET_COLORS[row][2],
+                    color == PIET_COLORS[row][3],
+                    color == PIET_COLORS[row][4],
+                    color == PIET_COLORS[row][5],
                 )
             )
             if x
