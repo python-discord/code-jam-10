@@ -142,7 +142,6 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
         )
         return new_img
     if filter_name == "Ishihara":
-        print("using ishihara")
         args_for_filter = {}
         for key, value in args.items():
             if key == "A":
