@@ -1,10 +1,8 @@
 import collections
+from typing import Tuple
 
 import numpy as np
-
-from PIL import Image, PyAccess
-from pinterpret import PietRuntime
-from piet import PietCommand, Color
+from PIL import Image
 
 
 class Reader:
@@ -31,10 +29,12 @@ class Reader:
             directions = [[1, 0], [-1, 0], [0, 1], [0, -1]]
             for dr, dc in directions:
                 r, c = row + dr, col + dc
-                if (r in range(rows) and
-                        c in range(cols) and
-                        np.array_equal(im_array[r, c], pixel) and
-                        (r, c) not in visited):
+                if (
+                    r in range(rows)
+                    and c in range(cols)
+                    and np.array_equal(im_array[r, c], pixel)
+                    and (r, c) not in visited
+                ):
                     q.append((r, c))
                     visited.add((r, c))
                     size += 1
@@ -81,7 +81,7 @@ class Reader:
 
         return smallest
 
-    def image_size(self) -> (int, int):
+    def image_size(self) -> Tuple[int, int]:
         "returns size of image after scaling it down to a codel size of 1 pixel"
         im = self.im_rgb
         width, height = im.size
