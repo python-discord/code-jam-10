@@ -191,15 +191,14 @@ DIRECTIONS = (
 
 
 class Codel(NamedTuple):
-    size: int
     color: Color
     pixels: set[OrderedPair]
 
     def __len__(self) -> int:
-        return self.size
+        return len(self.pixels)
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(size={self.size}, color={self.color})"
+        return f"{self.__class__.__name__}(size={len(self)}, color={self.color})"
 
 
 class Reader:
@@ -238,7 +237,7 @@ class Reader:
                     queue.append(offset_pos)
                     visited.add(offset_pos)
 
-        return Codel(len(visited), color, visited)
+        return Codel(color, visited)
 
     def smallest_codel(self) -> int:
         """Return the side length in pixels of the smallest codel."""
@@ -659,7 +658,7 @@ class PietInterpreter:
             self.pointer.move_to_next()
             if self.reader.colors[self.position.y][self.position.x] == WHITE:
                 # Skip the codel_info call if the current codel is white for performance reasons.
-                self._current_codel = Codel(1, WHITE, {self.position})
+                self._current_codel = Codel(WHITE, {self.position})
                 # Skip to the last white pixel in the direction of the DP.
                 next_pos = self.pointer.next_position()
                 while self.reader.colors[next_pos.y][next_pos.x] == WHITE:
@@ -680,7 +679,7 @@ class PietInterpreter:
                 delta = self._determine_color_change()
                 instruction = self.runtime.delta_map[delta]
                 if delta == (1, 0):
-                    args.append(self._last_codel.size)
+                    args.append(len(self._last_codel))
                 self._flips = 0
         else:
             if self.last_step and not self.last_step.did_flip:
