@@ -157,7 +157,9 @@ class GUI(Tk):
     def _valid_key(self):
         """Checks if key is valid"""
         self.key = self.key_method_text.get()
-        if not (4 <= len(self.key) <= 24) or len(self.key) == 0:
+        if len(self.key) == 0:
+            return True
+        elif not (4 <= len(self.key) <= 24):
             self.key_method.configure(bg=RED, fg=WHITE)
             self.error.configure(text="Key must be between 4 and 24 characters long")
             return False
@@ -184,9 +186,9 @@ class GUI(Tk):
         """Opens the encryption page with the secret key"""
         # Mode 0 is for Typing Colors
         # Mode 1 is for Masked Image
+        if len(self.key) == 0:
+            self.key = "".join(choices(PRINTABLE.replace("\t", ""), k=16))
         if mode == 0:
-            if len(self.key) == 0:
-                self.key = "".join(choices(PRINTABLE.replace("\t", ""), k=16))
 
             def create_win():
                 self.currentwin = TypingColorsWin(self)
@@ -203,7 +205,7 @@ class GUI(Tk):
             return
         try:
             object, decoded_text = utils.decrypt(filename, key)
-        except KeyError:  # invalid decryption key
+        except Exception:  # invalid decryption key
             self.key_method.configure(bg=RED, fg=WHITE)
             self.error.configure(text="Invalid secret key")
             return

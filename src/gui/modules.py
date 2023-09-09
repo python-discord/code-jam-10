@@ -38,7 +38,8 @@ def loading_animation(root, after, *args):
 
     canvas = Canvas(root, bg=DARK_GRAY)
     canvas.pack(fill="both", expand=True)
-    drawtext("Pixel Studios")
+    # drawtext("Pixel Studios")
+    drawtext(" ")
 
 
 def center(root: Tk, WIN_W: int, WIN_H: int):

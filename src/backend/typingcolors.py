@@ -142,11 +142,14 @@ class TypingColors:
         self.text = ''
         self.update(text)
 
-    def img_scaled(self, scale_factor=10):
+    def img_scaled(self, scale_factor=10, max_width: int = 0):
         """Returns scaled TkImage for GUI"""
         if not scale_factor:
             scale_factor = 10
         size = (int(self.ar_width * scale_factor), int(self.ar_height * scale_factor))
+        if max_width:
+            if size[0] > max_width:  # Don't allow image to take more than 60% of the window width
+                size[0] = max_width
         return ImageTk.PhotoImage(self.canvas.resize(size, Image.BOX))
 
     def save_as(self, filename):

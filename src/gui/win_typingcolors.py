@@ -35,7 +35,7 @@ class TypingColorsWin(Frame):
             font=("Consolas", 14),
         )
         self.canvas = Label(
-            self.mainframe, image=self.typingColors.img_scaled(), bg=DARK_GRAY
+            self.mainframe, image=self.typingColors.img_scaled(0.6*self.root.winfo_width()), bg=DARK_GRAY
         )
         self.key = StringVar()
         self.key.set(f"Secret Key: {root.key}")
@@ -67,7 +67,7 @@ class TypingColorsWin(Frame):
     def updatecanvas(self, event=None):
         """Updates the canvas to fill the screen"""
         sf = max(1, (self.grid_bbox(0, 0)[3]) // self.typingColors.ar_height)
-        img = self.typingColors.img_scaled(int(sf))
+        img = self.typingColors.img_scaled(int(sf), self.root.winfo_width())
         self.canvas.configure(image=img, width=self.typingColors.ar_width*sf, height=self.typingColors.ar_height*sf)
         self.canvas.image = img
 
