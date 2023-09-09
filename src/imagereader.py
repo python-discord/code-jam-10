@@ -1,5 +1,5 @@
 import collections
-from typing import NamedTuple, Tuple
+from typing import NamedTuple
 
 import numpy as np
 from PIL import Image
@@ -17,11 +17,11 @@ class CodelInfo(NamedTuple):
 
 
 class Reader:
-    def __init__(self, im: Image.Image) -> None:
-        self.im_array = np.asarray(im.convert("RGB"))
+    def __init__(self, image: Image.Image) -> None:
+        self.im_array = np.asarray(image.convert("RGB"))
 
     def codel_info(self, pos: tuple[int, int]) -> CodelInfo:
-        "returns information about the codel that contains pos(y,x)"
+        """Return information about the codel that contains pos (y,x)."""
         y, x = pos
         im_array = self.im_array
         pixel = im_array[y][x]
@@ -51,7 +51,7 @@ class Reader:
         return CodelInfo(size, (r, g, b), visited)
 
     def smallest_codel(self) -> int:
-        "returns side-length in pixels of the smallest codel"
+        """Return the side length in pixels of the smallest codel."""
         im_array = self.im_array
         pixel = im_array[0][0]
         rows, cols = len(im_array), len(im_array[0])
@@ -89,8 +89,8 @@ class Reader:
 
         return smallest
 
-    def image_size(self) -> Tuple[int, int]:
-        "returns size of image after scaling it down to a codel size of 1 pixel"
+    def image_size(self) -> tuple[int, int]:
+        """Return the size of image after scaling it down to a codel size of 1 pixel."""
         height, width = self.im_array.shape
         codel_size = self.smallest_codel()
         return (width // codel_size, height // codel_size)

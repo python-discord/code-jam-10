@@ -1,4 +1,3 @@
-# import inspect
 import math
 import string
 import sys
@@ -272,19 +271,13 @@ class PietInterpreter:
         self.reader = Reader(image)
         self.runtime = runtime or PietRuntime()
         self.stack = self.runtime.stack
-        # self.instructions = dict()
         self.position = (0, 0)
-        # self.event_queue = []
         self.iteration = -1
         self.last_codel = self.reader.codel_info(self.position)
         self.current_codel = self.reader.codel_info(self.position)
         self.steps: list[StepTrace] = []
         self._flips = 0
         self._move_to_furthest_pixel()
-
-        # for name, obj in inspect.getmembers(self.runtime):
-        #     if name.startswith("p_"):
-        #         self.instructions.update({name: obj})
 
     @property
     def last_step(self) -> StepTrace:
@@ -338,18 +331,6 @@ class PietInterpreter:
         largest_y = max(coords, key=lambda x: x[0])[0]
         smallest_x = min(coords, key=lambda x: x[1])[1]
         smallest_y = min(coords, key=lambda x: x[0])[0]
-        # largest_x = 0
-        # largest_y = 0
-        # smallest_y, smallest_x, *_ = self.reader.im_array.shape
-        # for y, x in coords:
-        #     if x > largest_x:
-        #         largest_x = x
-        #     if x < smallest_x:
-        #         smallest_x = x
-        #     if y > largest_y:
-        #         largest_y = y
-        #     if y < smallest_y:
-        #         smallest_y = y
         return (
             largest_x,
             largest_y,
