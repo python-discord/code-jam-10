@@ -1,16 +1,15 @@
 import random
 import string
-from collections import deque
 from io import StringIO
 
 import pytest
 
-from piet.pinterpret import CodelChooserDirection, PietRuntime, PointerDirection
+from src.piet.runtime import CodelChooserDirection, PietRuntime, PietStack, PointerDirection
 
 
 @pytest.fixture(name="piet_runtime")
 def fixture_piet_runtime():
-    return PietRuntime(StringIO("69 test"))
+    return PietRuntime(output_buffer=StringIO())
 
 
 def test_push_instruction(piet_runtime: PietRuntime):
@@ -21,7 +20,7 @@ def test_push_instruction(piet_runtime: PietRuntime):
 def test_pop_instruction(piet_runtime: PietRuntime):
     piet_runtime.p_push(1)
     piet_runtime.p_pop()
-    assert len(piet_runtime.stack._stack) == 0
+    assert len(piet_runtime.stack) == 0
 
 
 def test_add_instruction(piet_runtime: PietRuntime):
@@ -106,39 +105,46 @@ def test_duplicate_instruction(piet_runtime: PietRuntime):
 
 
 def test_roll_instruction(piet_runtime: PietRuntime):
-    base_stack = deque(random.randbytes(random.choice(range(1, 10))))
-    edge_stack = deque(random.randbytes(random.choice(range(1, 10))))
+    base_stack = PietStack(random.randbytes(random.choice(range(1, 10))))
+    edge_stack = PietStack(random.randbytes(random.choice(range(1, 10))))
     roll_count = random.choice(range(1, 10))
-    piet_runtime.stack._stack.extend(base_stack)
-    piet_runtime.stack._stack.extend(edge_stack)
-    piet_runtime.stack._stack.extend((len(edge_stack), roll_count))
+    piet_runtime.stack.extend(base_stack)
+    piet_runtime.stack.extend(edge_stack)
+    piet_runtime.stack.extend((len(edge_stack), roll_count))
     edge_stack.rotate(roll_count)
     piet_runtime.p_roll()
     base_stack.extend(edge_stack)
-    assert piet_runtime.stack._stack == base_stack
+    assert piet_runtime.stack == base_stack
 
 
 def test_input_num_instruction(piet_runtime: PietRuntime):
+    piet_runtime.input = StringIO("69 test")
     piet_runtime.p_input_num()
-    assert (piet_runtime.input_buffer == " test") and (piet_runtime.stack[0] == 69)
+    result = piet_runtime.input.read()
+    assert piet_runtime.stack.top == 69
+    assert result == " test"
 
 
 def test_input_char_instruction(piet_runtime: PietRuntime):
+    piet_runtime.input = StringIO("test")
     piet_runtime.p_input_char()
     piet_runtime.p_input_char()
     piet_runtime.p_input_char()
     piet_runtime.p_input_char()
-    piet_runtime.p_input_char()
-    assert piet_runtime.stack._stack == deque((32, 116, 101, 115, 116))
+    assert piet_runtime.stack == PietStack((116, 101, 115, 116))
 
 
 def test_output_num_instruction(piet_runtime: PietRuntime):
     num = random.choice(range(1, 100))
     piet_runtime.p_push(num)
-    assert piet_runtime.p_output_num() == num
+    piet_runtime.p_output_num()
+    piet_runtime.output.seek(0)
+    assert piet_runtime.output.read() == str(num)
 
 
 def test_output_char_instruction(piet_runtime: PietRuntime):
     char = random.choice(string.ascii_letters)
     piet_runtime.p_push(ord(char))
-    assert piet_runtime.p_output_char() == char
+    piet_runtime.p_output_char()
+    piet_runtime.output.seek(0)
+    assert piet_runtime.output.read() == char
