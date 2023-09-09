@@ -141,6 +141,23 @@ class Level:
             ],
             [
                 (
+                    Path(icons_dir_path, "magnifying_glass.png"),
+                    ControlPanel(
+                        "Hidden in ASCII",
+                        {
+                            "sliders": [],
+                            "dropdowns": [],
+                            # "buttons": [
+                            #     "zoom in",
+                            #     "zoom out"
+                            # ]
+                        },
+                    ),
+                    {},
+                )
+            ],
+            [
+                (
                     Path(icons_dir_path, "rishihara.png"),
                     ControlPanel(
                         "Motion",
@@ -171,26 +188,8 @@ class Level:
                         ),
                     },
                 ),
-            ],
-            [
-                (
-                    Path(icons_dir_path, "magnifying_glass.png"),
-                    ControlPanel(
-                        "Hidden in ASCII",
-                        {
-                            "sliders": [],
-                            "dropdowns": [],
-                            # "buttons": [
-                            #     "zoom in",
-                            #     "zoom out"
-                            # ]
-                        }
-                    ),
-                    {},
-                )
             ]
         ]
-
 
         if 0 <= self.level_number - 1 < len(filters):
             return cast(FilterList, filters[self.level_number - 1])

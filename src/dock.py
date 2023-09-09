@@ -200,4 +200,3 @@ class Dock(QWidget):
         :return:
         """
         self.img_label.setPixmap(image)
-
