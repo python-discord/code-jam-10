@@ -35,7 +35,7 @@ class Level:
         if self.level_number == 3:
             return Path(image_dir_path, "number_hidden_image.png")
         if self.level_number == 4:
-            return Path(image_dir_path, "desert.jpg")
+            return Path(image_dir_path, "img2.jpg")
         return Path(image_dir_path, "default.png")
 
     def get_secret_answer(self) -> str:
@@ -73,8 +73,8 @@ class Level:
                         "Ishihara",
                         {
                             "sliders": [
-                                ("A", (0, 100), Qt.Orientation.Horizontal),
-                                ("B", (0, 100), Qt.Orientation.Horizontal),
+                                ("A", (0, 100), Qt.Orientation.Horizontal, True),
+                                ("B", (0, 100), Qt.Orientation.Horizontal, True),
                             ],
                             "dropdowns": [],
                         },
@@ -97,6 +97,7 @@ class Level:
                                     "Exposure",
                                     ("Image 1", "Image 2"),
                                     Qt.Orientation.Horizontal,
+                                    False
                                 )
                             ],
                             "dropdowns": [],
@@ -136,14 +137,15 @@ class Level:
                                     "horizontal wave",
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
+                                    False
                                 ),
-                                ("vertical wave", (0, 100), Qt.Orientation.Horizontal),
-                                ("vertical spike", (0, 100), Qt.Orientation.Horizontal),
+                                ("vertical wave", (0, 100), Qt.Orientation.Horizontal, False),
+                                ("vertical spike", (0, 100), Qt.Orientation.Horizontal, False),
                                 (
                                     "horizontal spike",
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
-                                ),
+                                    False)
                             ],
                             "dropdowns": [],
                         },
@@ -152,7 +154,7 @@ class Level:
                         "second_image": None,
                         "secret_code": "Turbo secret",
                         "MotionTransformer": MotionTransformer(
-                            Image.open(image_dir_path / "desert.jpg")
+                            Image.open(image_dir_path / "img2.jpg")
                         ),
                     },
                 ),

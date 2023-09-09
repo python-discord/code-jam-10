@@ -2,22 +2,10 @@ import math
 from collections import OrderedDict
 from enum import Enum, auto
 from typing import Callable, Iterable
-import time
 
 import numpy as np
 from numpy.typing import NDArray
 from PIL import Image
-
-def measure_execution_time(func):
-    def wrapper(*args, **kwargs):
-        start_time = time.time()
-        result = func(*args, **kwargs)
-        end_time = time.time()
-        execution_time = end_time - start_time
-        print(f"Function {func.__name__} took {execution_time:.4f} seconds to execute")
-        return result
-    return wrapper
-
 
 
 class PIXEL_INTERPOLATION_METHOD(Enum):
@@ -42,29 +30,6 @@ class OFF_CANVAS_FILL(Enum):
 
 class Effect:
     """List of effects that all take xmesh, ymesh, and magnitude of the effect"""
-
-    @staticmethod
-    def explode(
-        xmesh: NDArray, ymesh: NDArray, magnitude: float = 1
-    ) -> tuple[NDArray, NDArray]:
-        """
-        Creates a motion outward from the center - work in progress
-
-        :param xmesh: a mesh grid for x-axis
-        :param ymesh: a mesh grid for y-axis
-        :param magnitude: the magnitude of the effect
-        :return: xmesh, ymesh
-        """
-        height, width = xmesh.shape
-        normalized_distance = (
-            (xmesh / width - 0.5) ** 2 + (ymesh / height - 0.5) ** 2
-        ) ** 0.5
-        new_distance = normalized_distance / (
-            np.maximum((1 - normalized_distance) * 3 * magnitude, 1) + 0.1
-        )
-        xmesh = (xmesh - width / 2) * new_distance / normalized_distance + width / 2
-        ymesh = (ymesh - height / 2) * new_distance / normalized_distance + height / 2
-        return xmesh, ymesh
 
     @staticmethod
     def vertical_wave(
@@ -131,11 +96,33 @@ class Effect:
         :param spikenum: number of spikes
         :return: xmesh, ymesh
         """
-        print("horizontal spike calculation")
         height, _ = xmesh.shape
         spike_distance = height // spikenum
         offset = np.abs(ymesh % spike_distance - spike_distance // 2) * magnitude * 2
         return xmesh + offset, ymesh
+
+
+def explode(
+    xmesh: NDArray, ymesh: NDArray, magnitude: float = 1
+) -> tuple[NDArray, NDArray]:
+    """
+    Creates a motion outward from the center - work in progress
+
+    :param xmesh: a mesh grid for x-axis
+    :param ymesh: a mesh grid for y-axis
+    :param magnitude: the magnitude of the effect
+    :return: xmesh, ymesh
+    """
+    height, width = xmesh.shape
+    normalized_distance = (
+        (xmesh / width - 0.5) ** 2 + (ymesh / height - 0.5) ** 2
+    ) ** 0.5
+    new_distance = normalized_distance / (
+        np.maximum((1 - normalized_distance) * 3 * magnitude, 1) + 0.1
+    )
+    xmesh = (xmesh - width / 2) * new_distance / normalized_distance + width / 2
+    ymesh = (ymesh - height / 2) * new_distance / normalized_distance + height / 2
+    return xmesh, ymesh
 
 
 class MotionTransformer:
@@ -153,7 +140,6 @@ class MotionTransformer:
             Effect.horizontal_spike,
         ),
     ) -> None:
-        print("initializing motion transform")
         self.img = img
         self.interpolation = interpolation
         self.fill_method = fill_method
@@ -185,9 +171,6 @@ class MotionTransformer:
             self._generate_mesh()
         self.img = img
 
-
-
-    @measure_execution_time
     def calculate_output(self, magnitudelist: Iterable[float]) -> Image.Image:
         """
         Outputs the distorted image with all filters applied
@@ -197,21 +180,7 @@ class MotionTransformer:
         """
         xmesh, ymesh = self.xmesh, self.ymesh
         for func, magnitude in zip(self.funclist, magnitudelist):
-            cache_key = (func.__name__, magnitude)
-            if False:
-                # If the result is already in the cache, use it
-                xmesh, ymesh = self.cache[cache_key]
-            else:
-                xmesh_copy, ymesh_copy = func(xmesh, ymesh, magnitude)
-                self.cache[cache_key] = (
-                    xmesh_copy,
-                    ymesh_copy,
-                )  # Store a copy of the result in the cache
-                xmesh, ymesh = xmesh_copy, ymesh_copy
-
-                # Check cache size and remove the oldest entry if it exceeds the capacity
-                if len(self.cache) > self.cache_capacity:
-                    self.cache.popitem(last=False)  # Remove the oldest entry
+            xmesh, ymesh = func(xmesh, ymesh, magnitude)
         xmesh = xmesh.astype(int) % self.img.width
         ymesh = ymesh.astype(int) % self.img.height
         np_img = np.array(self.img)
@@ -224,7 +193,6 @@ class MotionTransformer:
 
         :return:
         """
-        print(self.img.size)
         self.xmesh, self.ymesh = np.meshgrid(
             np.arange(self.img.width), np.arange(self.img.height), sparse=False
         )
