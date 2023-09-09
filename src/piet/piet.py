@@ -39,6 +39,8 @@ class SelfExpandingList(list[T]):
                     except IndexError:
                         items.append(deepcopy(self._default))
                 return self.__class__(items, default=deepcopy(self._default))
+            if index < -1:
+                raise IndexError("SelfExpandingList index out of range")
             return super().__getitem__(index)
         except IndexError:
             if isinstance(index, slice):
@@ -66,6 +68,8 @@ class SelfExpandingList(list[T]):
                 for i in indices:
                     self.__setitem__(i, value)
             else:
+                if index < -1:
+                    raise IndexError("SelfExpandingList index out of range")
                 super().__setitem__(index, value)
         except IndexError:
             if isinstance(index, slice):
