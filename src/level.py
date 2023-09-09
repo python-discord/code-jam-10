@@ -1,8 +1,9 @@
 from pathlib import Path
 from typing import Dict, List, Tuple, cast
-
+from PIL import Image
 from PyQt6.QtCore import Qt
 
+from lib.motions.motions import MotionTransformer
 from src.control_panel import ControlPanel
 
 FilterItem = Tuple[Path, ControlPanel, Dict[str, Path | str | None | int]]
@@ -32,6 +33,8 @@ class Level:
             return Path(image_dir_path, "clockwork.jpg")
         if self.level_number == 3:
             return Path(image_dir_path, "land_n_poles.png")
+        if self.level_number == 4:
+            return Path(image_dir_path, "desert.jpg")
         return Path(image_dir_path, "default.png")
 
     def get_secret_answer(self) -> str:
@@ -72,12 +75,13 @@ class Level:
                                 ("A", (0, 100), Qt.Orientation.Horizontal),
                                 ("B", (0, 100), Qt.Orientation.Horizontal),
                             ],
-                            "dropdowns": []
-                        }
+                            "dropdowns": [],
+                        },
                     ),
                     {
                         "second_image": None,
                         "secret_code": "42",
+                        "MotionTransformer": None,
                     },
                 ),
             ],
@@ -86,7 +90,6 @@ class Level:
                     Path(icons_dir_path, "button_sample2.png"),
                     ControlPanel(
                         "Double Exposure",
-
                         {
                             "sliders": [
                                 (
@@ -95,12 +98,13 @@ class Level:
                                     Qt.Orientation.Horizontal,
                                 )
                             ],
-                            "dropdowns": []
-                        }
+                            "dropdowns": [],
+                        },
                     ),
                     {
                         "second_image": Path(image_dir_path, "doggo.jpg"),
                         "secret_code": "secret",
+                        "MotionTransformer": None,
                     },
                 ),
             ],
@@ -112,22 +116,46 @@ class Level:
                         {
                             "sliders": [],
                             "dropdowns": [
-                                [
-                                    "Rust",
-                                    "Chocolate",
-                                    "Flamenco",
-                                    "Casablanca",
-                                    "Buff"
-                                ]
+                                ["Rust", "Chocolate", "Flamenco", "Casablanca", "Buff"]
                             ],
-                            "buttons": [
-                                1  # TODO MAKE THIS HAVE INFO
-                            ]
-                        }
+                            "buttons": [1],  # TODO MAKE THIS HAVE INFO
+                        },
                     ),
-                    {}
+                    {},
                 )
-            ]
+            ],
+            [
+                (
+                    Path(icons_dir_path, "rishihara.png"),
+                    ControlPanel(
+                        "Motion",
+                        {
+                            "sliders": [
+                                (
+                                    "horizontal wave",
+                                    (0, 100),
+                                    Qt.Orientation.Horizontal,
+                                ),
+                                ("vertical wave", (0, 100), Qt.Orientation.Horizontal),
+                                ("vertical spike", (0, 100), Qt.Orientation.Horizontal),
+                                (
+                                    "horizontal spike",
+                                    (0, 100),
+                                    Qt.Orientation.Horizontal,
+                                ),
+                            ],
+                            "dropdowns": [],
+                        },
+                    ),
+                    {
+                        "second_image": None,
+                        "secret_code": "42",
+                        "MotionTransformer": MotionTransformer(
+                            Image.open(image_dir_path / "desert.jpg")
+                        ),
+                    },
+                ),
+            ],
         ]
 
         if 0 <= self.level_number - 1 < len(filters):
