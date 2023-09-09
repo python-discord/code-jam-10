@@ -3,19 +3,22 @@ from .steganography import Image, Steganography
 
 EOM = "$$$"
 
+
 def pixels_top_left(pixels: list[list[int]], bytes_input: bytes):
+    """A generator that chooses pixels starting from the top left"""
     for pixel in pixels:
         yield pixel
 
 
 def pixels_space_evenly(pixels: list[list[int]], bytes_input: bytes):
-    ... # TODO
+    """A generator that chooses pixels such that they are spaced evenly throughout the image"""
+    ...  # TODO
 
 
 class Lsb(Steganography):
     """Least Significant Bit Implementation of Steganography"""
 
-    def __init__(self, pixels_generator = pixels_top_left):
+    def __init__(self, pixels_generator=pixels_top_left):
         """Initialises the LSB encoder and decoder.
 
         Args:
@@ -24,7 +27,6 @@ class Lsb(Steganography):
                 for the full number of bytes specified.
         """
         self.pixels_generator = pixels_generator
-
 
     def encode(self, text: str, img: Image):
         """Encode the text in the image.
