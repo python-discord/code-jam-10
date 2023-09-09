@@ -64,13 +64,16 @@ class Level:
         filters = [
             [
                 (
-                    Path(icons_dir_path, "button_sample4.png"),
+                    Path(icons_dir_path, "rishihara.png"),
                     ControlPanel(
                         "Ishihara",
-                        [
-                            ("A", (0, 100), Qt.Orientation.Horizontal),
-                            ("B", (0, 100), Qt.Orientation.Horizontal),
-                        ],
+                        {
+                            "sliders": [
+                                ("A", (0, 100), Qt.Orientation.Horizontal),
+                                ("B", (0, 100), Qt.Orientation.Horizontal),
+                            ],
+                            "dropdowns": []
+                        }
                     ),
                     {
                         "second_image": None,
@@ -91,7 +94,6 @@ class Level:
                             ],
                             "dropdowns": []
                         }
-
                     ),
                     {
                         "second_image": Path(image_dir_path, "desert.jpg"),
