@@ -69,18 +69,8 @@ class Level:
                         "Ishihara",
                         {
                             "sliders": [
-                                (
-                                    "A",
-                                    (0, 100),
-                                    Qt.Orientation.Horizontal,
-                                    True
-                                ),
-                                (
-                                    "B",
-                                    (0, 100),
-                                    Qt.Orientation.Horizontal,
-                                    True
-                                ),
+                                ("A", (0, 100), Qt.Orientation.Horizontal),
+                                ("B", (0, 100), Qt.Orientation.Horizontal),
                             ],
                             "dropdowns": []
                         }
@@ -103,7 +93,6 @@ class Level:
                                     "Exposure",
                                     ("Image 1", "Image 2"),
                                     Qt.Orientation.Horizontal,
-                                    False
                                 )
                             ],
                             "dropdowns": []
