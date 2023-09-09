@@ -5,7 +5,7 @@ import time
 from enum import IntEnum
 from os import PathLike
 from string import whitespace
-from typing import Optional, SupportsInt, Tuple
+from typing import NamedTuple, Optional, SupportsInt, Tuple
 from warnings import warn
 
 import numpy as np
@@ -13,56 +13,87 @@ from numpy.typing import ArrayLike
 from PIL import Image
 
 from imagereader import CodelInfo, Reader
-from piet import PIET_COLORS
 
-"""
-TODO:
-
--block exec on black/edge
--noop on white
--perform DP/CC manipulation on block
--impl DEBUG features
-    - last_step
-    - last_instruction
-- stop exec when all paths exhausted
-"""
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 
 
-class DirectionPointerValues(IntEnum):
+class Color(NamedTuple):
+    r: int
+    g: int
+    b: int
+
+    def __eq__(self, other: object, /) -> bool:
+        if isinstance(other, Color):
+            return self.r == other.r and self.g == other.g and self.b == other.b
+        if isinstance(other, tuple):
+            if len(other) != 3:
+                return False
+            return self.r == other[0] and self.g == other[1] and self.b == other[2]
+        if isinstance(other, int):
+            return int(self) == other
+        return False
+
+    def __int__(self) -> int:
+        return (self.r << 0) + (self.g << 8) + (self.b << 16)
+
+
+#         lightness hue
+#              v     v
+PIET_COLORS: tuple[tuple[Color, ...], ...] = (
+    (
+        Color(255, 192, 192),
+        Color(255, 255, 192),
+        Color(192, 255, 192),
+        Color(192, 255, 255),
+        Color(192, 192, 255),
+        Color(255, 192, 255),
+    ),
+    (
+        Color(255, 000, 000),
+        Color(255, 255, 000),
+        Color(000, 255, 000),
+        Color(000, 255, 255),
+        Color(000, 000, 255),
+        Color(255, 000, 255),
+    ),
+    (
+        Color(192, 000, 000),
+        Color(192, 192, 000),
+        Color(000, 192, 000),
+        Color(000, 192, 192),
+        Color(000, 000, 192),
+        Color(192, 000, 192),
+    ),
+)
+
+
+class PointerDirection(IntEnum):
     RIGHT = 0
     DOWN = 1
     LEFT = 2
     UP = 3
 
 
-class CodelChooserValues(IntEnum):
-    LEFT = 0
+class CodelChooserDirection(IntEnum):
+    LEFT = -1
     RIGHT = 1
 
 
 class DirectionPointer:
-    def __init__(self) -> None:
-        self.position = DirectionPointerValues.RIGHT
+    def __init__(self):
+        self.direction = PointerDirection.RIGHT
 
-    def rotate(self):
-        if self.position == 3:
-            self.position = DirectionPointerValues.RIGHT
-        else:
-            self.position = DirectionPointerValues(self.position + 1)
-
-    def set(self, value):
-        self.position = DirectionPointerValues(value)
+    def rotate(self, times: int = 1):
+        self.direction = PointerDirection((self.direction + times) % 4)
 
 
 class CodelChooser:
-    def __init__(self) -> None:
-        self.position = CodelChooserValues.LEFT
+    def __init__(self):
+        self.direction = CodelChooserDirection.LEFT
 
-    def flip(self):
-        self.position = CodelChooserValues(int(not self.position))
-
-    def set(self, value):
-        self.position = CodelChooserValues(value)
+    def flip(self, times: int = 1):
+        self.direction = CodelChooserDirection(self.direction * -1 if abs(times) % 2 else self.direction)
 
 
 class PietStack:
@@ -162,10 +193,10 @@ class PietRuntime:
         self.stack.push(np.int64(np.greater(*self.stack.popx())))
 
     def p_pointer(self):
-        self.pointer.set(np.mod(self.stack.pop(), 4))
+        self.pointer.rotate(int(self.stack.pop()))
 
     def p_switch(self):
-        self.codel_chooser.set(np.mod(self.stack.pop(), 2))
+        self.codel_chooser.flip(int(self.stack.pop()))
 
     def p_duplicate(self):
         self.stack.push(self.stack.top)
@@ -262,20 +293,23 @@ class PietInterpreter:
 
         return tuple(c_delta)
 
-    def _get_polars(self, list):
-        largest_x = 0
-        largest_y = 0
-        smallest_x = self.reader.im_rgb.size[0]
-        smallest_y = self.reader.im_rgb.size[1]
-        for y, x in list:
-            if x > largest_x:
-                largest_x = x
-            if x < smallest_x:
-                smallest_x = x
-            if y > largest_y:
-                largest_y = y
-            if y < smallest_y:
-                smallest_y = y
+    def _get_polars(self, coords):
+        largest_x = max(coords, key=lambda x: x[1])[1]
+        largest_y = max(coords, key=lambda x: x[0])[0]
+        smallest_x = min(coords, key=lambda x: x[1])[1]
+        smallest_y = min(coords, key=lambda x: x[0])[0]
+        # largest_x = 0
+        # largest_y = 0
+        # smallest_y, smallest_x, *_ = self.reader.im_array.shape
+        # for y, x in coords:
+        #     if x > largest_x:
+        #         largest_x = x
+        #     if x < smallest_x:
+        #         smallest_x = x
+        #     if y > largest_y:
+        #         largest_y = y
+        #     if y < smallest_y:
+        #         smallest_y = y
         return (
             largest_x,
             largest_y,
@@ -283,59 +317,58 @@ class PietInterpreter:
             smallest_y,
         )
 
-    def _determine_farthest_pixel(self, codel: CodelInfo) -> Tuple[int, int]:
-        # TODO: this can all obviously be optimized
+    def _determine_farthest_pixel(self, codel: CodelInfo) -> tuple[int, int]:
         lx, ly, sx, sy = self._get_polars(codel.pixels)
-        largest_x_places = []
-        largest_y_places = []
-        smallest_x_places = []
-        smallest_y_places = []
-        for y, x in codel.pixels:
-            if x == lx:
-                largest_x_places.append((y, x))
-            if x == sx:
-                smallest_x_places.append((y, x))
-            if y == ly:
-                largest_y_places.append((y, x))
-            if y == sy:
-                smallest_y_places.append((y, x))
-
-        if self.runtime.pointer.position == DirectionPointerValues.RIGHT:
+        if self.runtime.pointer.direction is PointerDirection.RIGHT:
+            largest_x_places = [(y, x) for y, x in codel.pixels if x == lx]
             lx, ly, sx, sy = self._get_polars(largest_x_places)
-            if self.runtime.codel_chooser.position == CodelChooserValues.LEFT:
+            if self.runtime.codel_chooser.direction is CodelChooserDirection.LEFT:
                 return sy, lx
-            else:
-                return ly, lx
-        elif self.runtime.pointer.position == DirectionPointerValues.DOWN:
+            return ly, lx
+        if self.runtime.pointer.direction is PointerDirection.DOWN:
+            largest_y_places = [(y, x) for y, x in codel.pixels if y == ly]
             lx, ly, sx, sy = self._get_polars(largest_y_places)
-            if self.runtime.codel_chooser.position == CodelChooserValues.LEFT:
+            if self.runtime.codel_chooser.direction is CodelChooserDirection.LEFT:
                 return ly, lx
-            else:
-                return ly, sx
-        elif self.runtime.pointer.position == DirectionPointerValues.LEFT:
+            return ly, sx
+        if self.runtime.pointer.direction is PointerDirection.LEFT:
+            smallest_x_places = [(y, x) for y, x in codel.pixels if x == sx]
             lx, ly, sx, sy = self._get_polars(smallest_x_places)
-            if self.runtime.codel_chooser.position == CodelChooserValues.LEFT:
+            if self.runtime.codel_chooser.direction is CodelChooserDirection.LEFT:
                 return ly, sx
-            else:
-                return sy, sx
-        elif self.runtime.pointer.position == DirectionPointerValues.UP:
+            return sy, sx
+        if self.runtime.pointer.direction is PointerDirection.UP:
+            smallest_y_places = [(y, x) for y, x in codel.pixels if y == sy]
             lx, ly, sx, sy = self._get_polars(smallest_y_places)
-            if self.runtime.codel_chooser.position == CodelChooserValues.LEFT:
+            if self.runtime.codel_chooser.direction is CodelChooserDirection.LEFT:
                 return sy, sx
-            else:
-                return sy, lx
+            return sy, lx
         return (-1, -1)
+
+    def _next_move(self) -> tuple[int, int]:
+        if self.runtime.pointer.direction is PointerDirection.RIGHT:
+            y, x = tuple(np.add(self.position, (0, 1)))
+            return y, x
+        if self.runtime.pointer.direction is PointerDirection.DOWN:
+            y, x = tuple(np.add(self.position, (1, 0)))
+            return y, x
+        if self.runtime.pointer.direction is PointerDirection.LEFT:
+            y, x = tuple(np.subtract(self.position, (0, 1)))
+            return y, x
+        if self.runtime.pointer.direction is PointerDirection.UP:
+            y, x = tuple(np.subtract(self.position, (1, 0)))
+            return y, x
+        raise ValueError("Invalid direction pointer position.")
 
     def _move(self):
         """Move one pixel in the direction of the DP"""
-        if self.runtime.pointer.position == DirectionPointerValues.RIGHT:
-            self.current_position = tuple(np.add(self.current_position, (0, 1)))
-        elif self.runtime.pointer.position == DirectionPointerValues.DOWN:
-            self.current_position = tuple(np.add(self.current_position, (1, 0)))
-        elif self.runtime.pointer.position == DirectionPointerValues.LEFT:
-            self.current_position = tuple(np.subtract(self.current_position, (0, 1)))
-        elif self.runtime.pointer.position == DirectionPointerValues.UP:
-            self.current_position = tuple(np.subtract(self.current_position, (1, 0)))
+        self.position = self._next_move()
+
+    def _move_to_furthest_pixel(self):
+        # move to farthest pixel in current codel
+        if self.current_codel.color != WHITE:
+            farthest_pixel = self._determine_farthest_pixel(self.current_codel)
+            self.position = farthest_pixel
 
     def step(self):
         "Execute a single step."
