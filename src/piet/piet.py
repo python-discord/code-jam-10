@@ -62,9 +62,6 @@ class SelfExpandingList(list[T]):
         try:
             if isinstance(index, slice):
                 indices = range(index.start or 0, index.stop or len(self), index.step or 1)
-                # if hasattr(value, "__len__") and len(value) == len(indices):
-                #     super().__setitem__(index, value)
-                # else:
                 for i in indices:
                     self.__setitem__(i, value)
             else:
@@ -126,6 +123,29 @@ class ColorChange(NamedTuple):
     hue: int
 
 
+class PointerDirection(Enum):
+    RIGHT = OrderedPair(0, 1)
+    DOWN = OrderedPair(1, 0)
+    LEFT = OrderedPair(0, -1)
+    UP = OrderedPair(-1, 0)
+
+
+class DirectionOffset(IntEnum):
+    FRONT = 0
+    RIGHT = 1
+    BACK = 2
+    LEFT = 3
+    FRONT_RIGHT = 4
+    BACK_RIGHT = 5
+    BACK_LEFT = 6
+    FRONT_LEFT = 7
+
+
+class CodelChooserDirection(IntEnum):
+    LEFT = -1
+    RIGHT = 1
+
+
 #         lightness hue
 #              v     v
 PIET_COLORS: tuple[tuple[Color, ...], ...] = (
@@ -182,14 +202,6 @@ class PietCommand(Enum):
     OUT_CHAR = ColorChange(2, 5)
 
 
-DIRECTIONS = (
-    OrderedPair(1, 0),
-    OrderedPair(-1, 0),
-    OrderedPair(0, 1),
-    OrderedPair(0, -1),
-)
-
-
 class Codel(NamedTuple):
     color: Color
     pixels: set[OrderedPair]
@@ -226,8 +238,8 @@ class Reader:
         queue.append(pos)
         while queue:
             pos = queue.popleft()
-            for direction in DIRECTIONS:
-                offset_pos = pos + direction
+            for direction in PointerDirection:
+                offset_pos = pos + direction.value
                 if (
                     offset_pos.y in y_range
                     and offset_pos.x in x_range
@@ -283,29 +295,6 @@ class Reader:
         height, width = len(self.colors), len(self.colors[0])
         codel_size = self.smallest_codel()
         return OrderedPair(width // codel_size, height // codel_size)
-
-
-class PointerDirection(Enum):
-    RIGHT = OrderedPair(0, 1)
-    DOWN = OrderedPair(1, 0)
-    LEFT = OrderedPair(0, -1)
-    UP = OrderedPair(-1, 0)
-
-
-class DirectionOffset(IntEnum):
-    FRONT = 0
-    RIGHT = 1
-    BACK = 2
-    LEFT = 3
-    FRONT_RIGHT = 4
-    BACK_RIGHT = 5
-    BACK_LEFT = 6
-    FRONT_LEFT = 7
-
-
-class CodelChooserDirection(IntEnum):
-    LEFT = -1
-    RIGHT = 1
 
 
 class DirectionPointer:
@@ -727,10 +716,6 @@ class PietInterpreter:
 
 class PietProgramGenerator:
     def __init__(self):
-        # self.size = size
-        # self.commands = np.full(size, PietCommand._NONE, dtype=PietCommand)
-        # self.commands = np.full((2, 2), PietCommand._NONE, dtype=PietCommand)
-        # self.colors = np.full((2, 2), WHITE, dtype=Color)
         self.commands = SelfExpandingList(default=SelfExpandingList[PietCommand](default=PietCommand._NONE))
         self.colors = SelfExpandingList(default=SelfExpandingList(default=BLACK))
         self.interpreter = PietInterpreter(self.image, debug=False)
@@ -803,33 +788,6 @@ class PietProgramGenerator:
             pointer.rotate()
             pointer.move_to_next()
         self.set_command(command, pointer.position)
-
-    # @property
-    # def colors(self) -> list[list[Color]]:
-    #     colors = []
-    #     current_hue = 0
-    #     current_lightness = 0
-    #     previous_color = PietCommand.NOOP.value
-    #     for row in self.commands:
-    #         color_row = []
-    #         for command in row:
-    #             command: PietCommand
-    #             if command is PietCommand._NONE:
-    #                 color_row.append(PietCommand.NOOP.value)
-    #             elif command is PietCommand._PREVIOUS:
-    #                 color_row.append(previous_color)
-    #             elif isinstance(command.value, ColorChange):
-    #                 if previous_color not in (PietCommand.BLOCK.value, PietCommand.NOOP.value):
-    #                     current_hue = (current_hue + command.value.hue) % 6
-    #                     current_lightness = (current_lightness + command.value.lightness) % 3
-    #                 color = PIET_COLORS[current_lightness][current_hue]
-    #                 color_row.append(color)
-    #                 previous_color = color
-    #             elif isinstance(command.value, Color):
-    #                 color_row.append(command.value)
-    #                 previous_color = command.value
-    #         colors.append(color_row)
-    #     return colors
 
     @property
     def image(self) -> Image.Image:
