@@ -1,11 +1,13 @@
 from pathlib import Path
 from typing import Dict, List, Tuple, cast
 
+from PIL import Image
 from PyQt6.QtCore import Qt
 
 from lib.hidden_in_ascii.hidden_in_ascii import (
     ascii_to_img, generate_ascii_file, prepare_input, seed_secret
 )
+from lib.motions.motions import MotionTransformer
 from src.control_panel import ControlPanel
 
 FilterItem = Tuple[Path, ControlPanel, Dict[str, Path | str | None | int]]
@@ -43,6 +45,8 @@ class Level:
             seed_secret(ascii_file_path, self.get_secret_answer(), False)
             ascii_to_img(ascii_file_path, coordinates, input_img.size, output_img_path)
             return output_img_path
+        if self.level_number == 5:
+            return Path(image_dir_path, "img2.jpg")
         return Path(image_dir_path, "default.png")
 
     def get_secret_answer(self) -> str:
@@ -57,9 +61,11 @@ class Level:
         if self.level_number == 2:
             return "secret2"
         if self.level_number == 3:
-            return "Very secret"
-        if self.level_number == 4:
             return "200012"
+        if self.level_number == 4:
+            return "secret"
+        if self.level_number == 5:
+            return "secret"
         return "pythoncodejam2023"
 
     def get_filters(self) -> FilterList:
@@ -80,15 +86,16 @@ class Level:
                         "Ishihara",
                         {
                             "sliders": [
-                                ("A", (0, 100), Qt.Orientation.Horizontal),
-                                ("B", (0, 100), Qt.Orientation.Horizontal),
+                                ("A", (0, 100), Qt.Orientation.Horizontal, True),
+                                ("B", (0, 100), Qt.Orientation.Horizontal, True),
                             ],
-                            "dropdowns": []
-                        }
+                            "dropdowns": [],
+                        },
                     ),
                     {
                         "second_image": None,
                         "secret_code": "42",
+                        "MotionTransformer": None,
                     },
                 ),
             ],
@@ -97,21 +104,22 @@ class Level:
                     Path(icons_dir_path, "button_sample2.png"),
                     ControlPanel(
                         "Double Exposure",
-
                         {
                             "sliders": [
                                 (
                                     "Exposure",
                                     ("Image 1", "Image 2"),
                                     Qt.Orientation.Horizontal,
+                                    False
                                 )
                             ],
-                            "dropdowns": []
-                        }
+                            "dropdowns": [],
+                        },
                     ),
                     {
                         "second_image": Path(image_dir_path, "doggo.jpg"),
                         "secret_code": "secret",
+                        "MotionTransformer": None,
                     },
                 ),
             ],
@@ -123,21 +131,46 @@ class Level:
                         {
                             "sliders": [],
                             "dropdowns": [
-                                [
-                                    "Rust",
-                                    "Chocolate",
-                                    "Flamenco",
-                                    "Casablanca",
-                                    "Buff"
-                                ]
+                                ["Rust", "Chocolate", "Flamenco", "Casablanca", "Buff"]
                             ],
-                            "buttons": [
-                                "swap"
-                            ]
-                        }
+                            "buttons": "swap",
+                        },
                     ),
-                    {}
+                    {},
                 )
+            ],
+            [
+                (
+                    Path(icons_dir_path, "rishihara.png"),
+                    ControlPanel(
+                        "Motion",
+                        {
+                            "sliders": [
+                                (
+                                    "horizontal wave",
+                                    (0, 100),
+                                    Qt.Orientation.Horizontal,
+                                    False
+                                ),
+                                ("vertical wave", (0, 100), Qt.Orientation.Horizontal, False),
+                                ("vertical spike", (0, 100), Qt.Orientation.Horizontal, False),
+                                (
+                                    "horizontal spike",
+                                    (0, 100),
+                                    Qt.Orientation.Horizontal,
+                                    False)
+                            ],
+                            "dropdowns": [],
+                        },
+                    ),
+                    {
+                        "second_image": None,
+                        "secret_code": "Turbo secret",
+                        "MotionTransformer": MotionTransformer(
+                            Image.open(image_dir_path / "img2.jpg")
+                        ),
+                    },
+                ),
             ],
             [
                 (
@@ -157,6 +190,7 @@ class Level:
                 )
             ]
         ]
+
 
         if 0 <= self.level_number - 1 < len(filters):
             return cast(FilterList, filters[self.level_number - 1])

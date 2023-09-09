@@ -35,6 +35,7 @@ class Dock(QWidget):
                     value,
                     {
                         "second_image": args["second_image"],
+                        "MotionTransformer": args["MotionTransformer"],
                     },
                 )
             )
@@ -168,6 +169,7 @@ class Dock(QWidget):
         args_to_pass = self.args_cache
         args_to_pass["second_image"] = args["second_image"]
         args_to_pass["image_to_edit"] = str(self.level.get_image_source())
+        args_to_pass["MotionTransformer"] = args["MotionTransformer"]
         size = self.img_label.size()
         args_to_pass["image_label_w"] = size.width()
         args_to_pass["image_label_h"] = size.height()
@@ -192,10 +194,18 @@ class Dock(QWidget):
 
     def update_image(self, image: QPixmap) -> None:
         """
-        Update the image label with a new image
+        Update the image in the main window
 
         :param image:
         :return:
         """
-        # Update the label
         self.img_label.setPixmap(image)
+
+    def update_args_cache(self, args: dict) -> None:
+        """
+        Update the args cache
+
+        :param args:
+        :return:
+        """
+        self.args_cache = args
