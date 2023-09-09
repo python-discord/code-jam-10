@@ -513,7 +513,7 @@ class PietInterpreter:
         self,
         image: Image.Image,
         *,
-        step_limit: int = 1000000,
+        step_limit: int = 1_000_000,
         debug: bool = False,
         runtime: PietRuntime | None = None,
     ):
@@ -521,7 +521,7 @@ class PietInterpreter:
         self.debug = debug
         self.reader = ImageReader(image)
         self.runtime = runtime or PietRuntime()
-        self.iteration = -1
+        self.iteration = 0
         self.steps: list[StepTrace] = []
         self._last_codel = self.reader.codel_info(self.position)
         self._current_codel = self.reader.codel_info(self.position)
@@ -628,7 +628,6 @@ class PietInterpreter:
         "Execute a single step."
         if self.iteration >= self.step_limit:
             raise StepLimitReached("Step limit reached.")
-        self.iteration += 1
         if self._flips >= 4:
             raise EndOfProgram("End of program reached.")
 
@@ -691,6 +690,7 @@ class PietInterpreter:
             self._current_codel,
         )
         self.steps.append(step)
+        self.iteration += 1
         if self.debug:
             print(step, file=sys.stderr)
 
