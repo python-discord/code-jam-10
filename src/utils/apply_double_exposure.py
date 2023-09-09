@@ -12,13 +12,15 @@ from src.utils.lru_cache import LRUCache
 _image_cache = LRUCache(capacity=10)  # Cache capacity of 10 images
 
 
-def apply_double_exposure(img1: tuple, img2: tuple, slider_value: int) -> QPixmap:
+def apply_double_exposure(img1: tuple, img2: tuple, slider_value: int, w: int, h: int) -> QPixmap:
     """
     Apply double exposure to an image
 
     :param img1:
     :param img2:
     :param slider_value:
+    :param w: width of the image label
+    :param h: height of the image label
     :return:
     """
     img1_path = str(img1)
@@ -45,7 +47,7 @@ def apply_double_exposure(img1: tuple, img2: tuple, slider_value: int) -> QPixma
     bytesPerLine = 3 * width
     qimage = QImage(image_np.data, width, height, bytesPerLine, QImage.Format.Format_RGB888)
     pixmap = QPixmap.fromImage(qimage)
-
+    pixmap = pixmap.scaled(w, h)
     return pixmap
 
 

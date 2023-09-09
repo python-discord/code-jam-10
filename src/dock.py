@@ -168,6 +168,9 @@ class Dock(QWidget):
         args_to_pass = self.args_cache
         args_to_pass["second_image"] = args["second_image"]
         args_to_pass["image_to_edit"] = str(self.level.get_image_source())
+        size = self.img_label.size()
+        args_to_pass["image_label_w"] = size.width()
+        args_to_pass["image_label_h"] = size.height()
 
         new_image = apply_filter(filter_title, args_to_pass)
         self.update_image(new_image)
@@ -180,6 +183,9 @@ class Dock(QWidget):
 
         args_to_pass = self.args_cache
         args_to_pass["image_to_edit"] = str(self.level.get_image_source())
+        size = self.img_label.size()
+        args_to_pass["image_label_w"] = size.width()
+        args_to_pass["image_label_h"] = size.height()
 
         new_image = apply_filter(filter_title, args_to_pass)
         self.update_image(new_image)

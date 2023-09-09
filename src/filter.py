@@ -138,7 +138,9 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
         return apply_double_exposure(
             args_for_filter["image_to_edit"],
             args_for_filter["second_image"],
-            args_for_filter["Exposure"]
+            args_for_filter["Exposure"],
+            args["image_label_w"],
+            args["image_label_h"],
         )
     if filter_name == "Ishihara":
         args_for_filter = {}
@@ -165,6 +167,8 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
         return apply_color_swap(
             args_for_filter["image_to_edit"],
             args_for_filter["first_color"],
-            args_for_filter["second_color"]
+            args_for_filter["second_color"],
+            args["image_label_w"],
+            args["image_label_h"]
         )
     pass
