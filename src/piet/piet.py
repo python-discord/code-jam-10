@@ -634,7 +634,7 @@ class PietInterpreter:
 
         next_y, next_x = self._next_move()
         try:
-            blocked = self.reader.colors[next_y][next_x] == BLACK
+            blocked = self.reader.colors[next_y][next_x] == BLACK or next_y < 0 or next_x < 0
         except IndexError:
             blocked = True
 
