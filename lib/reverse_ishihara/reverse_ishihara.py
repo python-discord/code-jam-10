@@ -1,7 +1,13 @@
 import random
 
+import cv2
 import numpy as np
-from PIL import Image, ImageCms, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont
+
+from src.utils.lru_cache_pil import LRUCachePIL
+
+# Global cache object with, for example, a capacity of 10 images
+image_cache = LRUCachePIL(10)
 
 
 def reverse_ishihara(image: Image.Image, message: str = None,
@@ -57,42 +63,44 @@ def reverse_ishihara(image: Image.Image, message: str = None,
     return image
 
 
-def unmask_reverse_ishihara(image: Image.Image, a_scale: int = 2, b_scale: int = 2) -> Image.Image:
+def unmask_reverse_ishihara(image_path: str, a_scale: int = 2, b_scale: int = 2) -> np.array:
     """
-    Reverse a reverse Ishihara image to reveal the hidden message.
+    Unmask a reverse Ishihara image
 
-    :param image: PIL Image object
+    :param image_path:
     :param a_scale:
     :param b_scale:
-    :return: PIL Image object
+    :return:
     """
-    # Convert image to Lab color space
-    srgb_profile = ImageCms.createProfile("sRGB")
-    lab_profile = ImageCms.createProfile("LAB")
+    image = cv2.imread(image_path)
+    if image is None:
+        print("Error reading the image.")
+        return None
 
-    rgb2lab_transform = ImageCms.buildTransformFromOpenProfiles(srgb_profile, lab_profile, "RGB", "LAB")
-    lab_image = ImageCms.applyTransform(image, rgb2lab_transform)
+    # Convert to LAB
+    lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2Lab)
+    l_channel, a_channel, b_channel = cv2.split(lab_image)
 
-    # Convert Lab image to numpy array for easier manipulation
-    lab_array = np.array(lab_image)
+    # Scale the 'a' and 'b' channels
+    a_channel = cv2.normalize(a_channel * a_scale, None, 0, 255, cv2.NORM_MINMAX)
+    b_channel = cv2.normalize(b_channel * b_scale, None, 0, 255, cv2.NORM_MINMAX)
 
-    # Increase contrast in a and b channels
-    l_channel, a_channel, b_channel = lab_array[:, :, 0], lab_array[:, :, 1], lab_array[:, :, 2]
-
-    # Center around zero and scale
-    a_channel = (a_channel - 128) * a_scale + 128
-    b_channel = (b_channel - 128) * b_scale + 128
-
-    # Ensure values remain in the 0-255 range
-    a_channel = np.clip(a_channel, 0, 255)
-    b_channel = np.clip(b_channel, 0, 255)
-
-    # Reconstruct the Lab image
-    enhanced_lab_array = np.stack([l_channel, a_channel, b_channel], axis=2).astype(np.uint8)
-    enhanced_lab_image = Image.fromarray(enhanced_lab_array)
+    # Merge the channels back
+    enhanced_lab_image = cv2.merge([l_channel, a_channel.astype(np.uint8), b_channel.astype(np.uint8)])
 
     # Convert back to RGB
-    lab2rgb_transform = ImageCms.buildTransformFromOpenProfiles(lab_profile, srgb_profile, "LAB", "RGB")
-    enhanced_rgb_image = ImageCms.applyTransform(enhanced_lab_image, lab2rgb_transform)
+    enhanced_rgb_image = cv2.cvtColor(enhanced_lab_image, cv2.COLOR_Lab2BGR)
 
-    return enhanced_rgb_image
+    # Considering the blue channel might have the difference we need (as before), threshold it
+    _, b_channel = cv2.threshold(enhanced_rgb_image[:, :, 2], 1, 255, cv2.THRESH_BINARY)
+
+    # Erode to enhance the message dots over the noise
+    kernel = np.ones((3, 3), np.uint8)
+    mask = cv2.erode(b_channel, kernel, iterations=1)
+
+    # Extract message
+    result = cv2.bitwise_and(enhanced_rgb_image, enhanced_rgb_image, mask=mask)
+
+    # cv2.imwrite("enhanced.png", result)
+
+    return result

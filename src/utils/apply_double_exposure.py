@@ -6,10 +6,10 @@ from PyQt6.QtCore import QBuffer
 from PyQt6.QtGui import QImage, QPixmap
 
 from lib.double_exposure.double_exposure import double_exposure
-from src.utils.lru_cache import LRUCache
+from src.utils.lru_cache_pil import LRUCachePIL
 
 # Create a cache for storing images:
-_image_cache = LRUCache(capacity=10)  # Cache capacity of 10 images
+_image_cache = LRUCachePIL(capacity=10)  # Cache capacity of 10 images
 
 
 def apply_double_exposure(img1: tuple, img2: tuple, slider_value: int, w: int, h: int) -> QPixmap:

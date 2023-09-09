@@ -3,9 +3,9 @@ from PIL import Image
 from PyQt6.QtGui import QImage, QPixmap
 
 from lib.pixelate_and_swap.pixelate_and_swap import swap_colors
-from src.utils.apply_double_exposure import LRUCache
+from src.utils.apply_double_exposure import LRUCachePIL
 
-_image_cache = LRUCache(capacity=10)  # Cache capacity of 10 images
+_image_cache = LRUCachePIL(capacity=10)  # Cache capacity of 10 images
 
 
 def apply_color_swap(image: tuple, first_color: str, second_color: str, w: int, h: int) -> QPixmap:
