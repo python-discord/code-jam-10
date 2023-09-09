@@ -67,9 +67,17 @@ class Window(QMainWindow):
         layout = QHBoxLayout(frame)
         img = QPixmap(str(self.level.img_source))
 
+        # Check all filters to see if they all of them don't need control panel
+        # This allows image to take up the entire space
+        no_control_panel = all(_filter[1] is None for _filter in self.level.filters)
+
         # Define max image size constraints (80% of height and 70% of width of the user's primary screen size)
-        max_height = self.screen_size.height() * 0.8
-        max_width = self.screen_size.width() * 0.7
+        if no_control_panel is None:
+            max_height = self.screen_size.height() * 0.8
+            max_width = self.screen_size.width() * 0.9
+        else:
+            max_height = self.screen_size.height() * 0.8
+            max_width = self.screen_size.width() * 0.7
 
         # Calculate the scaling factors for width and height
         img_size = img.size()
