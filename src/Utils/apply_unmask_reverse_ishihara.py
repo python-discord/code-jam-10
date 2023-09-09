@@ -26,7 +26,7 @@ def apply_unmask_reverse_ishihara(args: dict) -> QPixmap:
         else:
             slider_b = 0
 
-        img_path = str(args["img_to_edit"])
+        img_path = str(args["image_to_edit"])
         if not (_img := _image_cache.get(img_path)):
             _img = Image.open(img_path)
             _image_cache.put(img_path, _img)

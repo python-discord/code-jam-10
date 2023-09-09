@@ -64,78 +64,25 @@ class Level:
         filters = [
             [
                 (
-                    Path(icons_dir_path, "button_sample4.png"),
+                    Path(icons_dir_path, "rishihara.png"),
                     ControlPanel(
                         "Ishihara",
-                        [
-                            ("A", (0, 100), Qt.Orientation.Horizontal),
-                            ("B", (0, 100), Qt.Orientation.Horizontal),
-                        ],
+                        {
+                            "sliders": [
+                                ("A", (0, 100), Qt.Orientation.Horizontal),
+                                ("B", (0, 100), Qt.Orientation.Horizontal),
+                            ],
+                            "dropdowns": []
+                        }
                     ),
                     {
                         "second_image": None,
                         "secret_code": "42",
                     },
                 ),
-                (
-                    Path(icons_dir_path, "button_sample2.png"),
-                    ControlPanel(
-                        "Double Exposure",
-                        {
-                            "sliders": [
-                                (
-                                    "Exposure",
-                                    ("Image 1", "Image 2"),
-                                    Qt.Orientation.Horizontal,
-                                )
-                            ],
-                            "dropdowns": []
-                        }
-
-                    ),
-                    {
-                        "second_image": Path(image_dir_path, "desert.jpg"),
-                        "secret_code": "42",
-                    },
-                ),
-                (
-                    Path(icons_dir_path, "button_sample3.png"),
-                    ControlPanel(
-                        "Motion Manipulation",
-                        {
-                            "sliders": [
-                                ("Wavelength", (0, 100), Qt.Orientation.Horizontal),
-                                ("Gap", (0, 100), Qt.Orientation.Horizontal),
-                                ("Wave Height", (0, 100), Qt.Orientation.Horizontal),
-                            ]
-                        }
-                    ),
-                    {
-                        "second_image": Path(image_dir_path, "desert.jpg"),
-                        "secret_code": "42",
-                    },
-                ),
             ],
             [
                 (
-                    Path(icons_dir_path, "button_sample.png"),
-                    ControlPanel(
-                        "Image Differencing",
-                        {
-                            "sliders": [
-                                ("X", (0, 100), Qt.Orientation.Horizontal),
-                                ("Y", (0, 100), Qt.Orientation.Horizontal),
-                            ],
-
-                            "dropdowns": []
-                        }
-                    ),
-                    {
-                        "second_image": Path(image_dir_path, "doggo.jpg"),
-                        "secret_code": "secret",
-                    },
-                ),
-                (
                     Path(icons_dir_path, "button_sample2.png"),
                     ControlPanel(
                         "Double Exposure",
@@ -147,24 +94,6 @@ class Level:
                                     ("Image 1", "Image 2"),
                                     Qt.Orientation.Horizontal,
                                 )
-                            ],
-                            "dropdowns": []
-                        }
-                    ),
-                    {
-                        "second_image": Path(image_dir_path, "doggo.jpg"),
-                        "secret_code": "secret",
-                    },
-                ),
-                (
-                    Path(icons_dir_path, "button_sample3.png"),
-                    ControlPanel(
-                        "Motion Manipulation",
-                        {
-                            "sliders": [
-                                ("Wavelength", (0, 100), Qt.Orientation.Horizontal),
-                                ("Gap", (0, 100), Qt.Orientation.Horizontal),
-                                ("Wave Height", (0, 100), Qt.Orientation.Horizontal),
                             ],
                             "dropdowns": []
                         }
