@@ -25,36 +25,29 @@ class Dock(QWidget):
         self._update_secret_code = update_secret_code_callback
         self.img_label = image_label
         self.filters = []
+        self.args_cache: Dict[str, int | str] = {}
 
         for _, control_panel, args in self.level.filters:
             if control_panel is not None:
                 control_panel.sliderValueChanged.connect(
-                    lambda label, value, cp=control_panel: self.update_image_label(
-                        apply_filter(
-                            cp.title,
-                            {
-                                "slider_label": label,
-                                "slider_value": value,
-                                "image_to_edit": self.level.img_source,
-                                "second_image": args["second_image"],
-                            },
-                            level.secret_answer
-                        )
+                    lambda label, value, cp=control_panel: self.update_args_and_image(
+                        cp.title,
+                        label,
+                        value,
+                        {
+                            "second_image": args["second_image"],
+                        },
                     )
                 )
 
                 # Handle the comboBoxesSwapped signal here
                 control_panel.comboBoxesSwapped.connect(
-                    lambda value1, value2, cp=control_panel: self.update_image_label(
-                        apply_filter(
-                            cp.title,
-                            {
-                                "image_to_edit": self.level.img_source,
-                                "first_color": value1,
-                                "second_color": value2,
-                            },
-                            level.secret_answer
-                        )
+                    lambda value1, value2, cp=control_panel: self.button_pressed_with_two_values(
+                        cp.title,
+                        {
+                            "first_color": value1,
+                            "second_color": value2,
+                        }
                     )
                 )
                 self.filters.append(control_panel)
@@ -163,7 +156,36 @@ class Dock(QWidget):
         layout = self._create_tabbed_controls()
         layout.setCurrentIndex(index)
 
-    def update_image_label(self, new_image: QPixmap) -> None:
+    def update_args_and_image(self, filter_title: str, label: str, value: int, args: dict) -> None:
+        """Update the args_cache and then apply the filter with the updated args"""
+        # Update the cache with the slider value
+        self.args_cache[label] = value
+
+        # Only update args if the keys are present in args_cache
+        for key, val in args.items():
+            if key in self.args_cache.keys():
+                self.args_cache[key] = args[key]
+
+        args_to_pass = self.args_cache
+        args_to_pass["second_image"] = args["second_image"]
+        args_to_pass["image_to_edit"] = str(self.level.get_image_source())
+
+        new_image = apply_filter(filter_title, args_to_pass)
+        self.update_image(new_image)
+
+    def button_pressed_with_two_values(self, filter_title: str, args: dict) -> None:
+        """Update the args_cache and then apply the filter with the updated args"""
+        # Only update args if the keys are present in args_cache
+        for key, val in args.items():
+            self.args_cache[key] = args[key]
+
+        args_to_pass = self.args_cache
+        args_to_pass["image_to_edit"] = str(self.level.get_image_source())
+
+        new_image = apply_filter(filter_title, args_to_pass)
+        self.update_image(new_image)
+
+    def update_image(self, image: QPixmap) -> None:
         """
         Update the image label with a new image
 

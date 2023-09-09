@@ -8,7 +8,7 @@ from lib.hidden_in_ascii.hidden_in_ascii import (
 )
 from src.control_panel import ControlPanel
 
-FilterItem = Tuple[Path, ControlPanel, Dict[str, Path]]
+FilterItem = Tuple[Path, ControlPanel, Dict[str, Path | str | None | int]]
 FilterList = List[FilterItem]
 
 
@@ -30,7 +30,7 @@ class Level:
         # This can be extended to retrieve images dynamically based on the level
         image_dir_path = Path(Path(__file__).parent, "images")
         if self.level_number == 1:
-            return Path(image_dir_path, "sample.png")
+            return Path(image_dir_path, "reverse_ishihara.png")
         if self.level_number == 2:
             return Path(image_dir_path, "clockwork.jpg")
         if self.level_number == 3:
@@ -53,7 +53,7 @@ class Level:
         """
         # This can be extended to provide answers dynamically based on the level
         if self.level_number == 1:
-            return "secret"
+            return "42"
         if self.level_number == 2:
             return "secret2"
         if self.level_number == 3:
@@ -75,68 +75,25 @@ class Level:
         filters = [
             [
                 (
-                    Path(icons_dir_path, "button_sample.png"),
+                    Path(icons_dir_path, "rishihara.png"),
                     ControlPanel(
-                        "Image Differencing",
+                        "Ishihara",
                         {
                             "sliders": [
-                                ("X", (0, 100), Qt.Orientation.Horizontal),
-                                ("Y", (0, 100), Qt.Orientation.Horizontal),
-                            ]
-                        }
-                    ),
-                    {"second_image": Path(image_dir_path, "desert.jpg")},
-                ),
-                (
-                    Path(icons_dir_path, "button_sample2.png"),
-                    ControlPanel(
-                        "Double Exposure",
-                        {
-                            "sliders": [
-                                (
-                                    "Exposure",
-                                    ("Image 1", "Image 2"),
-                                    Qt.Orientation.Horizontal,
-                                )
+                                ("A", (0, 100), Qt.Orientation.Horizontal),
+                                ("B", (0, 100), Qt.Orientation.Horizontal),
                             ],
                             "dropdowns": []
                         }
-
                     ),
-                    {"second_image": Path(image_dir_path, "desert.jpg")},
+                    {
+                        "second_image": None,
+                        "secret_code": "42",
+                    },
                 ),
-                (
-                    Path(icons_dir_path, "button_sample3.png"),
-                    ControlPanel(
-                        "Motion Manipulation",
-                        {
-                            "sliders": [
-                                ("Wavelength", (0, 100), Qt.Orientation.Horizontal),
-                                ("Gap", (0, 100), Qt.Orientation.Horizontal),
-                                ("Wave Height", (0, 100), Qt.Orientation.Horizontal),
-                            ]
-                        }
-                    ),
-                    {"second_image": Path(image_dir_path, "desert.jpg")},
-                )
             ],
             [
                 (
-                    Path(icons_dir_path, "button_sample.png"),
-                    ControlPanel(
-                        "Image Differencing",
-                        {
-                            "sliders": [
-                                ("X", (0, 100), Qt.Orientation.Horizontal),
-                                ("Y", (0, 100), Qt.Orientation.Horizontal),
-                            ],
-
-                            "dropdowns": []
-                        }
-                    ),
-                    {"second_image": Path(image_dir_path, "doggo.jpg")},
-                ),
-                (
                     Path(icons_dir_path, "button_sample2.png"),
                     ControlPanel(
                         "Double Exposure",
@@ -152,22 +109,10 @@ class Level:
                             "dropdowns": []
                         }
                     ),
-                    {"second_image": Path(image_dir_path, "doggo.jpg")},
-                ),
-                (
-                    Path(icons_dir_path, "button_sample3.png"),
-                    ControlPanel(
-                        "Motion Manipulation",
-                        {
-                            "sliders": [
-                                ("Wavelength", (0, 100), Qt.Orientation.Horizontal),
-                                ("Gap", (0, 100), Qt.Orientation.Horizontal),
-                                ("Wave Height", (0, 100), Qt.Orientation.Horizontal),
-                            ],
-                            "dropdowns": []
-                        }
-                    ),
-                    {"second_image": Path(image_dir_path, "doggo.jpg")},
+                    {
+                        "second_image": Path(image_dir_path, "doggo.jpg"),
+                        "secret_code": "secret",
+                    },
                 ),
             ],
             [
@@ -212,7 +157,12 @@ class Level:
                 )
             ]
         ]
-        return cast(FilterList, filters[self.level_number - 1])
+
+        if 0 <= self.level_number - 1 < len(filters):
+            return cast(FilterList, filters[self.level_number - 1])
+        else:
+            # Return an empty FilterList if out-of-bounds
+            return []
 
     def level_up(self) -> None:
         """

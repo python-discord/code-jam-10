@@ -6,6 +6,9 @@ from PyQt6.QtWidgets import (
 
 from src.utils.apply_color_swap import apply_color_swap
 from src.utils.apply_double_exposure import apply_double_exposure
+from src.utils.apply_unmask_reverse_ishihara import (
+    apply_unmask_reverse_ishihara
+)
 
 
 class Filter(QWidget):
@@ -124,11 +127,34 @@ def apply_filter(filter_name: str, args: dict, secret: str) -> QPixmap:
     :return: img
     """
     if filter_name == "Double Exposure":
+        args_for_filter = {}
+        for key, value in args.items():
+            if key == "Exposure":
+                args_for_filter["Exposure"] = value
+            if key == "image_to_edit":
+                args_for_filter["image_to_edit"] = value
+            if key == "second_image":
+                args_for_filter["second_image"] = value
         return apply_double_exposure(
-            args["image_to_edit"], args["second_image"], args["slider_value"]
+            args["image_to_edit"],
+            args["second_image"],
+            args["slider_value"]
         )
     if filter_name == "Color Swap":
+        args_for_filter = {}
+        for key, value in args.items():
+            if key == "A":
+                args_for_filter["A"] = value
+            if key == "B":
+                args_for_filter["B"] = value
+            if key == "image_to_edit":
+                args_for_filter["image_to_edit"] = value
+        new_img = apply_unmask_reverse_ishihara(
+            args_for_filter
+        )
         return apply_color_swap(
-            args["image_to_edit"], args["first_color"], args["second_color"]
+            args["image_to_edit"],
+            args["first_color"],
+            args["second_color"]
         )
     pass
