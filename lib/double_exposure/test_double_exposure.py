@@ -2,7 +2,7 @@ import unittest
 
 from PIL import Image
 
-from lib.double_exposure.double_exposure import double_exposure
+from .double_exposure import double_exposure
 
 
 class DoubleExposureTestCase(unittest.TestCase):

@@ -4,12 +4,10 @@ from typing import Any
 
 from PIL import Image
 
-from lib.hidden_in_ascii.hidden_in_ascii import (
+from .hidden_in_ascii import (
     ascii_to_img, generate_ascii_file, img_to_ascii, prepare_input,
     seed_secret, validate_image_size, validate_secret_length
 )
-
-Test_Assets_Path = Path(__file__).parent / "test_assets"
 
 
 def string_exists_in_file(file_path: Path, target_string: str) -> bool:
@@ -34,7 +32,7 @@ class TestPrepareInputImage(unittest.TestCase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize inputs"""
         super().__init__(*args, **kwargs)
-        self.input_file_path = Test_Assets_Path / "doggo.jpg"
+        self.input_file_path = Path("src/images/doggo.jpg")
 
     def test_input_file_exists(self) -> None:
         """Check that the test file that will be used in this test suite exists in the directory"""
@@ -76,7 +74,7 @@ class TestImageToAscii(unittest.TestCase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize inputs"""
         super().__init__(*args, **kwargs)
-        self.input_file_path = Test_Assets_Path / "doggo.jpg"
+        self.input_file_path = Path("src/images/doggo.jpg")
         self.dens = 2
 
     def setUp(self) -> None:
@@ -105,11 +103,11 @@ class TestAsciiToImage(unittest.TestCase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize inputs"""
         super().__init__(*args, **kwargs)
-        self.input_file_path = Test_Assets_Path / "doggo.jpg"
-        self.output_file_path = Test_Assets_Path / "output.png"
+        self.input_file_path = Path("src/images/doggo.jpg")
+        self.output_file_path = Path("src/images/output.png")
         self.dens = 2
         self.insane_mode = False
-        self.ascii_file_path = Test_Assets_Path / "ascii.txt"
+        self.ascii_file_path = Path("lib/hidden_in_ascii/ascii.txt")
         self.secret = "Very secret"
 
     def setUp(self) -> None:
