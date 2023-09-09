@@ -18,11 +18,11 @@ def apply_unmask_reverse_ishihara(args: dict) -> QPixmap:
     """
     try:
         if "A" in args:
-            slider_a = int(args["A"]/10)
+            slider_a = int(args["A"])
         else:
             slider_a = 0
         if "B" in args:
-            slider_b = int(args["B"]/10)
+            slider_b = int(args["B"])
         else:
             slider_b = 0
 
