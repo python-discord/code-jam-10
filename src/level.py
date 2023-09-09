@@ -33,7 +33,7 @@ class Level:
         if self.level_number == 2:
             return Path(image_dir_path, "clockwork.jpg")
         if self.level_number == 3:
-            return Path(image_dir_path, "land_n_poles.png")
+            return Path(image_dir_path, "number_hidden_image.png")
         if self.level_number == 4:
             return Path(image_dir_path, "desert.jpg")
         return Path(image_dir_path, "default.png")
@@ -50,7 +50,7 @@ class Level:
         if self.level_number == 2:
             return "secret2"
         if self.level_number == 3:
-            return "Very secret"
+            return "21002"
         if self.level_number == 4:
             return "Turbo secret"
         return "pythoncodejam2023"
