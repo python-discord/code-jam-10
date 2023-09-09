@@ -2,10 +2,22 @@ import math
 from collections import OrderedDict
 from enum import Enum, auto
 from typing import Callable, Iterable
+import time
 
 import numpy as np
 from numpy.typing import NDArray
 from PIL import Image
+
+def measure_execution_time(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print(f"Function {func.__name__} took {execution_time:.4f} seconds to execute")
+        return result
+    return wrapper
+
 
 
 class PIXEL_INTERPOLATION_METHOD(Enum):
@@ -119,6 +131,7 @@ class Effect:
         :param spikenum: number of spikes
         :return: xmesh, ymesh
         """
+        print("horizontal spike calculation")
         height, _ = xmesh.shape
         spike_distance = height // spikenum
         offset = np.abs(ymesh % spike_distance - spike_distance // 2) * magnitude * 2
@@ -140,6 +153,7 @@ class MotionTransformer:
             Effect.horizontal_spike,
         ),
     ) -> None:
+        print("initializing motion transform")
         self.img = img
         self.interpolation = interpolation
         self.fill_method = fill_method
@@ -171,6 +185,9 @@ class MotionTransformer:
             self._generate_mesh()
         self.img = img
 
+
+
+    @measure_execution_time
     def calculate_output(self, magnitudelist: Iterable[float]) -> Image.Image:
         """
         Outputs the distorted image with all filters applied
@@ -181,7 +198,7 @@ class MotionTransformer:
         xmesh, ymesh = self.xmesh, self.ymesh
         for func, magnitude in zip(self.funclist, magnitudelist):
             cache_key = (func.__name__, magnitude)
-            if cache_key in self.cache:
+            if False:
                 # If the result is already in the cache, use it
                 xmesh, ymesh = self.cache[cache_key]
             else:
@@ -207,6 +224,7 @@ class MotionTransformer:
 
         :return:
         """
+        print(self.img.size)
         self.xmesh, self.ymesh = np.meshgrid(
             np.arange(self.img.width), np.arange(self.img.height), sparse=False
         )
