@@ -128,6 +128,12 @@ class GUI(Tk):
             foreground=DARK_GRAY,
         )
         encrypt.grid(row=0, column=0, padx=10, pady=10)
+        encrypt.bind(
+            "<Enter>",
+            lambda event: encrypt["menu"].tk_popup(
+                encrypt.winfo_rootx(), encrypt.winfo_rooty() + encrypt.winfo_height()
+            ),
+        )
         method.trace("w", lambda *args: self.check_key(True, opts.index(method.get())))
 
         # Decrypt Button
@@ -192,9 +198,7 @@ class GUI(Tk):
 
     def decrypt(self, key: str = None):
         """Opens the decryption page with the secret key"""
-        filename = fd.askopenfilename(
-            title="Select Image", filetypes=[("PNG", "*.png")]
-        )
+        filename = fd.askopenfilename(title="Select Image", filetypes=[("PNG", "*.png")])
         if not filename:
             return
         try:
@@ -223,9 +227,7 @@ class GUI(Tk):
 
     def switch_steganography(self):
         """Switches to encrypt steganography"""
-        filename = fd.askopenfilename(
-            title="Select Image", filetypes=[("PNG", "*.png")]
-        )
+        filename = fd.askopenfilename(title="Select Image", filetypes=[("PNG", "*.png")])
         if not filename:
             return
 
