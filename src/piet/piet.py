@@ -525,7 +525,7 @@ class PietInterpreter:
         self,
         image: Image.Image,
         *,
-        step_limit: int = 10000000,
+        step_limit: int = 1000000,
         debug: bool = False,
         runtime: PietRuntime | None = None,
     ):
@@ -660,10 +660,15 @@ class PietInterpreter:
             if self.reader.colors[self.position.y][self.position.x] == WHITE:
                 # Skip the codel_info call if the current codel is white for performance reasons.
                 self._current_codel = Codel(1, WHITE, {self.position})
+                # Skip to the last white pixel in the direction of the DP.
+                next_pos = self.pointer.next_position()
+                while self.reader.colors[next_pos.y][next_pos.x] == WHITE:
+                    self._current_codel.pixels.add(next_pos)
+                    self.pointer.move_to_next()
+                    next_pos = self.pointer.next_position()
             else:
                 self._current_codel = self.reader.codel_info(self.position)
-
-            self._move_to_furthest_pixel()
+                self._move_to_furthest_pixel()
 
             # determine color delta between current and previous codel
             # and execute relevant instruction
@@ -728,7 +733,7 @@ class PietProgramGenerator:
         # self.commands = np.full((2, 2), PietCommand._NONE, dtype=PietCommand)
         # self.colors = np.full((2, 2), WHITE, dtype=Color)
         self.commands = SelfExpandingList(default=SelfExpandingList[PietCommand](default=PietCommand._NONE))
-        self.colors = SelfExpandingList(default=SelfExpandingList(default=WHITE))
+        self.colors = SelfExpandingList(default=SelfExpandingList(default=BLACK))
         self.interpreter = PietInterpreter(self.image, debug=False)
         self._current_hue = 0
         self._current_lightness = 0
