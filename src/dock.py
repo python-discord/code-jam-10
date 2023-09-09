@@ -211,3 +211,22 @@ class Dock(QWidget):
         :return:
         """
         print(f"ZOOM REQUESTED {filter_title} {direction}")
+        print(self.img_label)
+
+        # Get the current pixmap and scale it
+        current_pixmap = self.img_label.pixmap()
+        if direction == "zoom in":
+            if current_pixmap:
+                scaled_pixmap = current_pixmap.scaled(
+                    int(current_pixmap.width() * 1.2), int(current_pixmap.height() * 1.2)
+                )
+                self.img_label.setPixmap(scaled_pixmap)
+        elif direction == "zoom out":
+            if current_pixmap:
+                scaled_pixmap = current_pixmap.scaled(
+                    int(current_pixmap.width() * 0.8), int(current_pixmap.height() * 0.8)
+                )
+                self.img_label.setPixmap(scaled_pixmap)
+        else:
+            pass
+            #  TODO reset image size

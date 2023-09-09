@@ -4,7 +4,7 @@ from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import (
     QApplication, QFrame, QGridLayout, QHBoxLayout, QLabel, QMainWindow,
-    QMessageBox, QStackedLayout, QWidget
+    QMessageBox, QStackedLayout, QWidget, QScrollArea
 )
 
 from src.dock import Dock
@@ -76,11 +76,16 @@ class Window(QMainWindow):
         scale_factor = min(width_scale, height_scale)
         scaled_img = img.scaled(QSize(int(img_size.width() * scale_factor), int(img_size.height() * scale_factor)))
 
-        # Convert img_label to an instance variable
-        self.img_label = QLabel(self)
-        self.img_label.setPixmap(scaled_img)
+        # Scroll area for zooming
+        scroll_area = QScrollArea(self)
 
-        layout.addWidget(self.img_label)
+        # Convert img_label to an instance variable
+        self.img_label = QLabel(scroll_area)
+        self.img_label.setPixmap(scaled_img)
+        scroll_area.setWidget(self.img_label)
+        scroll_area.setWidgetResizable(True)
+
+        layout.addWidget(scroll_area)
         layout.addLayout(self._create_tabbed_controls())
 
         return frame

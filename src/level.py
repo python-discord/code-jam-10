@@ -149,7 +149,8 @@ class Level:
                             "dropdowns": [],
                             "buttons": [
                                 "zoom in",
-                                "zoom out"
+                                "zoom out",
+                                "reset size"
                             ]
                         }
                     ),
