@@ -1,15 +1,102 @@
-from enum import Enum
+import collections
+import functools
+import math
+import string
+import sys
+import time
+from collections import deque
+from copy import deepcopy
+from enum import Enum, IntEnum
 from io import StringIO
-from typing import NamedTuple
+from typing import Callable, Iterable, NamedTuple, TypeVar, overload
+from warnings import warn
 
-import numpy as np
 from PIL import Image
 
-from piet.pinterpret import PietInterpreter, PietRuntime, PointerDirection, StepLimitReached
+T = TypeVar("T")
 
 
-def color_to_int(color) -> int:
-    return int(color[0] << 0) + int(color[1] << 8) + int(color[2] << 16)
+class SelfExpandingList(list[T]):
+    def __init__(self, iterable: Iterable[T] = (), /, *, default: T = None):
+        self._default = deepcopy(default)
+        super().__init__(iterable)
+
+    @overload
+    def __getitem__(self, index: int, /) -> T:
+        ...
+
+    @overload
+    def __getitem__(self, index: slice, /) -> "SelfExpandingList[T]":
+        ...
+
+    def __getitem__(self, index: int | slice, /) -> T | "SelfExpandingList[T]":
+        try:
+            if isinstance(index, slice):
+                items = []
+                for i in range(index.start or 0, index.stop or len(self), index.step or 1):
+                    try:
+                        items.append(super().__getitem__(i))
+                    except IndexError:
+                        items.append(deepcopy(self._default))
+                return self.__class__(items, default=deepcopy(self._default))
+            return super().__getitem__(index)
+        except IndexError:
+            if isinstance(index, slice):
+                i: int = index.stop
+            else:
+                i = index
+            self.extend([deepcopy(self._default) for _ in range((i - len(self) + 1))])
+            return self.__getitem__(index)
+
+    @overload
+    def __setitem__(self, index: int, value: T, /):
+        ...
+
+    @overload
+    def __setitem__(self, index: slice, value: T | Iterable[T], /):
+        ...
+
+    def __setitem__(self, index, value, /):
+        try:
+            if isinstance(index, slice):
+                indices = range(index.start or 0, index.stop or len(self), index.step or 1)
+                # if hasattr(value, "__len__") and len(value) == len(indices):
+                #     super().__setitem__(index, value)
+                # else:
+                for i in indices:
+                    self.__setitem__(i, value)
+            else:
+                super().__setitem__(index, value)
+        except IndexError:
+            if isinstance(index, slice):
+                i: int = index.stop
+            else:
+                i = index
+            self.extend([deepcopy(self._default) for _ in range((i - len(self) + 1))])
+            self.__setitem__(index, value)
+
+
+class OrderedPair(NamedTuple):
+    y: int
+    x: int
+
+    def __add__(self, other: "OrderedPair | tuple[int, int]", /) -> "OrderedPair":
+        return OrderedPair(self.y + other[0], self.x + other[1])
+
+    def __sub__(self, other: "OrderedPair | tuple[int, int]", /) -> "OrderedPair":
+        return OrderedPair(self.y - other[0], self.x - other[1])
+
+    def __mul__(self, other: "OrderedPair | tuple[int, int]", /) -> "OrderedPair":
+        return OrderedPair(self.y * other[0], self.x * other[1])
+
+    def __floordiv__(self, other: "OrderedPair | tuple[int, int]", /) -> "OrderedPair":
+        return OrderedPair(self.y // other[0], self.x // other[1])
+
+    def __mod__(self, other: "OrderedPair | tuple[int, int]", /) -> "OrderedPair":
+        return OrderedPair(self.y % other[0], self.x % other[1])
+
+    def __pow__(self, other: "OrderedPair | tuple[int, int]", /) -> "OrderedPair":
+        return OrderedPair(self.y ** other[0], self.x ** other[1])
 
 
 class Color(NamedTuple):
@@ -17,13 +104,22 @@ class Color(NamedTuple):
     g: int
     b: int
 
+    def __eq__(self, other: "Color | tuple[int, int, int] | int", /) -> bool:
+        if isinstance(other, (Color, tuple)):
+            if len(other) != 3:
+                return False
+            return self.r == other[0] and self.g == other[1] and self.b == other[2]
+        if isinstance(other, int):
+            return int(self) == other
+        return False
+
     def __int__(self) -> int:
         return (self.r << 0) + (self.g << 8) + (self.b << 16)
 
 
 class ColorChange(NamedTuple):
-    hue: int
     lightness: int
+    hue: int
 
 
 #         lightness hue
@@ -63,154 +159,604 @@ class PietCommand(Enum):
     _NONE = 0
     NOOP = Color(255, 255, 255)
     BLOCK = Color(0, 0, 0)
-    PUSH = ColorChange(0, 1)
-    POP = ColorChange(0, 2)
-    ADD = ColorChange(1, 0)
+    PUSH = ColorChange(1, 0)
+    POP = ColorChange(2, 0)
+    ADD = ColorChange(0, 1)
     SUBTRACT = ColorChange(1, 1)
-    MULTIPLY = ColorChange(1, 2)
-    DIVIDE = ColorChange(2, 0)
-    MOD = ColorChange(2, 1)
+    MULTIPLY = ColorChange(2, 1)
+    DIVIDE = ColorChange(0, 2)
+    MOD = ColorChange(1, 2)
     NOT = ColorChange(2, 2)
-    GREATER = ColorChange(3, 0)
-    POINTER = ColorChange(3, 1)
-    SWITCH = ColorChange(3, 2)
-    DUPLICATE = ColorChange(4, 0)
-    ROLL = ColorChange(4, 1)
-    IN_NUMBER = ColorChange(4, 2)
-    IN_CHAR = ColorChange(5, 0)
-    OUT_NUMBER = ColorChange(5, 1)
-    OUT_CHAR = ColorChange(5, 2)
+    GREATER = ColorChange(0, 3)
+    POINTER = ColorChange(1, 3)
+    SWITCH = ColorChange(2, 3)
+    DUPLICATE = ColorChange(0, 4)
+    ROLL = ColorChange(1, 4)
+    IN_NUMBER = ColorChange(2, 4)
+    IN_CHAR = ColorChange(0, 5)
+    OUT_NUMBER = ColorChange(1, 5)
+    OUT_CHAR = ColorChange(2, 5)
+
+
+DIRECTIONS = (
+    OrderedPair(1, 0),
+    OrderedPair(-1, 0),
+    OrderedPair(0, 1),
+    OrderedPair(0, -1),
+)
+
+
+class Codel(NamedTuple):
+    size: int
+    color: Color
+    pixels: set[OrderedPair]
+
+    def __len__(self) -> int:
+        return self.size
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(size={self.size}, color={self.color})"
+
+
+class Reader:
+    def __init__(self, image: Image.Image) -> None:
+        colors: list[list[Color]] = []
+        for y in range(image.height):
+            row = []
+            for x in range(image.width):
+                row.append(Color(*image.getpixel((x, y))))
+            colors.append(row)
+        self.colors = colors
+
+    def codel_info(self, pos: OrderedPair, /) -> Codel:
+        """Return information about the codel that contains pos (y,x)."""
+        colors = self.colors
+        color = colors[pos.y][pos.x]
+
+        height, width = len(colors), len(colors[0])
+        y_range = range(height)
+        x_range = range(width)
+        visited: set[OrderedPair] = set()
+
+        queue = collections.deque()
+        visited.add(pos)
+        queue.append(pos)
+        while queue:
+            pos = queue.popleft()
+            for direction in DIRECTIONS:
+                offset_pos = pos + direction
+                if (
+                    offset_pos.y in y_range
+                    and offset_pos.x in x_range
+                    and colors[offset_pos.y][offset_pos.x] == color
+                    and offset_pos not in visited
+                ):
+                    queue.append(offset_pos)
+                    visited.add(offset_pos)
+
+        return Codel(len(visited), color, visited)
+
+    def smallest_codel(self) -> int:
+        """Return the side length in pixels of the smallest codel."""
+        colors = self.colors
+        pixel = colors[0][0]
+        height, width = len(colors), len(colors[0])
+        smallest = height
+
+        rsf = 0
+        for y in range(height):
+            for x in range(width):
+                if x == 0:
+                    pixel = colors[y][x]
+                    rsf = 0
+                next = colors[y][x]
+                if next == pixel:
+                    rsf += 1
+                else:
+                    if rsf < smallest:
+                        smallest = rsf
+                        pixel = colors[y][x]
+                        rsf = 1
+
+        rsf = 0
+        for x in range(width):
+            for y in range(height):
+                if y == 0:
+                    pixel = colors[y][x]
+                    rsf = 0
+                next = colors[y][x]
+                if next == pixel:
+                    rsf += 1
+                else:
+                    if rsf < smallest:
+                        smallest = rsf
+                        pixel = colors[y][x]
+                        rsf = 1
+
+        return smallest
+
+    def image_size(self) -> OrderedPair:
+        """Return the size of image after scaling it down to a codel size of 1 pixel."""
+        height, width = len(self.colors), len(self.colors[0])
+        codel_size = self.smallest_codel()
+        return OrderedPair(width // codel_size, height // codel_size)
+
+
+class PointerDirection(IntEnum):
+    RIGHT = 0
+    DOWN = 1
+    LEFT = 2
+    UP = 3
+
+
+class CodelChooserDirection(IntEnum):
+    LEFT = -1
+    RIGHT = 1
+
+
+class DirectionPointer:
+    def __init__(self):
+        self.direction = PointerDirection.RIGHT
+
+    def rotate(self, times: int = 1):
+        self.direction = PointerDirection((self.direction + times) % 4)
+
+
+class CodelChooser:
+    def __init__(self):
+        self.direction = CodelChooserDirection.LEFT
+
+    def flip(self, times: int = 1):
+        self.direction = CodelChooserDirection(self.direction * -1 if abs(times) % 2 else self.direction)
+
+
+class PietStack:
+    def __init__(self):
+        self._stack = deque()
+
+    @property
+    def top(self) -> int:
+        return self._stack[-1]
+
+    def pop(self) -> int:
+        """Pop the top item off of the stack"""
+        return self._stack.pop()
+
+    def pop_multiple(self, count: int = 2, /) -> list[int]:
+        """Pop the top `count` items off the stack (default: 2)"""
+        return [self.pop() for _ in range(count)]
+
+    def push(self, item: int, /):
+        """Push an item (int) on to the top of the stack"""
+        self._stack.append(item)
+
+    def extend(self, items: Iterable[int], /):
+        """Push multiple items on to the stack"""
+        self._stack.extend(items)
+
+
+def pass_on_empty_stack(func: Callable) -> Callable:
+    @functools.wraps(func)
+    def wrapper(self, *args, **kwargs):
+        try:
+            return func(self, *args, **kwargs)
+        except IndexError:
+            warn("Attempted to pop from empty stack.", RuntimeWarning)
+            return None
+
+    return wrapper
+
+
+class PietRuntime:
+    def __init__(self, output_buffer=sys.stdout, input_buffer: str = "", stack: PietStack | None = None):
+        self.output = output_buffer
+        self.stack = stack or PietStack()
+        self.pointer = DirectionPointer()
+        self.codel_chooser = CodelChooser()
+        self.input_buffer = input_buffer
+        self.delta_map: dict[tuple[int, int], Callable] = {
+            (0, 0): self.p_noop,
+            (0, 1): self.p_add,
+            (0, 2): self.p_divide,
+            (0, 3): self.p_greater,
+            (0, 4): self.p_duplicate,
+            (0, 5): self.p_input_char,
+            (1, 0): self.p_push,
+            (1, 1): self.p_subtract,
+            (1, 2): self.p_modulo,
+            (1, 3): self.p_pointer,
+            (1, 4): self.p_roll,
+            (1, 5): self.p_output_num,
+            (2, 0): self.p_pop,
+            (2, 1): self.p_multiply,
+            (2, 2): self.p_not,
+            (2, 3): self.p_switch,
+            (2, 4): self.p_input_num,
+            (2, 5): self.p_output_char,
+        }
+
+    def p_blocked(self):
+        pass
+
+    def p_noop(self):
+        pass
+
+    def p_push(self, value: int, /):
+        self.stack.push(value)
+
+    @pass_on_empty_stack
+    def p_pop(self):
+        self.stack.pop()
+
+    @pass_on_empty_stack
+    def p_add(self):
+        self.stack.push(sum(self.stack.pop_multiple()))
+
+    @pass_on_empty_stack
+    def p_subtract(self):
+        first, second = self.stack.pop_multiple()
+        self.stack.push(second - first)
+
+    @pass_on_empty_stack
+    def p_multiply(self):
+        first, second = self.stack.pop_multiple()
+        self.stack.push(second * first)
+
+    @pass_on_empty_stack
+    def p_divide(self):
+        first, second = self.stack.pop_multiple()
+        self.stack.push(second // first)
+
+    @pass_on_empty_stack
+    def p_modulo(self):
+        first, second = self.stack.pop_multiple()
+        self.stack.push(second % first)
+
+    @pass_on_empty_stack
+    def p_not(self):
+        self.stack.push(int(not self.stack.pop()))
+
+    @pass_on_empty_stack
+    def p_greater(self):
+        first, second = self.stack.pop_multiple()
+        self.stack.push(int(second > first))
+
+    @pass_on_empty_stack
+    def p_pointer(self):
+        self.pointer.rotate(self.stack.pop())
+
+    @pass_on_empty_stack
+    def p_switch(self):
+        self.codel_chooser.flip(self.stack.pop())
+
+    @pass_on_empty_stack
+    def p_duplicate(self):
+        self.stack.push(self.stack.top)
+
+    @pass_on_empty_stack
+    def p_roll(self):
+        first, second = self.stack.pop_multiple()
+        values = deque(self.stack.pop_multiple(second))
+        values.rotate(first)
+        self.stack.extend(values)
+
+    def p_input_num(self):
+        buffer = ""
+        for char in self.input_buffer:
+            if char in string.whitespace and buffer:
+                break
+            self.input_buffer = self.input_buffer[1:]
+            buffer += char
+            if char in string.whitespace and not buffer:
+                break
+        try:
+            self.stack.push(int(buffer))
+        except ValueError:
+            self.input_buffer = buffer + self.input_buffer
+            warn(f"Conversion of '{buffer}' to integer failed. Check input.", RuntimeWarning)
+
+    def p_input_char(self):
+        char = self.input_buffer[0]
+        self.input_buffer = self.input_buffer[1:]
+        self.stack.push(ord(char))
+
+    @pass_on_empty_stack
+    def p_output_num(self):
+        self.output.write(str(self.stack.pop()))
+
+    @pass_on_empty_stack
+    def p_output_char(self):
+        self.output.write(chr(self.stack.pop()))
+
+
+class StepTrace(NamedTuple):
+    iteration: int
+    position: OrderedPair
+    instruction: Callable
+    did_flip: bool
+    last_codel: Codel
+    current_codel: Codel
+
+    def __repr__(self) -> str:
+        return (
+            f"StepTrace({self.iteration:0>4},"
+            f" instruction={self.instruction.__name__},"
+            f" position={self.position},"
+            f" did_flip={self.did_flip},"
+            f" last_codel={self.last_codel},"
+            f" current_codel={self.current_codel})"
+        )
+
+
+class EndOfProgram(BaseException):
+    pass
+
+
+class StepLimitReached(EndOfProgram):
+    pass
+
+
+class PietInterpreter:
+    def __init__(
+        self,
+        image: Image.Image,
+        *,
+        step_limit: int = 1000000,
+        debug: bool = False,
+        runtime: PietRuntime | None = None,
+    ):
+        self.step_limit = step_limit
+        self.debug = debug
+        self.reader = Reader(image)
+        self.runtime = runtime or PietRuntime()
+        self.stack = self.runtime.stack
+        self.position = OrderedPair(0, 0)
+        self.iteration = -1
+        self.last_codel = self.reader.codel_info(self.position)
+        self.current_codel = self.reader.codel_info(self.position)
+        self.steps: list[StepTrace] = []
+        self._flips = 0
+        self._move_to_furthest_pixel()
+
+    @property
+    def last_step(self) -> StepTrace | None:
+        try:
+            return self.steps[-1]
+        except IndexError:
+            return None
+
+    @staticmethod
+    def _find_color_position(color: Color) -> OrderedPair:
+        row = next(
+            i for i, v in enumerate((color in PIET_COLORS[0], color in PIET_COLORS[1], color in PIET_COLORS[2])) if v
+        )
+        column = next(
+            i
+            for i, v in enumerate(
+                (
+                    color == PIET_COLORS[row][0],
+                    color == PIET_COLORS[row][1],
+                    color == PIET_COLORS[row][2],
+                    color == PIET_COLORS[row][3],
+                    color == PIET_COLORS[row][4],
+                    color == PIET_COLORS[row][5],
+                )
+            )
+            if v
+        )
+        return OrderedPair(row, column)
+
+    def _determine_color_change(self) -> ColorChange:
+        c1_pos = self._find_color_position(self.last_codel.color)
+        c2_pos = self._find_color_position(self.current_codel.color)
+        lightness, hue = c2_pos[0] - c1_pos[0], c2_pos[1] - c1_pos[1]
+
+        if lightness < 0:
+            lightness += 3
+        if hue < 0:
+            hue += 6
+
+        return ColorChange(lightness, hue)
+
+    def _get_polars(self, coords: Iterable[OrderedPair]) -> tuple[OrderedPair, OrderedPair]:
+        largest_x = max(coords, key=lambda coord: coord.x).x
+        largest_y = max(coords, key=lambda coord: coord.y).y
+        smallest_x = min(coords, key=lambda coord: coord.x).x
+        smallest_y = min(coords, key=lambda coord: coord.y).y
+        return (
+            OrderedPair(largest_y, largest_x),
+            OrderedPair(smallest_y, smallest_x),
+        )
+
+    def _determine_farthest_pixel(self, codel: Codel) -> OrderedPair:
+        largest, smallest = self._get_polars(codel.pixels)
+        if self.runtime.pointer.direction is PointerDirection.RIGHT:
+            largest_x_places = [pos for pos in codel.pixels if pos.x == largest.x]
+            largest, smallest = self._get_polars(largest_x_places)
+            if self.runtime.codel_chooser.direction is CodelChooserDirection.LEFT:
+                return OrderedPair(smallest.y, largest.x)
+            return largest
+        if self.runtime.pointer.direction is PointerDirection.DOWN:
+            largest_y_places = [pos for pos in codel.pixels if pos.y == largest.y]
+            largest, smallest = self._get_polars(largest_y_places)
+            if self.runtime.codel_chooser.direction is CodelChooserDirection.LEFT:
+                return largest
+            return OrderedPair(largest.y, smallest.x)
+        if self.runtime.pointer.direction is PointerDirection.LEFT:
+            smallest_x_places = [pos for pos in codel.pixels if pos.x == smallest.x]
+            largest, smallest = self._get_polars(smallest_x_places)
+            if self.runtime.codel_chooser.direction is CodelChooserDirection.LEFT:
+                return OrderedPair(largest.y, smallest.x)
+            return smallest
+        if self.runtime.pointer.direction is PointerDirection.UP:
+            smallest_y_places = [pos for pos in codel.pixels if pos.y == smallest.y]
+            largest, smallest = self._get_polars(smallest_y_places)
+            if self.runtime.codel_chooser.direction is CodelChooserDirection.LEFT:
+                return smallest
+            return OrderedPair(smallest.y, largest.x)
+        return OrderedPair(-1, -1)
+
+    def _next_move(self) -> OrderedPair:
+        if self.runtime.pointer.direction is PointerDirection.RIGHT:
+            return self.position + OrderedPair(0, 1)
+        if self.runtime.pointer.direction is PointerDirection.DOWN:
+            return self.position + OrderedPair(1, 0)
+        if self.runtime.pointer.direction is PointerDirection.LEFT:
+            return self.position - OrderedPair(0, 1)
+        if self.runtime.pointer.direction is PointerDirection.UP:
+            return self.position - OrderedPair(1, 0)
+        raise ValueError("Invalid direction pointer position.")
+
+    def _move(self):
+        """Move one pixel in the direction of the DP"""
+        self.position = self._next_move()
+
+    def _move_to_furthest_pixel(self):
+        # move to farthest pixel in current codel
+        if self.current_codel.color != WHITE:
+            farthest_pixel = self._determine_farthest_pixel(self.current_codel)
+            self.position = farthest_pixel
+
+    def step(self):
+        "Execute a single step."
+        if self.iteration >= self.step_limit:
+            raise StepLimitReached("Step limit reached.")
+        self.iteration += 1
+        if self._flips >= 4:
+            raise EndOfProgram("End of program reached.")
+
+        args = []
+        did_flip = False
+
+        next_y, next_x = self._next_move()
+        try:
+            blocked = self.reader.colors[next_y][next_x] == BLACK
+        except IndexError:
+            blocked = True
+
+        if not blocked:
+            # move one pixel over to next codel
+            self.last_codel = self.current_codel
+            self._move()
+            if self.reader.colors[self.position.y][self.position.x] == WHITE:
+                # Skip the codel_info call if the current codel is white for performance reasons.
+                self.current_codel = Codel(1, WHITE, {self.position})
+            else:
+                self.current_codel = self.reader.codel_info(self.position)
+
+            self._move_to_furthest_pixel()
+
+            # determine color delta between current and previous codel
+            # and execute relevant instruction
+            if WHITE in (self.last_codel.color, self.current_codel.color):
+                instruction = self.runtime.p_noop
+                if self.last_codel.color != self.current_codel.color:
+                    self._flips = 0
+            else:
+                delta = self._determine_color_change()
+                instruction = self.runtime.delta_map[delta]
+                if delta == (1, 0):
+                    args.append(self.last_codel.size)
+                self._flips = 0
+        else:
+            if self.last_step and not self.last_step.did_flip:
+                self.runtime.codel_chooser.flip()
+                self._move_to_furthest_pixel()
+                instruction = self.runtime.p_blocked
+                did_flip = True
+                self._flips += 1
+            else:
+                self.runtime.pointer.rotate()
+                self._move_to_furthest_pixel()
+                instruction = self.runtime.p_blocked
+        instruction(*args)
+        step = StepTrace(
+            self.iteration,
+            self.position,
+            instruction,
+            did_flip,
+            self.last_codel,
+            self.current_codel,
+        )
+        self.steps.append(step)
+        if self.debug:
+            print(step, file=sys.stderr)
+
+    def run(self, speed: int = -1) -> EndOfProgram:
+        """Start execution at pos(0,0). Run at `speed` steps/sec (-1 is unlimited (default))."""
+
+        last_second = math.floor(time.time())
+        steps_this_second = 0
+        while True:
+            this_second = math.floor(time.time())
+            if this_second > last_second:
+                last_second = this_second
+                steps_this_second = 0
+            if speed != -1 and steps_this_second == speed:
+                continue
+
+            try:
+                self.step()
+            except EndOfProgram as exc:
+                return exc
+            steps_this_second += 1
 
 
 class PietProgramGenerator:
     def __init__(self):
-        # self.commands = np.full(size, PietCommand._NONE, dtype=PietCommand)
-        self.commands = np.full((2, 2), PietCommand._NONE, dtype=PietCommand)
-        self.colors = np.full((2, 2), WHITE, dtype=np.dtype((np.uint8, 3)))
         # self.size = size
+        # self.commands = np.full(size, PietCommand._NONE, dtype=PietCommand)
+        # self.commands = np.full((2, 2), PietCommand._NONE, dtype=PietCommand)
+        # self.colors = np.full((2, 2), WHITE, dtype=Color)
+        self.commands = SelfExpandingList(default=SelfExpandingList[PietCommand](default=PietCommand._NONE))
+        self.colors = SelfExpandingList(default=SelfExpandingList(default=WHITE))
         self._interpreter = PietInterpreter(self.image, debug=False)
         self._current_hue = 0
         self._current_lightness = 0
         self._previous_color = WHITE
 
-    # @property
-    # def current_command(self) -> PietCommand:
-    #     y, x = self.interpreter.position
-    #     return self.commands[y][x]
-
-    def set_next_command(self, command: PietCommand, multiplier: int = 1, offset: tuple[int, int] = (0, 0)):
+    def set_next_command(self, command: PietCommand, multiplier: int = 1, offset: OrderedPair | None = None):
+        # pylint: disable=protected-access
         if multiplier < 1:
             return
         # Update the reader with our current image.
-        self._interpreter.reader.im_array = self.colors
+        self._interpreter.reader.colors = self.colors  # type: ignore
         # Simulate steps to move the pointer.
-        next_y, next_x = self._interpreter._next_move()
-        next_command = self.commands[next_y][next_x]
+        next_pos = self._interpreter._next_move()
+        next_command = self.commands[next_pos.y][next_pos.x]
         while next_command is not PietCommand._NONE:
             self._interpreter.step()
-            next_y, next_x = self._interpreter._next_move()
+            next_pos = self._interpreter._next_move()
             try:
-                next_command = self.commands[next_y][next_x]
+                next_command = self.commands[next_pos.y][next_pos.x]
             except IndexError:
                 next_command = PietCommand._NONE
         # Next command is now NONE (0)
-        y, x = np.add((next_y, next_x), offset)
-        self.set_command(command, (y, x))
+        if offset is not None:
+            next_pos += offset
+        self.set_command(command, next_pos)
+        y, x = next_pos
 
         if multiplier > 1:
             if self._interpreter.runtime.pointer.direction is PointerDirection.RIGHT:
-                if x + multiplier + 1 >= self.commands.shape[1]:
-                    self.commands = np.hstack(
-                        (
-                            self.commands,
-                            np.full(
-                                (self.commands.shape[0], x + multiplier + 1 - self.commands.shape[1]),
-                                PietCommand._NONE,
-                                dtype=PietCommand,
-                            ),
-                        )
-                    )
-                    self.colors = np.hstack(
-                        (
-                            self.colors,
-                            np.full(
-                                (self.colors.shape[0], x + multiplier + 1 - self.colors.shape[1]),
-                                WHITE,
-                                dtype=np.dtype((np.uint8, 3)),
-                            ),
-                        )
-                    )
-                self.commands[y, x + 1 : x + multiplier] = PietCommand._PREVIOUS
-                self.colors[y, x + 1 : x + multiplier] = self._previous_color
+                self.commands[y][x + 1 : x + multiplier] = PietCommand._PREVIOUS
+                self.colors[y][x + 1 : x + multiplier] = self._previous_color
             elif self._interpreter.runtime.pointer.direction is PointerDirection.LEFT:
-                self.commands[y, x - multiplier + 1 : x] = PietCommand._PREVIOUS
-                self.colors[y, x - multiplier + 1 : x] = self._previous_color
+                self.commands[y][x - multiplier + 1 : x] = PietCommand._PREVIOUS
+                self.colors[y][x - multiplier + 1 : x] = self._previous_color
             elif self._interpreter.runtime.pointer.direction is PointerDirection.DOWN:
-                if y + multiplier + 1 >= self.commands.shape[0]:
-                    self.commands = np.vstack(
-                        (
-                            self.commands,
-                            np.full(
-                                (y + multiplier + 1 - self.commands.shape[0], self.commands.shape[1]),
-                                PietCommand._NONE,
-                                dtype=PietCommand,
-                            ),
-                        )
-                    )
-                    self.colors = np.vstack(
-                        (
-                            self.colors,
-                            np.full(
-                                (y + multiplier + 1 - self.colors.shape[0], self.colors.shape[1]),
-                                WHITE,
-                                dtype=np.dtype((np.uint8, 3)),
-                            ),
-                        )
-                    )
-                self.commands[y + 1 : y + multiplier, x] = PietCommand._PREVIOUS
-                self.colors[y + 1 : y + multiplier, x] = self._previous_color
+                for y in range(y + 1, y + multiplier):
+                    self.commands[y][x] = PietCommand._PREVIOUS
+                    self.colors[y][x] = self._previous_color
             elif self._interpreter.runtime.pointer.direction is PointerDirection.UP:
-                self.commands[y - multiplier + 1 : y, x] = PietCommand._PREVIOUS
-                self.colors[y - multiplier + 1 : y, x] = self._previous_color
+                for y in range(y - multiplier + 1, y):
+                    self.commands[y][x] = PietCommand._PREVIOUS
+                    self.colors[y][x] = self._previous_color
             else:
                 raise ValueError("Invalid direction pointer position.")
 
-    def set_command(self, command: PietCommand, position: tuple[int, int]):
+    def set_command(self, command: PietCommand, position: OrderedPair):
         y, x = position
-        if y + 1 >= self.commands.shape[0]:
-            self.commands = np.vstack(
-                (
-                    self.commands,
-                    np.full(
-                        (y + 1 - self.commands.shape[0], self.commands.shape[1]), PietCommand._NONE, dtype=PietCommand
-                    ),
-                )
-            )
-            self.colors = np.vstack(
-                (
-                    self.colors,
-                    np.full(
-                        (y + 1 - self.colors.shape[0], self.colors.shape[1]), WHITE, dtype=np.dtype((np.uint8, 3))
-                    ),
-                )
-            )
-        if x + 1 >= self.commands.shape[1]:
-            self.commands = np.hstack(
-                (
-                    self.commands,
-                    np.full(
-                        (self.commands.shape[0], x + 1 - self.commands.shape[1]), PietCommand._NONE, dtype=PietCommand
-                    ),
-                )
-            )
-            self.colors = np.hstack(
-                (
-                    self.colors,
-                    np.full(
-                        (self.colors.shape[0], x + 1 - self.colors.shape[1]), WHITE, dtype=np.dtype((np.uint8, 3))
-                    ),
-                )
-            )
         self.commands[y][x] = command
         if isinstance(command.value, ColorChange):
             if self._previous_color not in (PietCommand.BLOCK.value, PietCommand.NOOP.value):
@@ -224,9 +770,8 @@ class PietProgramGenerator:
         self.colors[y][x] = color
         self._previous_color = color
 
-    def set_offset_command(self, command: PietCommand, offset: tuple[int, int]):
-        y, x = tuple(np.add(self._interpreter.position, offset))
-        self.set_command(command, (y, x))
+    def set_offset_command(self, command: PietCommand, offset: OrderedPair):
+        self.set_command(command, self._interpreter.position + offset)
 
     # @property
     # def colors(self) -> list[list[Color]]:
@@ -258,54 +803,60 @@ class PietProgramGenerator:
     @property
     def image(self) -> Image.Image:
         colors = self.colors
-        x = [color_to_int(color) for row in colors for color in row]
-        # return Image.fromarray(np.array(x), mode="RGB")
-        image = Image.new("RGB", (len(colors[0]), len(colors)))
-        image.putdata(x)
+        if not colors:
+            return Image.new("RGB", (1, 1), WHITE)
+        height = len(colors)
+        width = len(max(colors, key=len))
+        color_ints = []
+        for y in range(height):
+            for x in range(width):
+                color_ints.append(int(colors[y][x]))
+        image = Image.new("RGB", (width, height))
+        image.putdata(color_ints)
         return image
 
 
 def generate_image(data: bytes) -> Image.Image:
     """Construct a Piet program that outputs the data given."""
     length = len(data)
-    program = PietProgramGenerator()
-    program.set_next_command(PietCommand.NOOP, 6)
+    generator = PietProgramGenerator()
+    generator.set_next_command(PietCommand.NOOP, 6)
     for i, byte in enumerate(data):
-        program.set_next_command(PietCommand.NOOP, 256 - byte)
+        generator.set_next_command(PietCommand.NOOP, 256 - byte)
         # program._current_lightness = random.randint(0, 2)
         # program._current_hue = random.randint(0, 5)
-        program.set_next_command(PietCommand.OUT_CHAR, byte)
+        generator.set_next_command(PietCommand.OUT_CHAR, byte)
         # program.set_next_command(random.choice([x for x in PietCommand if isinstance(x.value, ColorChange)]), byte)
-        program.set_next_command(PietCommand.PUSH)
-        program.set_next_command(PietCommand.OUT_CHAR, 1 + (2 * (i % 2)))
-        program.set_next_command(PietCommand.PUSH)
-        program.set_next_command(PietCommand.DUPLICATE)
-        program.set_next_command(PietCommand.POINTER)
-        program.set_next_command(PietCommand.POINTER)
-        program.set_next_command(PietCommand.NOOP, 4 + (2 * (i % 2)))
+        generator.set_next_command(PietCommand.PUSH)
+        generator.set_next_command(PietCommand.OUT_CHAR, 1 + (2 * (i % 2)))
+        generator.set_next_command(PietCommand.PUSH)
+        generator.set_next_command(PietCommand.DUPLICATE)
+        generator.set_next_command(PietCommand.POINTER)
+        generator.set_next_command(PietCommand.POINTER)
+        generator.set_next_command(PietCommand.NOOP, 4 + (2 * (i % 2)))
         if i == length - 1:
             # Add a terminating block of pixels to the end.
-            program.set_next_command(PietCommand.BLOCK)
-            program.set_next_command(PietCommand.NOOP, 2)
-            program.set_next_command(PietCommand.BLOCK)
-            program.set_offset_command(PietCommand.BLOCK, (0, 1))
-            program.set_offset_command(PietCommand.BLOCK, (-1, 1))
-            program.set_next_command(PietCommand.NOOP)
-            program.set_next_command(PietCommand.BLOCK)
-            program.set_offset_command(PietCommand.BLOCK, (1, 0))
-            program.set_offset_command(PietCommand.BLOCK, (-1, 0))
+            generator.set_next_command(PietCommand.BLOCK)
+            generator.set_next_command(PietCommand.NOOP, 2)
+            generator.set_next_command(PietCommand.BLOCK)
+            generator.set_offset_command(PietCommand.BLOCK, OrderedPair(0, 1))
+            generator.set_offset_command(PietCommand.BLOCK, OrderedPair(-1, 1))
+            generator.set_next_command(PietCommand.NOOP)
+            generator.set_next_command(PietCommand.BLOCK)
+            generator.set_offset_command(PietCommand.BLOCK, OrderedPair(1, 0))
+            generator.set_offset_command(PietCommand.BLOCK, OrderedPair(-1, 0))
 
-    return program.image
+    return generator.image
 
 
-if __name__ == "__main__":
+def main():
     # Run this file to generate a Piet program.
     # Test using https://piet.bubbler.one.
 
     with open(__file__, "rb") as file:
-        input_data = file.read()[:256]
+        data = file.read()[:256]
     # data = b"AB"
-    encoded = generate_image(input_data)
+    encoded = generate_image(data)
     encoded.save(f"{__file__}.png")
     encoded.show()
     output_buffer = StringIO()
@@ -313,4 +864,8 @@ if __name__ == "__main__":
     exc = interpreter.run()
     if isinstance(exc, StepLimitReached):
         raise exc
-    assert output_buffer.getvalue().encode() == input_data
+    assert output_buffer.getvalue().encode() == data
+
+
+if __name__ == "__main__":
+    main()
