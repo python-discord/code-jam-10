@@ -133,7 +133,7 @@ class Level:
                             "dropdowns": [
                                 ["Rust", "Chocolate", "Flamenco", "Casablanca", "Buff"]
                             ],
-                            "buttons": "swap",
+                            "buttons": ["swap"],
                         },
                     ),
                     {},
