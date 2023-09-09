@@ -35,7 +35,6 @@ class Dock(QWidget):
                     label,
                     value,
                     {
-                        "image_to_edit": self.level.img_source,
                         "second_image": args["second_image"],
                     },
                 )
@@ -169,7 +168,6 @@ class Dock(QWidget):
 
         args_to_pass = self.args_cache
         args_to_pass["second_image"] = args["second_image"]
-        args_to_pass["secret_code"] = args["secret_code"]
         args_to_pass["image_to_edit"] = str(self.level.get_image_source())
 
         new_image = apply_filter(filter_title, args_to_pass)
