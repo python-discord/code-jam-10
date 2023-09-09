@@ -3,14 +3,14 @@ from collections import OrderedDict
 from PIL.Image import Image
 
 
-class LRUCache:
+class LRUCachePIL:
     """LRU Cache implementation using OrderedDict"""
 
     def __init__(self, capacity: int) -> None:
         self.cache: OrderedDict[str, Image] = OrderedDict()
         self.capacity = capacity
 
-    def get(self, key: str) -> Image:
+    def get(self, key: str) -> Image | None:
         """
         Get an item from the cache
 
