@@ -49,6 +49,8 @@ class Dock(QWidget):
                     }
                 )
             )
+
+            control_panel.zoom.connect(lambda direction, cp=control_panel: self.zoom_image(cp.title, direction))
             self.filters.append(control_panel)
 
         layout = self._create_central_dock()
@@ -199,3 +201,13 @@ class Dock(QWidget):
         """
         # Update the label
         self.img_label.setPixmap(image)
+
+    def zoom_image(self, filter_title: str, direction: str) -> None:
+        """
+        Zoom in the image label
+
+        :param filter_title:
+        :param direction: zoom in or zoom out
+        :return:
+        """
+        print(f"ZOOM REQUESTED {filter_title} {direction}")

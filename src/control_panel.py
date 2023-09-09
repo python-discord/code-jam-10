@@ -11,6 +11,7 @@ class ControlPanel(QWidget):
     # Define a new signal at the top of the class
     sliderValueChanged = pyqtSignal(str, int)
     comboBoxesSwapped = pyqtSignal(str, str)
+    zoom = pyqtSignal(str)
 
     def __init__(self, title: str, widget_info: dict):
         super().__init__()
@@ -50,15 +51,24 @@ class ControlPanel(QWidget):
             # Append the QComboBoxes to the list
             self.combo_boxes.append((combo_box1, combo_box2))
 
-        # Adding buttons
-        for buttonText in widget_info.get('buttons', []):
+        # Adding combo box buttons
+        for button_text in widget_info.get('combo_box_buttons', []):
             button = QPushButton()
-            button.setText(buttonText)
+            button.setText(button_text)
 
             # Use default arguments in the lambda to capture the current values of combo_box1 and combo_box2
             # Assuming one button per pair of dropdowns.
             cb1, cb2 = self.combo_boxes.pop(0)  # Pop the first pair of QComboBoxes from the list
             button.clicked.connect(lambda checked, cb1=cb1, cb2=cb2: self.grab_values(cb1, cb2))
+
+            layout.addWidget(button)
+
+        # Adding zoom buttons
+        for button_text in widget_info.get('buttons', []):
+            button = QPushButton()
+            button.setText(button_text)
+            if button_text == "zoom in" or button_text == "zoom out":
+                button.clicked.connect(lambda checked, button_text=button_text: self.zoom_image(button_text))
 
             layout.addWidget(button)
 
@@ -69,6 +79,10 @@ class ControlPanel(QWidget):
         value1 = combo_box1.currentText()
         value2 = combo_box2.currentText()
         self.comboBoxesSwapped.emit(value1, value2)
+
+    def zoom_image(self, direction: str) -> None:
+        """Zoom the image shown in image label"""
+        self.zoom.emit(direction)
 
     def forward_signal(self, label: str, value: int) -> None:
         """

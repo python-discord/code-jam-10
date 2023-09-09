@@ -131,7 +131,7 @@ class Level:
                                     "Buff"
                                 ]
                             ],
-                            "buttons": [
+                            "combo_box_buttons": [
                                 "swap"
                             ]
                         }
@@ -147,10 +147,10 @@ class Level:
                         {
                             "sliders": [],
                             "dropdowns": [],
-                            # "buttons": [
-                            #     "zoom in",
-                            #     "zoom out"
-                            # ]
+                            "buttons": [
+                                "zoom in",
+                                "zoom out"
+                            ]
                         }
                     ),
                     {},
