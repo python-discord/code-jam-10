@@ -151,6 +151,10 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
                 args_for_filter["B"] = value
             if key == "image_to_edit":
                 args_for_filter["image_to_edit"] = value
+            if key == "image_label_w":
+                args_for_filter["image_label_w"] = value
+            if key == "image_label_h":
+                args_for_filter["image_label_h"] = value
         return apply_unmask_reverse_ishihara(
             args_for_filter
         )

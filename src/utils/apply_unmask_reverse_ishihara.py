@@ -49,8 +49,8 @@ def apply_unmask_reverse_ishihara(args: dict) -> QPixmap:
 
         # Convert the QImage to QPixmap
         pixmap = QPixmap.fromImage(q_image)
-        resized_pixmap = pixmap.scaled(450, 450)
-        # resized_pixmap = pixmap.scaled(args["image_label_w"], args["image_label_h"])  # TODO not able to scale
+        # resized_pixmap = pixmap.scaled(450, 450)
+        resized_pixmap = pixmap.scaled(args["image_label_w"], args["image_label_h"])  # TODO not able to scale
 
         return resized_pixmap
     except Exception as e:
