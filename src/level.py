@@ -97,7 +97,7 @@ class Level:
                                     "Exposure",
                                     ("Image 1", "Image 2"),
                                     Qt.Orientation.Horizontal,
-                                    False
+                                    False,
                                 )
                             ],
                             "dropdowns": [],
@@ -137,15 +137,27 @@ class Level:
                                     "horizontal wave",
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
-                                    False
+                                    False,
                                 ),
-                                ("vertical wave", (0, 100), Qt.Orientation.Horizontal, False),
-                                ("vertical spike", (0, 100), Qt.Orientation.Horizontal, False),
+                                (
+                                    "vertical wave",
+                                    (0, 100),
+                                    Qt.Orientation.Horizontal,
+                                    False,
+                                ),
+                                (
+                                    "vertical spike",
+                                    (0, 100),
+                                    Qt.Orientation.Horizontal,
+                                    False,
+                                ),
                                 (
                                     "horizontal spike",
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
-                                    False)
+                                    False,
+                                ),
+                                ("explode", (0, 100), Qt.Orientation.Horizontal, False),
                             ],
                             "dropdowns": [],
                         },
