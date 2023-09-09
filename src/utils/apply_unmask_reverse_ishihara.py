@@ -3,7 +3,7 @@ from PIL.ImageQt import ImageQt
 from PyQt6.QtGui import QPixmap
 
 from lib.reverse_ishihara.reverse_ishihara import unmask_reverse_ishihara
-from src.Utils.lru_cache import LRUCache
+from src.utils.lru_cache import LRUCache
 
 # Create a cache for storing images:
 _image_cache = LRUCache(capacity=10)  # Cache capacity of 10 images

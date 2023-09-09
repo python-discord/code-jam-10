@@ -6,7 +6,7 @@ from PyQt6.QtCore import QBuffer
 from PyQt6.QtGui import QImage, QPixmap
 
 from lib.double_exposure.double_exposure import double_exposure
-from src.Utils.lru_cache import LRUCache
+from src.utils.lru_cache import LRUCache
 
 # Create a cache for storing images:
 _image_cache = LRUCache(capacity=10)  # Cache capacity of 10 images
@@ -34,7 +34,7 @@ def apply_double_exposure(img1: tuple, img2: tuple, slider_value: int) -> QPixma
     img2 = _img
 
     # Convert slider value to float between 0 and 1
-    adjusted_slider_value = float(slider_value*5) / 100
+    adjusted_slider_value = float(slider_value * 5) / 100
 
     # Apply double exposure
     blended_image = double_exposure(img1, img2, adjusted_slider_value)
