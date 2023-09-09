@@ -1,4 +1,5 @@
 from PyQt6.QtGui import QImage, QPixmap
+
 from lib.motions.motions import MotionTransformer
 
 
