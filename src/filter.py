@@ -117,13 +117,12 @@ class Filter(QWidget):
         return slider_frame
 
 
-def apply_filter(filter_name: str, args: dict, secret: str) -> QPixmap:
+def apply_filter(filter_name: str, args: dict) -> QPixmap:
     """
     Apply a filter to an image
 
     :param filter_name:
     :param args:
-    :param secret: level secret
     :return: img
     """
     if filter_name == "Double Exposure":
@@ -149,9 +148,6 @@ def apply_filter(filter_name: str, args: dict, secret: str) -> QPixmap:
                 args_for_filter["B"] = value
             if key == "image_to_edit":
                 args_for_filter["image_to_edit"] = value
-        new_img = apply_unmask_reverse_ishihara(
-            args_for_filter
-        )
         return apply_color_swap(
             args["image_to_edit"],
             args["first_color"],

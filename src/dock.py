@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Dict
 
 from PyQt6.QtCore import QSize, pyqtSignal
 from PyQt6.QtGui import QIcon, QPixmap
@@ -28,29 +28,28 @@ class Dock(QWidget):
         self.args_cache: Dict[str, int | str] = {}
 
         for _, control_panel, args in self.level.filters:
-            if control_panel is not None:
-                control_panel.sliderValueChanged.connect(
-                    lambda label, value, cp=control_panel: self.update_args_and_image(
-                        cp.title,
-                        label,
-                        value,
-                        {
-                            "second_image": args["second_image"],
-                        },
-                    )
+            control_panel.sliderValueChanged.connect(
+                lambda label, value, cp=control_panel: self.update_args_and_image(
+                    cp.title,
+                    label,
+                    value,
+                    {
+                        "second_image": args["second_image"],
+                    },
                 )
+            )
 
-                # Handle the comboBoxesSwapped signal here
-                control_panel.comboBoxesSwapped.connect(
-                    lambda value1, value2, cp=control_panel: self.button_pressed_with_two_values(
-                        cp.title,
-                        {
-                            "first_color": value1,
-                            "second_color": value2,
-                        }
-                    )
+            # Handle the comboBoxesSwapped signal here
+            control_panel.comboBoxesSwapped.connect(
+                lambda value1, value2, cp=control_panel: self.button_pressed_with_two_values(
+                    cp.title,
+                    {
+                        "first_color": value1,
+                        "second_color": value2,
+                    }
                 )
-                self.filters.append(control_panel)
+            )
+            self.filters.append(control_panel)
 
         layout = self._create_central_dock()
         self.setLayout(layout)
@@ -189,8 +188,8 @@ class Dock(QWidget):
         """
         Update the image label with a new image
 
-        :param new_image:
+        :param image:
         :return:
         """
         # Update the label
-        self.img_label.setPixmap(new_image)
+        self.img_label.setPixmap(image)
