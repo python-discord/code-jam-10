@@ -128,7 +128,7 @@ class GUI(Tk):
 
     def _valid_key(self):
         """Checks if key is valid"""
-        self.key = self.key_method.get(1.0, "end-1c")
+        self.key = self.key_method.get(1.0, "end")
         if not (4 <= len(self.key) <= 24 or len(self.key) == 0):
             self.key_method.configure(bg=RED, fg=WHITE)
             self.error.configure(text="Key must be between 4 and 24 characters long")
@@ -141,14 +141,13 @@ class GUI(Tk):
 
     def check_key(self, encrypt: bool, mode: int = 0):
         """Opens the encrypt/decrypt page"""
-        self.key = self.key_method.get(1.0, "end-1c")
         if self._valid_key():
             self.key_method.configure(bg=DARK_GRAY, fg=WHITE)
             self.error.configure(text="")
             if encrypt:
                 self.encrypt(mode)
             elif len(self.key) > 0:  # checks if key is not empty for decryption
-                self.decrypt()
+                self.decrypt(self.key)
             else:
                 self.key_method.configure(bg=RED, fg=WHITE)
                 self.error.configure(text="Invalid secret key")

@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL.Image import open
 
 from backend.steganography import ExistingImage
 from backend.typingcolors import TypingColors
@@ -39,7 +39,7 @@ class Palette:
 
 def decrypt(file_path, key):
     """Calls the appropriate decryptor and returns the encryptor class and secret message"""
-    img = Image.open(file_path)
+    img = open(file_path)
     lastPixel = img.load()[-1, -1]
 
     if lastPixel[-2] & 7 == 1:

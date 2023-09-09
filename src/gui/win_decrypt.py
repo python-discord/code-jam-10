@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import filedialog as fd
 
 from PIL import ImageTk
+from PIL.Image import BOX, fromarray
 
 from backend.typingcolors import TypingColors
 from gui.modules import *
@@ -20,7 +21,7 @@ class DecryptWin(Frame):
             self.ar_width, self.ar_height = object.ar_width, object.ar_height
         else:
             self.mode = "Steganography"
-            self.image = Image.fromarray(object.input_image)
+            self.image = fromarray(object.input_image)
             self.aspect_ratio = self.image.width / self.image.height
         # create window
         super().__init__(root, bg=DARK_GRAY)
@@ -73,7 +74,7 @@ class DecryptWin(Frame):
             else:  # opposite
                 sf = max(1, self.grid_bbox(0, 0)[3] // self.image.height)
             w, h = int(self.image.width*sf), int(self.image.height*sf)
-        img = ImageTk.PhotoImage(self.image.resize((w, h), Image.BOX))
+        img = ImageTk.PhotoImage(self.image.resize((w, h), BOX))
         self.canvas.configure(image=img, width=w, height=h)
         self.canvas.image = img
 
