@@ -66,8 +66,8 @@ class Window(QMainWindow):
         img = QPixmap(str(self.level.img_source))
 
         # Define max image size constraints (80% of height and 70% of width of the user's primary screen size)
-        max_height = self.screen_size.height() * 0.8
-        max_width = self.screen_size.width() * 0.7
+        max_height = self.screen_size.height() * 0.7
+        max_width = self.screen_size.width() * 0.6
 
         # Calculate the scaling factors for width and height
         img_size = img.size()
