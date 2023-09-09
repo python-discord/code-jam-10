@@ -286,11 +286,22 @@ class Reader:
         return OrderedPair(width // codel_size, height // codel_size)
 
 
-class PointerDirection(IntEnum):
-    RIGHT = 0
-    DOWN = 1
-    LEFT = 2
-    UP = 3
+class PointerDirection(Enum):
+    RIGHT = OrderedPair(0, 1)
+    DOWN = OrderedPair(1, 0)
+    LEFT = OrderedPair(0, -1)
+    UP = OrderedPair(-1, 0)
+
+
+class DirectionOffset(IntEnum):
+    FRONT = 0
+    RIGHT = 1
+    BACK = 2
+    LEFT = 3
+    FRONT_RIGHT = 4
+    BACK_RIGHT = 5
+    BACK_LEFT = 6
+    FRONT_LEFT = 7
 
 
 class CodelChooserDirection(IntEnum):
@@ -301,9 +312,18 @@ class CodelChooserDirection(IntEnum):
 class DirectionPointer:
     def __init__(self):
         self.direction = PointerDirection.RIGHT
+        self.position = OrderedPair(0, 0)
 
     def rotate(self, times: int = 1):
-        self.direction = PointerDirection((self.direction + times) % 4)
+        directions = tuple(PointerDirection)
+        self.direction = directions[(directions.index(self.direction) + times) % 4]
+
+    def next_position(self) -> OrderedPair:
+        return self.position + self.direction.value
+
+    def move_to_next(self):
+        """Move one pixel in the direction of the DP"""
+        self.position = self.next_position()
 
 
 class CodelChooser:
@@ -505,7 +525,7 @@ class PietInterpreter:
         self,
         image: Image.Image,
         *,
-        step_limit: int = 1000000,
+        step_limit: int = 10000000,
         debug: bool = False,
         runtime: PietRuntime | None = None,
     ):
@@ -513,14 +533,24 @@ class PietInterpreter:
         self.debug = debug
         self.reader = Reader(image)
         self.runtime = runtime or PietRuntime()
-        self.stack = self.runtime.stack
-        self.position = OrderedPair(0, 0)
         self.iteration = -1
-        self.last_codel = self.reader.codel_info(self.position)
-        self.current_codel = self.reader.codel_info(self.position)
         self.steps: list[StepTrace] = []
+        self._last_codel = self.reader.codel_info(self.position)
+        self._current_codel = self.reader.codel_info(self.position)
         self._flips = 0
         self._move_to_furthest_pixel()
+
+    @property
+    def stack(self) -> PietStack:
+        return self.runtime.stack
+
+    @property
+    def pointer(self) -> DirectionPointer:
+        return self.runtime.pointer
+
+    @property
+    def position(self) -> OrderedPair:
+        return self.runtime.pointer.position
 
     @property
     def last_step(self) -> StepTrace | None:
@@ -551,8 +581,8 @@ class PietInterpreter:
         return OrderedPair(row, column)
 
     def _determine_color_change(self) -> ColorChange:
-        c1_pos = self._find_color_position(self.last_codel.color)
-        c2_pos = self._find_color_position(self.current_codel.color)
+        c1_pos = self._find_color_position(self._last_codel.color)
+        c2_pos = self._find_color_position(self._current_codel.color)
         lightness, hue = c2_pos[0] - c1_pos[0], c2_pos[1] - c1_pos[1]
 
         if lightness < 0:
@@ -600,26 +630,11 @@ class PietInterpreter:
             return OrderedPair(smallest.y, largest.x)
         return OrderedPair(-1, -1)
 
-    def _next_move(self) -> OrderedPair:
-        if self.runtime.pointer.direction is PointerDirection.RIGHT:
-            return self.position + OrderedPair(0, 1)
-        if self.runtime.pointer.direction is PointerDirection.DOWN:
-            return self.position + OrderedPair(1, 0)
-        if self.runtime.pointer.direction is PointerDirection.LEFT:
-            return self.position - OrderedPair(0, 1)
-        if self.runtime.pointer.direction is PointerDirection.UP:
-            return self.position - OrderedPair(1, 0)
-        raise ValueError("Invalid direction pointer position.")
-
-    def _move(self):
-        """Move one pixel in the direction of the DP"""
-        self.position = self._next_move()
-
     def _move_to_furthest_pixel(self):
         # move to farthest pixel in current codel
-        if self.current_codel.color != WHITE:
-            farthest_pixel = self._determine_farthest_pixel(self.current_codel)
-            self.position = farthest_pixel
+        if self._current_codel.color != WHITE:
+            farthest_pixel = self._determine_farthest_pixel(self._current_codel)
+            self.runtime.pointer.position = farthest_pixel
 
     def step(self):
         "Execute a single step."
@@ -632,7 +647,7 @@ class PietInterpreter:
         args = []
         did_flip = False
 
-        next_y, next_x = self._next_move()
+        next_y, next_x = self.pointer.next_position()
         try:
             blocked = self.reader.colors[next_y][next_x] == BLACK or next_y < 0 or next_x < 0
         except IndexError:
@@ -640,27 +655,27 @@ class PietInterpreter:
 
         if not blocked:
             # move one pixel over to next codel
-            self.last_codel = self.current_codel
-            self._move()
+            self._last_codel = self._current_codel
+            self.pointer.move_to_next()
             if self.reader.colors[self.position.y][self.position.x] == WHITE:
                 # Skip the codel_info call if the current codel is white for performance reasons.
-                self.current_codel = Codel(1, WHITE, {self.position})
+                self._current_codel = Codel(1, WHITE, {self.position})
             else:
-                self.current_codel = self.reader.codel_info(self.position)
+                self._current_codel = self.reader.codel_info(self.position)
 
             self._move_to_furthest_pixel()
 
             # determine color delta between current and previous codel
             # and execute relevant instruction
-            if WHITE in (self.last_codel.color, self.current_codel.color):
+            if WHITE in (self._last_codel.color, self._current_codel.color):
                 instruction = self.runtime.p_noop
-                if self.last_codel.color != self.current_codel.color:
+                if self._last_codel.color != self._current_codel.color:
                     self._flips = 0
             else:
                 delta = self._determine_color_change()
                 instruction = self.runtime.delta_map[delta]
                 if delta == (1, 0):
-                    args.append(self.last_codel.size)
+                    args.append(self._last_codel.size)
                 self._flips = 0
         else:
             if self.last_step and not self.last_step.did_flip:
@@ -679,8 +694,8 @@ class PietInterpreter:
             self.position,
             instruction,
             did_flip,
-            self.last_codel,
-            self.current_codel,
+            self._last_codel,
+            self._current_codel,
         )
         self.steps.append(step)
         if self.debug:
@@ -714,7 +729,7 @@ class PietProgramGenerator:
         # self.colors = np.full((2, 2), WHITE, dtype=Color)
         self.commands = SelfExpandingList(default=SelfExpandingList[PietCommand](default=PietCommand._NONE))
         self.colors = SelfExpandingList(default=SelfExpandingList(default=WHITE))
-        self._interpreter = PietInterpreter(self.image, debug=False)
+        self.interpreter = PietInterpreter(self.image, debug=False)
         self._current_hue = 0
         self._current_lightness = 0
         self._previous_color = WHITE
@@ -724,13 +739,13 @@ class PietProgramGenerator:
         if multiplier < 1:
             return
         # Update the reader with our current image.
-        self._interpreter.reader.colors = self.colors  # type: ignore
+        self.interpreter.reader.colors = self.colors  # type: ignore
         # Simulate steps to move the pointer.
-        next_pos = self._interpreter._next_move()
+        next_pos = self.interpreter.pointer.next_position()
         next_command = self.commands[next_pos.y][next_pos.x]
         while next_command is not PietCommand._NONE:
-            self._interpreter.step()
-            next_pos = self._interpreter._next_move()
+            self.interpreter.step()
+            next_pos = self.interpreter.pointer.next_position()
             try:
                 next_command = self.commands[next_pos.y][next_pos.x]
             except IndexError:
@@ -742,17 +757,17 @@ class PietProgramGenerator:
         y, x = next_pos
 
         if multiplier > 1:
-            if self._interpreter.runtime.pointer.direction is PointerDirection.RIGHT:
+            if self.interpreter.runtime.pointer.direction is PointerDirection.RIGHT:
                 self.commands[y][x + 1 : x + multiplier] = PietCommand._PREVIOUS
                 self.colors[y][x + 1 : x + multiplier] = self._previous_color
-            elif self._interpreter.runtime.pointer.direction is PointerDirection.LEFT:
+            elif self.interpreter.runtime.pointer.direction is PointerDirection.LEFT:
                 self.commands[y][x - multiplier + 1 : x] = PietCommand._PREVIOUS
                 self.colors[y][x - multiplier + 1 : x] = self._previous_color
-            elif self._interpreter.runtime.pointer.direction is PointerDirection.DOWN:
+            elif self.interpreter.runtime.pointer.direction is PointerDirection.DOWN:
                 for y in range(y + 1, y + multiplier):
                     self.commands[y][x] = PietCommand._PREVIOUS
                     self.colors[y][x] = self._previous_color
-            elif self._interpreter.runtime.pointer.direction is PointerDirection.UP:
+            elif self.interpreter.runtime.pointer.direction is PointerDirection.UP:
                 for y in range(y - multiplier + 1, y):
                     self.commands[y][x] = PietCommand._PREVIOUS
                     self.colors[y][x] = self._previous_color
@@ -774,8 +789,16 @@ class PietProgramGenerator:
         self.colors[y][x] = color
         self._previous_color = color
 
-    def set_offset_command(self, command: PietCommand, offset: OrderedPair):
-        self.set_command(command, self._interpreter.position + offset)
+    def set_offset_command(self, command: PietCommand, offset: DirectionOffset):
+        pointer = DirectionPointer()
+        pointer.direction = self.interpreter.runtime.pointer.direction
+        pointer.position = self.interpreter.runtime.pointer.position
+        pointer.rotate(offset.value)
+        pointer.move_to_next()
+        if offset.value > 3:
+            pointer.rotate()
+            pointer.move_to_next()
+        self.set_command(command, pointer.position)
 
     # @property
     # def colors(self) -> list[list[Color]]:
@@ -820,7 +843,7 @@ class PietProgramGenerator:
         return image
 
 
-def generate_image(data: bytes) -> Image.Image:
+def generate_image(data: bytes, cols: int = 4) -> Image.Image:
     """Construct a Piet program that outputs the data given."""
     length = len(data)
     generator = PietProgramGenerator()
@@ -832,23 +855,35 @@ def generate_image(data: bytes) -> Image.Image:
         generator.set_next_command(PietCommand.OUT_CHAR, byte)
         # program.set_next_command(random.choice([x for x in PietCommand if isinstance(x.value, ColorChange)]), byte)
         generator.set_next_command(PietCommand.PUSH)
-        generator.set_next_command(PietCommand.OUT_CHAR, 1 + (2 * (i % 2)))
-        generator.set_next_command(PietCommand.PUSH)
-        generator.set_next_command(PietCommand.DUPLICATE)
-        generator.set_next_command(PietCommand.POINTER)
-        generator.set_next_command(PietCommand.POINTER)
-        generator.set_next_command(PietCommand.NOOP, 4 + (2 * (i % 2)))
+        if (i + 1) % cols == 0:
+            generator.set_next_command(PietCommand.OUT_CHAR, 3 if (i + 1) % (cols * 2) == 0 else 1)
+            generator.set_next_command(PietCommand.PUSH)
+            generator.set_next_command(PietCommand.DUPLICATE)
+            generator.set_next_command(PietCommand.POINTER)
+            generator.set_next_command(PietCommand.POINTER)
+            generator.set_next_command(PietCommand.NOOP, 6 if (i + 1) % (cols * 2) == 0 else 4)
+        else:
+            generator.set_next_command(PietCommand.OUT_CHAR)
         if i == length - 1:
             # Add a terminating block of pixels to the end.
+            generator.set_next_command(PietCommand.NOOP)
+            if generator.interpreter.runtime.pointer.direction is PointerDirection.LEFT:
+                # The ADD command here is arbitrary, since a transition from white to a color is a no-op.
+                generator.set_next_command(PietCommand.ADD, 3)
+                generator.set_next_command(PietCommand.PUSH)
+                generator.set_next_command(PietCommand.DUPLICATE)
+                generator.set_next_command(PietCommand.POINTER)
+                generator.set_next_command(PietCommand.POINTER)
+            generator.set_next_command(PietCommand.NOOP, 4)
             generator.set_next_command(PietCommand.BLOCK)
             generator.set_next_command(PietCommand.NOOP, 2)
             generator.set_next_command(PietCommand.BLOCK)
-            generator.set_offset_command(PietCommand.BLOCK, OrderedPair(0, 1))
-            generator.set_offset_command(PietCommand.BLOCK, OrderedPair(-1, 1))
+            generator.set_offset_command(PietCommand.BLOCK, DirectionOffset.LEFT)
+            generator.set_offset_command(PietCommand.BLOCK, DirectionOffset.BACK_LEFT)
             generator.set_next_command(PietCommand.NOOP)
             generator.set_next_command(PietCommand.BLOCK)
-            generator.set_offset_command(PietCommand.BLOCK, OrderedPair(1, 0))
-            generator.set_offset_command(PietCommand.BLOCK, OrderedPair(-1, 0))
+            generator.set_offset_command(PietCommand.BLOCK, DirectionOffset.LEFT)
+            generator.set_offset_command(PietCommand.BLOCK, DirectionOffset.RIGHT)
 
     return generator.image
 
@@ -858,9 +893,9 @@ def main():
     # Test using https://piet.bubbler.one.
 
     with open(__file__, "rb") as file:
-        data = file.read()[:256]
+        data = file.read()
     # data = b"AB"
-    encoded = generate_image(data)
+    encoded = generate_image(data, 12)
     encoded.save(f"{__file__}.png")
     encoded.show()
     output_buffer = StringIO()
@@ -868,7 +903,7 @@ def main():
     exc = interpreter.run()
     if isinstance(exc, StepLimitReached):
         raise exc
-    assert output_buffer.getvalue().encode() == data
+    assert output_buffer.getvalue().encode() == data, f"Output does not match input.\n{output_buffer.getvalue()}"
 
 
 if __name__ == "__main__":
