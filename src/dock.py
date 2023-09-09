@@ -1,8 +1,8 @@
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Dict
 
 from PyQt6.QtCore import QSize, pyqtSignal
-from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import (
     QFrame, QHBoxLayout, QLabel, QLineEdit, QPushButton, QStackedLayout,
     QWidget
@@ -25,6 +25,7 @@ class Dock(QWidget):
         self._update_secret_code = update_secret_code_callback
         self.img_label = image_label
         self.filters = []
+        self.args_cache: Dict[str, int | str] = {}
 
         for _, filter_item, args in self.level.filters:
             control_panel = filter_item
@@ -161,12 +162,29 @@ class Dock(QWidget):
         layout = self._create_tabbed_controls()
         layout.setCurrentIndex(index)
 
-    def update_image_label(self, new_image: QPixmap) -> None:
-        """
-        Update the image label with a new image
+    def update_args_and_image(self, filter_title: str, label: str, value: int, args: dict) -> None:
+        """Update the args_cache and then apply the filter with the updated args"""
+        # Update the cache with the slider value
+        self.args_cache[label] = value
 
-        :param new_image:
+        # Only update args if the keys are present in args_cache
+        for key, val in args.items():
+            if key in self.args_cache.keys():
+                self.args_cache[key] = args[key]
+
+        args_to_pass = self.args_cache
+        args_to_pass["second_image"] = args["second_image"]
+        args_to_pass["secret_code"] = args["secret_code"]
+        args_to_pass["img_to_edit"] = str(self.level.get_image_source())
+
+        new_image = apply_filter(filter_title, args_to_pass)
+        self.img_label.setPixmap(new_image)
+
+    def update_args_cache(self, args: dict) -> None:
+        """
+        Update the args cache
+
+        :param args:
         :return:
         """
-        # Update the label
-        self.img_label.setPixmap(new_image)
+        self.args_cache = args

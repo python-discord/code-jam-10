@@ -1,52 +1,14 @@
 import io
-from collections import OrderedDict
 
+import numpy as np
 from PIL import Image
 from PyQt6.QtCore import QBuffer
 from PyQt6.QtGui import QImage, QPixmap
 
 from lib.double_exposure.double_exposure import double_exposure
+from src.Utils.lru_cache import LRUCache
 
-
-class LRUCache:
-    """LRU Cache implementation using OrderedDict"""
-
-    def __init__(self, capacity: int) -> None:
-        self.cache: OrderedDict[str, Image] = OrderedDict()
-        self.capacity = capacity
-
-    def get(self, key: str) -> Image:
-        """
-        Get an item from the cache
-
-        :param key:
-        :return:
-        """
-        if key not in self.cache:
-            return None
-        else:
-            # Move the accessed entry to the end
-            self.cache.move_to_end(key)
-            return self.cache[key]
-
-    def put(self, key: str, value: Image) -> None:
-        """
-        Put an item in the cache
-
-        :param key:
-        :param value:
-        :return:
-        """
-        if key in self.cache:
-            # If entry is found, remove it and re-insert at the end
-            del self.cache[key]
-        elif len(self.cache) >= self.capacity:
-            # If the cache is at capacity, remove the first (oldest) item
-            self.cache.popitem(last=False)
-        self.cache[key] = value
-
-
-# Now integrate the LRUCache into your previous function:
+# Create a cache for storing images:
 _image_cache = LRUCache(capacity=10)  # Cache capacity of 10 images
 
 
@@ -77,11 +39,12 @@ def apply_double_exposure(img1: tuple, img2: tuple, slider_value: int) -> QPixma
     # Apply double exposure
     blended_image = double_exposure(img1, img2, adjusted_slider_value)
 
-    # Convert blended PIL image to QPixmap
-    blended_image_rgba = blended_image.convert("RGBA")
-    data = blended_image_rgba.tobytes("raw", "BGRA")
-    qim = QImage(data, blended_image.width, blended_image.height, QImage.Format.Format_ARGB32)
-    pixmap = QPixmap.fromImage(qim)
+    # Convert blended image to QPixmap
+    image_np = np.array(blended_image)
+    height, width, channel = image_np.shape
+    bytesPerLine = 3 * width
+    qimage = QImage(image_np.data, width, height, bytesPerLine, QImage.Format.Format_RGB888)
+    pixmap = QPixmap.fromImage(qimage)
 
     return pixmap
 
