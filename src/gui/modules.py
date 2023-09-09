@@ -9,32 +9,36 @@ PRINTABLE = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$
 
 def loading_animation(root, after, *args):
     """Animates the loading screen"""
+
     def drawtext(text):
         """Draws the text"""
+
         def dropletter(letter, n, after_drop, *after_args):
             """Animates a single letter"""
             if n > 30:
                 after_drop(*after_args)
                 return
-            canvas.scale(letter, 790-55*len(text), 240, .9, .9)
-            root.after(10, lambda: dropletter(letter, n+1, after_drop, *after_args))
+            canvas.scale(letter, 790 - 55 * len(text), 240, 0.9, 0.9)
+            root.after(10, lambda: dropletter(letter, n + 1, after_drop, *after_args))
 
         if not text:  # animation complete
             root.after(1000, lambda: after(*args))
             return
-        if text[0] == ' ':  # skip spaces
+        if text[0] == " ":  # skip spaces
             drawtext(text[1:])
             return
         # render next letter
         dropletter(
-            canvas.create_text(400, 0, text=text[0], fill='white', font=("Cascadia Mono", 66)),
+            canvas.create_text(
+                400, 0, text=text[0], fill="white", font=("Cascadia Mono", 66)
+            ),
             0,
-            lambda: drawtext(text[1:])
+            lambda: drawtext(text[1:]),
         )
 
     canvas = Canvas(root, bg=DARK_GRAY)
-    canvas.pack(fill='both', expand=True)
-    drawtext('Pixel Studios')
+    canvas.pack(fill="both", expand=True)
+    drawtext("Pixel Studios")
 
 
 def center(root: Tk, WIN_W: int, WIN_H: int):
@@ -43,9 +47,7 @@ def center(root: Tk, WIN_W: int, WIN_H: int):
     width = root.winfo_screenwidth()
     height = root.winfo_screenheight()
     x = int((width - WIN_W) / 2)
-    y = int(
-        (height - WIN_H) / 3
-    )  # A bit off center to align it well with the taskbar
+    y = int((height - WIN_H) / 3)  # A bit off center to align it well with the taskbar
     root.geometry(f"+{x}+{y}")
 
 
@@ -56,20 +58,12 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
         win = The class method to be called
     """
     layouts = {
-        "Import": {
-            "command": win.open,
-            "accelerator": "Ctrl+O",
-            "state": "normal"
-        },
-        "Export": {
-            "command": win.export,
-            "accelerator": "Ctrl+I",
-            "state": "normal"
-        },
+        "Import": {"command": win.open, "accelerator": "Ctrl+O", "state": "normal"},
+        "Export": {"command": win.export, "accelerator": "Ctrl+I", "state": "normal"},
         "Set Key": {
             "command": win.edit_key,
             "accelerator": "Ctrl+K",
-            "state": "normal"
+            "state": "normal",
         },
         "--": "",
         "Encrypt": {
@@ -77,20 +71,24 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
                 "Typing Colors": {
                     "command": root.switch_typingcolors,
                     "accelerator": "Ctrl+T",
-                    "state": "disabled" if win.__class__.__name__ == "TypingColorsWin" else "normal"
+                    "state": "disabled"
+                    if win.__class__.__name__ == "TypingColorsWin"
+                    else "normal",
                 },
                 "Steganograpy": {
                     "command": root.switch_steganography,
                     "accelerator": "Ctrl+S",
-                    "state": "disabled" if win.__class__.__name__ == "SteganographyWin" else "normal"
-                }
+                    "state": "disabled"
+                    if win.__class__.__name__ == "SteganographyWin"
+                    else "normal",
+                },
             }
         },
         "Decrypt": {
             "command": root.switch_decrypt,
             "accelerator": "Ctrl+D",
-            "state": "disabled" if win.__class__.__name__ == "DecryptWin" else "normal"
-        }
+            "state": "disabled" if win.__class__.__name__ == "DecryptWin" else "normal",
+        },
     }
 
     # Main Menu Bar
@@ -115,8 +113,12 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
                             command=layout["command"],
                             accelerator=layout["accelerator"],
                             state=layout["state"],
-                            activeforeground=WHITE if layout["state"] == "normal" else GRAY,
-                            activebackground=GRAY if layout["state"] == "normal" else WHITE,
+                            activeforeground=WHITE
+                            if layout["state"] == "normal"
+                            else GRAY,
+                            activebackground=GRAY
+                            if layout["state"] == "normal"
+                            else WHITE,
                         )
                     menubar.add_cascade(
                         label=name,
@@ -140,6 +142,7 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
 
 def key_popup(root, after_exec):
     """Opens up an edit key window"""
+
     def command():
         if not root._valid_key():
             return
@@ -148,8 +151,14 @@ def key_popup(root, after_exec):
 
     root.popup = Toplevel(root, bg=DARK_GRAY)
     root.popup.geometry("350x200")
-    root.key_method = Text(
-        root.popup, height=1, width=25, padx=2, pady=2, font=("Consolas", 12), bd=0
+    # ? if you want to show the previous key as default value in the pop uncomment next line
+    root.key_method_text = StringVar(root.popup, "")
+    root.key_method = Entry(
+        root.popup,
+        width=25,
+        font=("Consolas", 12),
+        bd=0,
+        textvariable=root.key_method_text,
     )
     root.key_method.pack(pady=30)
 
@@ -172,6 +181,6 @@ def key_popup(root, after_exec):
         pady=3,
         cursor="hand2",
         bd=0,
-        command=command
+        command=command,
     )
     submit.pack()

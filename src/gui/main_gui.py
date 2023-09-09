@@ -1,4 +1,3 @@
-
 from pathlib import Path
 from random import choices
 from tkinter import *
@@ -34,6 +33,24 @@ class GUI(Tk):
     def loading_screen(self):
         """The starting page for the application"""
         self.title("Pixel Studios")
+
+        # GET THE CURRENT SCREEN SIZE AND SET MIN SIZE accordingly
+        self.minsize(width=720, height=480)
+        # sw = self.winfo_screenwidth()
+        # sh = self.winfo_screenheight()
+        # # 1920 * 1080
+        # # 1280 * 720
+
+        # if sh >= 1080:
+        #     w = int(sw // 1.5)
+        #     h = int(sh // 1.5)
+        #     self.minsize(width=w, height=h)
+        #     WIN_W, WIN_H = (w, h)
+        # else:
+        #     # self.minsize(width=sw, height=sh)
+        #     WIN_W, WIN_H = (800, 500)
+        # self.maxsize(width=666, height=666)
+
         self.geometry(f"{WIN_W}x{WIN_H}")
         center(self, WIN_W, WIN_H)
         loading_animation(self, lambda: self.callback(self.create_main_window))
@@ -58,8 +75,13 @@ class GUI(Tk):
         )
         label.pack()
 
-        self.key_method = Text(
-            input, height=1, width=25, padx=2, pady=2, font=("Consolas", 12), bd=0
+        self.key_method_text = StringVar(input, "")
+        self.key_method = Entry(
+            input,
+            width=25,
+            font=("Consolas", 12),
+            bd=0,
+            textvariable=self.key_method_text,
         )
         self.key_method.pack()
 
@@ -128,8 +150,8 @@ class GUI(Tk):
 
     def _valid_key(self):
         """Checks if key is valid"""
-        self.key = self.key_method.get(1.0, "end")
-        if not (4 <= len(self.key) <= 24 or len(self.key) == 0):
+        self.key = self.key_method_text.get()
+        if not (4 <= len(self.key) <= 24) or len(self.key) == 0:
             self.key_method.configure(bg=RED, fg=WHITE)
             self.error.configure(text="Key must be between 4 and 24 characters long")
             return False
@@ -162,7 +184,8 @@ class GUI(Tk):
 
             def create_win():
                 self.currentwin = TypingColorsWin(self)
-                self.currentwin.pack(expand=True, fill='both')
+                self.currentwin.pack(expand=True, fill="both")
+
             self.callback(create_win)
         else:
             self.switch_steganography()
@@ -183,7 +206,8 @@ class GUI(Tk):
 
         def create_win():
             self.currentwin = DecryptWin(self, object, decoded_text)
-            self.currentwin.pack(expand=True, fill='both')
+            self.currentwin.pack(expand=True, fill="both")
+
         self.callback(create_win)
 
     def switch_typingcolors(self):
@@ -193,7 +217,8 @@ class GUI(Tk):
 
         def create_win():
             self.currentwin = TypingColorsWin(self)
-            self.currentwin.pack(expand=True, fill='both')
+            self.currentwin.pack(expand=True, fill="both")
+
         self.callback(create_win)
 
     def switch_steganography(self):
@@ -206,7 +231,8 @@ class GUI(Tk):
 
         def create_win():
             self.currentwin = SteganographyWin(self, filename)
-            self.currentwin.pack(expand=True, fill='both')
+            self.currentwin.pack(expand=True, fill="both")
+
         self.callback(create_win)
 
     def switch_decrypt(self):
