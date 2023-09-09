@@ -3,9 +3,28 @@ from .steganography import Image, Steganography
 
 EOM = "$$$"
 
+def pixels_top_left(pixels: list[list[int]], bytes_input: bytes):
+    for pixel in pixels:
+        yield pixel
+
+
+def pixels_space_evenly(pixels: list[list[int]], bytes_input: bytes):
+    ... # TODO
+
 
 class Lsb(Steganography):
     """Least Significant Bit Implementation of Steganography"""
+
+    def __init__(self, pixels_generator = pixels_top_left):
+        """Initialises the LSB encoder and decoder.
+
+        Args:
+            pixels_generator: A generator which is given the pixels in the image as well as the bytes to be encoded
+                and outputs which ones to choose. The function must ensure that it continues to yield values
+                for the full number of bytes specified.
+        """
+        self.pixels_generator = pixels_generator
+
 
     def encode(self, text: str, img: Image):
         """Encode the text in the image.
@@ -28,7 +47,7 @@ class Lsb(Steganography):
 
         bits = byteutils.iter_bits(bytes_input)
         pixel_data = img.pixels
-        for pixel in pixel_data:
+        for pixel in self.pixels_generator(img.pixels, bytes_input=bytes_input):
             for idx, channel in enumerate(pixel):
                 try:
                     bit = next(bits)
