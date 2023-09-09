@@ -56,14 +56,14 @@ def reverse_ishihara(image: Image.Image, message: str = None,
 
     return image
 
-# Create a function to reverse a reverse Ishihara image
 
-
-def unmask_reverse_ishihara(image: Image.Image) -> Image.Image:
+def unmask_reverse_ishihara(image: Image.Image, a_scale: int = 2, b_scale: int = 2) -> Image.Image:
     """
     Reverse a reverse Ishihara image to reveal the hidden message.
 
     :param image: PIL Image object
+    :param a_scale:
+    :param b_scale:
     :return: PIL Image object
     """
     # Convert image to Lab color space
@@ -80,8 +80,8 @@ def unmask_reverse_ishihara(image: Image.Image) -> Image.Image:
     l_channel, a_channel, b_channel = lab_array[:, :, 0], lab_array[:, :, 1], lab_array[:, :, 2]
 
     # Center around zero and scale
-    a_channel = (a_channel - 128) * 2 + 128
-    b_channel = (b_channel - 128) * 2 + 128
+    a_channel = (a_channel - 128) * a_scale + 128
+    b_channel = (b_channel - 128) * b_scale + 128
 
     # Ensure values remain in the 0-255 range
     a_channel = np.clip(a_channel, 0, 255)

@@ -5,6 +5,9 @@ from PyQt6.QtWidgets import (
 )
 
 from src.Utils.apply_double_exposure import apply_double_exposure
+from src.Utils.apply_unmask_reverse_ishihara import (
+    apply_unmask_reverse_ishihara
+)
 
 
 class Filter(QWidget):
@@ -122,8 +125,33 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
     :return: img
     """
     if filter_name == "Double Exposure":
+        print("using double exposure")
+        args_for_filter = {}
+        for key, value in args.items():
+            if key == "Exposure":
+                args_for_filter["Exposure"] = value
+            if key == "img_to_edit":
+                args_for_filter["img_to_edit"] = value
+            if key == "second_image":
+                args_for_filter["second_image"] = value
+
         new_img = apply_double_exposure(
-            args["image_to_edit"], args["second_image"], args["slider_value"]
+            args_for_filter["img_to_edit"],
+            args_for_filter["second_image"],
+            args_for_filter["Exposure"]
         )
         return new_img
-    pass
+    if filter_name == "Ishihara":
+        print("using ishihara")
+        args_for_filter = {}
+        for key, value in args.items():
+            if key == "A":
+                args_for_filter["A"] = value
+            if key == "B":
+                args_for_filter["B"] = value
+            if key == "img_to_edit":
+                args_for_filter["img_to_edit"] = value
+        new_img = apply_unmask_reverse_ishihara(
+            args_for_filter
+        )
+        return new_img
