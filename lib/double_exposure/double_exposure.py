@@ -10,16 +10,16 @@ def double_exposure(img1: Image, img2: Image, alpha: float = 0.5) -> Image:
     :param alpha: int
     :return:
     """
-    # Check that both images are 450x450 and if not, resize them
-    if img1.size != (450, 450):
-        img1 = img1.resize((450, 450))
-
-    if img2.size != (450, 450):
-        img2 = img2.resize((450, 450))
+    # Ensure img1 is the smaller image, or swap if necessary
+    if img1.size[0] > img2.size[0] or img1.size[1] > img2.size[1]:
+        img1, img2 = img2, img1
 
     # Convert both images to RGB
     img1 = img1.convert("RGB")
     img2 = img2.convert("RGB")
+
+    # Resize img2 to match img1's size
+    img2 = img2.resize(img1.size)
 
     # Blend the images
     blended = Image.blend(img1, img2, alpha)
