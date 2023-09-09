@@ -213,7 +213,7 @@ class Codel(NamedTuple):
         return f"{self.__class__.__name__}(size={len(self)}, color={self.color})"
 
 
-class Reader:
+class ImageReader:
     def __init__(self, image: Image.Image) -> None:
         colors: list[list[Color]] = []
         for y in range(image.height):
@@ -519,7 +519,7 @@ class PietInterpreter:
     ):
         self.step_limit = step_limit
         self.debug = debug
-        self.reader = Reader(image)
+        self.reader = ImageReader(image)
         self.runtime = runtime or PietRuntime()
         self.iteration = -1
         self.steps: list[StepTrace] = []
