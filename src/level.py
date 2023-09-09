@@ -50,7 +50,7 @@ class Level:
         if self.level_number == 2:
             return "secret2"
         if self.level_number == 3:
-            return "21002"
+            return "200012"
         if self.level_number == 4:
             return "Turbo secret"
         return "pythoncodejam2023"
