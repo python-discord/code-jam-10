@@ -4,7 +4,7 @@ import sys
 from collections import deque
 from enum import Enum, IntEnum
 from io import StringIO
-from typing import Callable, Iterable, TextIO
+from typing import Callable, TextIO
 from warnings import warn
 
 from .common import OrderedPair
@@ -58,17 +58,10 @@ class CodelChooser:
         self.direction = CodelChooserDirection(self.direction * -1 if abs(times) % 2 else self.direction)
 
 
-class PietStack:
-    def __init__(self):
-        self._stack = deque()
-
+class PietStack(deque[int]):
     @property
     def top(self) -> int:
-        return self._stack[-1]
-
-    def pop(self) -> int:
-        """Pop the top item off of the stack"""
-        return self._stack.pop()
+        return self[-1]
 
     def pop_multiple(self, count: int = 2, /) -> list[int]:
         """Pop the top `count` items off the stack (default: 2)"""
@@ -76,11 +69,7 @@ class PietStack:
 
     def push(self, item: int, /):
         """Push an item (int) on to the top of the stack"""
-        self._stack.append(item)
-
-    def extend(self, items: Iterable[int], /):
-        """Push multiple items on to the stack"""
-        self._stack.extend(items)
+        self.append(item)
 
 
 def pass_on_empty_stack(func: Callable) -> Callable:
