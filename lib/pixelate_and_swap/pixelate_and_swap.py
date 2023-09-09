@@ -60,10 +60,10 @@ def swap_colors(img: Image.Image, color1: tuple, color2: tuple) -> Image.Image:
 
     # Create a mask for pixels matching color1. This will be a boolean array with
     # the same shape as the image where pixels that match color1 are marked as True.
-    mask1 = (img_array == color1).all(-1)
+    mask1 = (img_array == np.array(color1)[np.newaxis, np.newaxis, :]).all(-1)
 
     # Similarly, create a mask for pixels matching color2.
-    mask2 = (img_array == color2).all(-1)
+    mask2 = (img_array == np.array(color2)[np.newaxis, np.newaxis, :]).all(-1)
 
     # Use the masks to swap the colors. For pixels that match the mask1 (originally color1),
     # set their value to color2.
