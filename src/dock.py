@@ -201,11 +201,3 @@ class Dock(QWidget):
         """
         self.img_label.setPixmap(image)
 
-    def update_args_cache(self, args: dict) -> None:
-        """
-        Update the args cache
-
-        :param args:
-        :return:
-        """
-        self.args_cache = args
