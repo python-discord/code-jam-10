@@ -1,7 +1,4 @@
-from itertools import count, cycle
 from tkinter import *
-
-from PIL import Image, ImageTk
 
 DARK_GRAY, GRAY = "#222831", "#393E46"
 AQUA, WHITE = "#00ADB5", "#EEEEEE"
@@ -10,52 +7,34 @@ BRIGHT_RED = "#ff0000"
 PRINTABLE = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\t"
 
 
-class ImageLabel(Label):
-    """
-    A Label that displays images, and plays them if they are gifs
+def loading_animation(root, after, *args):
+    """Animates the loading screen"""
+    def drawtext(text):
+        """Draws the text"""
+        def dropletter(letter, n, after_drop, *after_args):
+            """Animates a single letter"""
+            if n > 30:
+                after_drop(*after_args)
+                return
+            canvas.scale(letter, 790-55*len(text), 240, .9, .9)
+            root.after(10, lambda: dropletter(letter, n+1, after_drop, *after_args))
 
-    Source: https://pythonprogramming.altervista.org/animate-gif-in-tkinter/
-    The code was modified to fit the needs of this application
-    """
+        if not text:  # animation complete
+            root.after(1000, lambda: after(*args))
+            return
+        if text[0] == ' ':  # skip spaces
+            drawtext(text[1:])
+            return
+        # render next letter
+        dropletter(
+            canvas.create_text(400, 0, text=text[0], fill='white', font=("Cascadia Mono", 66)),
+            0,
+            lambda: drawtext(text[1:])
+        )
 
-    def load(self, im: str, repeat: bool = False, after_exec=None):
-        """Loads an image"""
-        self.im = im
-        self.after_exec = after_exec
-        im = Image.open(im)
-        self.og_frames = []
-        try:
-            for i in count(1):
-                self.og_frames.append(ImageTk.PhotoImage(im))
-                im.seek(i)
-        except EOFError:
-            pass
-        self.frames = (
-            cycle(self.og_frames) if repeat else iter(self.og_frames)
-        )  # If img needs to be cycled
-        try:
-            self.delay = im.info["duration"]
-        except Exception:
-            self.delay = 100
-        if len(self.og_frames) == 1:  # If image is not a gif
-            self.config(image=next(self.frames))
-        else:  # If image is gif
-            self.next_frame()
-
-    def unload(self):
-        """Unloads the iamge"""
-        self.config(image=None)
-        self.frames = None
-
-    def next_frame(self):
-        """Updates the image frame (if gif)"""
-        if self.frames:
-            try:
-                self.config(image=next(self.frames))
-                self.after(self.delay, self.next_frame)
-            except StopIteration:
-                if self.after_exec:
-                    self.after_exec()
+    canvas = Canvas(root, bg=DARK_GRAY)
+    canvas.pack(fill='both', expand=True)
+    drawtext('Pixel Studios')
 
 
 def center(root: Tk, WIN_W: int, WIN_H: int):

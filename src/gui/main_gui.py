@@ -36,23 +36,7 @@ class GUI(Tk):
         self.title("Pixel Studios")
         self.geometry(f"{WIN_W}x{WIN_H}")
         center(self, WIN_W, WIN_H)
-
-        gif = ImageLabel(self)
-        gif.configure(bd=0, highlightbackground=None)
-        gif.place(relx=0.5, rely=0.43, anchor="center")
-
-        def loading_animation(root):
-            """Loading animation circle for the application"""
-            loading = ImageLabel(root)
-            loading.configure(bd=0, highlightbackground=None)
-            loading.place(relx=0.5, rely=0.57, anchor="center")
-            loading.load(
-                IMGS / "loading.gif",
-                False,
-                lambda: self.callback(self.create_main_window),
-            )
-
-        gif.load(IMGS / "title.gif", False, lambda: self.callback(self.create_main_window))
+        loading_animation(self, lambda: self.callback(self.create_main_window))
         self.configure(background=DARK_GRAY)
         self.mainloop()
 
