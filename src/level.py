@@ -31,7 +31,7 @@ class Level:
         if self.level_number == 2:
             return Path(image_dir_path, "clockwork.jpg")
         if self.level_number == 3:
-            return Path(image_dir_path, "land_n_poles.png")
+            return Path(image_dir_path, "number_hidden_image.png")
         return Path(image_dir_path, "default.png")
 
     def get_secret_answer(self) -> str:
@@ -48,7 +48,7 @@ class Level:
         if self.level_number == 3:
             return "Very secret"
         if self.level_number == 4:
-            return "Turbo secret"
+            return "200012"
         return "pythoncodejam2023"
 
     def get_filters(self) -> FilterList:
