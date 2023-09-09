@@ -88,3 +88,10 @@ class SteganographyWin(Frame):
         result = Image.fromarray(encoded_image)
         filename = fd.asksaveasfilename(title="Export As", filetypes=[("All", "*.png")])
         result.save(filename)
+
+    def edit_key(self):
+        """Changes encryption key"""
+        def after():
+            self.steganography = ExistingImage(self.image, self.root.key)
+            self.key.set(f"Secret Key: {self.root.key}")
+        key_popup(self.root, after)

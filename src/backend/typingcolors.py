@@ -136,10 +136,16 @@ class TypingColors:
 
         self.text = text  # update old to new text
 
-    def img_scaled(self, scale_factor=35):
+    def force_update(self):
+        """Re-draws the entire canvas"""
+        text = self.text
+        self.text = ''
+        self.update(text)
+
+    def img_scaled(self, scale_factor=10):
         """Returns scaled TkImage for GUI"""
         if not scale_factor:
-            scale_factor = 35
+            scale_factor = 10
         size = (int(self.ar_width * scale_factor), int(self.ar_height * scale_factor))
         return ImageTk.PhotoImage(self.canvas.resize(size, Image.BOX))
 

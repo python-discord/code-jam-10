@@ -12,6 +12,7 @@ class DecryptWin(Frame):
 
     def __init__(self, root, object, decoded_text):
         """Creates the layout"""
+        # identify mode and set image
         self.root = root
         if isinstance(object, TypingColors):
             self.mode = "Typing Colors"
@@ -85,3 +86,7 @@ class DecryptWin(Frame):
         filename = fd.asksaveasfilename(title="Export As", filetypes=[("TXT", "*.txt")])
         if filename:
             open(filename, 'w').write(self.text.get(1.0, 'end'))
+
+    def edit_key(self):
+        """Edits decryption key"""
+        key_popup(self.root, lambda: self.root.decrypt(self.root.key))

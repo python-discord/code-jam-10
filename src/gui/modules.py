@@ -7,9 +7,6 @@ DARK_GRAY, GRAY = "#222831", "#393E46"
 AQUA, WHITE = "#00ADB5", "#EEEEEE"
 RED, GREEN = "#cd0000", "#1BAA4A"
 BRIGHT_RED = "#ff0000"
-
-KEY = ""  # key for switching between encrypt and decrypt
-
 PRINTABLE = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\t"
 
 
@@ -91,7 +88,7 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
             "state": "normal"
         },
         "Set Key": {
-            "command": edit_key,
+            "command": win.edit_key,
             "accelerator": "Ctrl+K",
             "state": "normal"
         },
@@ -118,7 +115,7 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
     }
 
     # Main Menu Bar
-    menubar = Menu(root, tearoff=0, font=("Consolas", 12))
+    menubar = Menu(root)
 
     # Add to menu bars
     for name, data in layouts.items():
@@ -162,8 +159,14 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
     root.configure(background=DARK_GRAY, menu=menubar)
 
 
-def edit_key(root: Tk, after_exec: callable = None, *args):
+def key_popup(root, after_exec):
     """Opens up an edit key window"""
+    def command():
+        if not root._valid_key():
+            return
+        after_exec()
+        root.popup.destroy()
+
     root.popup = Toplevel(root, bg=DARK_GRAY)
     root.popup.geometry("350x200")
     root.key_method = Text(
@@ -190,6 +193,6 @@ def edit_key(root: Tk, after_exec: callable = None, *args):
         pady=3,
         cursor="hand2",
         bd=0,
-        command=lambda: after_exec(*args) if root._valid_key() else None
+        command=command
     )
     submit.pack()

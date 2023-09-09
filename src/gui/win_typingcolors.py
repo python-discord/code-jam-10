@@ -10,6 +10,7 @@ class TypingColorsWin(Frame):
 
     def __init__(self, root: Tk):
         """Creates the layout"""
+        # create the window
         self.root = root
         super().__init__(root, bg=DARK_GRAY)
         dynamic_menu_bar(root, self)
@@ -86,3 +87,11 @@ class TypingColorsWin(Frame):
         filename = fd.asksaveasfilename(title="Export As", filetypes=[("PNG", "*.png")])
         if filename:
             self.typingColors.save_as(filename+".png")
+
+    def edit_key(self):
+        """Editing the encryption key"""
+        def after():
+            self.typingColors.set_key(self.root.key)
+            self.typingColors.force_update()
+            self.key.set(f"Secret Key: {self.root.key}")
+        key_popup(self.root, after)

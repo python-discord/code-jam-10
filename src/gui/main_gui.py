@@ -1,3 +1,4 @@
+
 from pathlib import Path
 from random import choices
 from tkinter import *
@@ -10,8 +11,7 @@ from gui.win_decrypt import DecryptWin
 from gui.win_steganography import SteganographyWin
 from gui.win_typingcolors import TypingColorsWin
 
-WIN_W, WIN_H = (800, 600)
-POP_W, POP_H = (400, 300)
+WIN_W, WIN_H = (800, 500)
 IMGS = Path("assets") / "imgs"
 
 
@@ -52,7 +52,6 @@ class GUI(Tk):
                 lambda: self.callback(self.create_main_window),
             )
 
-        # gif.load(IMGS / "title.gif", False, lambda: loading_animation(self))
         gif.load(IMGS / "title.gif", False, lambda: self.callback(self.create_main_window))
         self.configure(background=DARK_GRAY)
         self.mainloop()
@@ -229,4 +228,4 @@ class GUI(Tk):
 
     def switch_decrypt(self):
         """Switches to decrypt mode"""
-        edit_key(self, after_exec=lambda: self.decrypt(self.key))
+        key_popup(self, after_exec=lambda: self.decrypt(self.key))
