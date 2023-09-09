@@ -134,12 +134,13 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
                 args_for_filter["image_to_edit"] = value
             if key == "second_image":
                 args_for_filter["second_image"] = value
+
         return apply_double_exposure(
-            args["image_to_edit"],
-            args["second_image"],
-            args["slider_value"]
+            args_for_filter["image_to_edit"],
+            args_for_filter["second_image"],
+            args_for_filter["Exposure"]
         )
-    if filter_name == "Color Swap":
+    if filter_name == "Ishihara":
         args_for_filter = {}
         for key, value in args.items():
             if key == "A":
@@ -148,9 +149,22 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
                 args_for_filter["B"] = value
             if key == "image_to_edit":
                 args_for_filter["image_to_edit"] = value
+        return apply_unmask_reverse_ishihara(
+            args_for_filter
+        )
+    if filter_name == "Color Swap":
+        args_for_filter = {}
+
+        for key, value in args.items():
+            if key == "first_color":
+                args_for_filter["first_color"] = value
+            if key == "second_color":
+                args_for_filter["second_color"] = value
+            if key == "image_to_edit":
+                args_for_filter["image_to_edit"] = value
         return apply_color_swap(
-            args["image_to_edit"],
-            args["first_color"],
-            args["second_color"]
+            args_for_filter["image_to_edit"],
+            args_for_filter["first_color"],
+            args_for_filter["second_color"]
         )
     pass
