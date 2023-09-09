@@ -156,18 +156,19 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
         )
         return new_img
     if filter_name == "Color Swap":
-        args_for_filter == {}
-        
+        print("Args: ", args)
+        args_for_filter = {}
+
         for key, value in args.items():
             if key == "first_color":
                 args_for_filter["first_color"] = value
             if key == "second_color":
                 args_for_filter["second_color"] = value
-            if key == "img_to_edit":
-                args_for_filter["img_to_edit"] = value
+            if key == "image_to_edit":
+                args_for_filter["image_to_edit"] = value
         new_img = apply_color_swap(
-            args_for_filter["image_to_edit"], 
-            args_for_filter["first_color"], 
+            args_for_filter["image_to_edit"],
+            args_for_filter["first_color"],
             args_for_filter["second_color"]
         )
         return new_img
