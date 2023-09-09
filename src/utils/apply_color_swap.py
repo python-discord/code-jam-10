@@ -1,6 +1,7 @@
 # Now integrate the LRUCache into your previous function:
 from PIL import Image
 from PyQt6.QtGui import QImage, QPixmap
+from PyQt6.QtCore import QSize
 
 from lib.pixelate_and_swap.pixelate_and_swap import swap_colors
 from src.utils.apply_double_exposure import LRUCache
@@ -43,6 +44,7 @@ def apply_color_swap(image: tuple, first_color: str, second_color: str) -> QPixm
     data = swapped_image.tobytes("raw", "BGRA")
     qim = QImage(data, swapped_image.size[0], swapped_image.size[1], QImage.Format.Format_ARGB32)
     pixmap = QPixmap.fromImage(qim)
-    pixmap = pixmap.scaled(450, 450)
+    w, h = img.size
+    pixmap = pixmap.scaled(QSize(w, h))
 
     return pixmap

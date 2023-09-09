@@ -187,7 +187,7 @@ class Level:
                                 ]
                             ],
                             "buttons": [
-                                1  # TODO MAKE THIS HAVE INFO
+                                "swap"
                             ]
                         }
                     ),
@@ -197,8 +197,18 @@ class Level:
             [
                 (
                     Path(icons_dir_path, "magnifying_glass.png"),
-                    None,
-                    {"second_image": Path(image_dir_path, "doggo.jpg")},
+                    ControlPanel(
+                        "Hidden in ASCII",
+                        {
+                            "sliders": [],
+                            "dropdowns": [],
+                            # "buttons": [
+                            #     "zoom in",
+                            #     "zoom out"
+                            # ]
+                        }
+                    ),
+                    {},
                 )
             ]
         ]
