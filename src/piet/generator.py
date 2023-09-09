@@ -31,7 +31,7 @@ class PietCommand(Enum):
     OUT_CHAR = ColorChange(2, 5)
 
 
-class PietProgramGenerator:
+class ImageGenerator:
     def __init__(self):
         self.commands = SelfExpandingList(default=SelfExpandingList[PietCommand](default=PietCommand._NONE))
         self.colors = SelfExpandingList(default=SelfExpandingList(default=BLACK))
@@ -39,6 +39,32 @@ class PietProgramGenerator:
         self._current_hue = 0
         self._current_lightness = 0
         self._previous_color = WHITE
+
+    def set_command(self, command: PietCommand, position: OrderedPair):
+        y, x = position
+        self.commands[y][x] = command
+        if isinstance(command.value, ColorChange):
+            if self._previous_color not in (PietCommand.BLOCK.value, PietCommand.NOOP.value):
+                self._current_hue = (self._current_hue + command.value.hue) % 6
+                self._current_lightness = (self._current_lightness + command.value.lightness) % 3
+            color = PIET_COLORS[self._current_lightness][self._current_hue]
+        elif isinstance(command.value, Color):
+            color = command.value
+        else:
+            color = WHITE
+        self.colors[y][x] = color
+        self._previous_color = color
+
+    def set_offset_command(self, command: PietCommand, offset: DirectionOffset):
+        pointer = DirectionPointer()
+        pointer.direction = self.interpreter.runtime.pointer.direction
+        pointer.position = self.interpreter.runtime.pointer.position
+        pointer.rotate(offset.value)
+        pointer.move_to_next()
+        if offset.value > 3:
+            pointer.rotate()
+            pointer.move_to_next()
+        self.set_command(command, pointer.position)
 
     def set_next_command(self, command: PietCommand, multiplier: int = 1, offset: OrderedPair | None = None):
         # pylint: disable=protected-access
@@ -79,32 +105,6 @@ class PietProgramGenerator:
                     self.colors[y][x] = self._previous_color
             else:
                 raise ValueError("Invalid direction pointer position.")
-
-    def set_command(self, command: PietCommand, position: OrderedPair):
-        y, x = position
-        self.commands[y][x] = command
-        if isinstance(command.value, ColorChange):
-            if self._previous_color not in (PietCommand.BLOCK.value, PietCommand.NOOP.value):
-                self._current_hue = (self._current_hue + command.value.hue) % 6
-                self._current_lightness = (self._current_lightness + command.value.lightness) % 3
-            color = PIET_COLORS[self._current_lightness][self._current_hue]
-        elif isinstance(command.value, Color):
-            color = command.value
-        else:
-            color = WHITE
-        self.colors[y][x] = color
-        self._previous_color = color
-
-    def set_offset_command(self, command: PietCommand, offset: DirectionOffset):
-        pointer = DirectionPointer()
-        pointer.direction = self.interpreter.runtime.pointer.direction
-        pointer.position = self.interpreter.runtime.pointer.position
-        pointer.rotate(offset.value)
-        pointer.move_to_next()
-        if offset.value > 3:
-            pointer.rotate()
-            pointer.move_to_next()
-        self.set_command(command, pointer.position)
 
     @property
     def image(self) -> Image.Image:

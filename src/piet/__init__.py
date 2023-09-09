@@ -1,10 +1,8 @@
-from .generator import PietProgramGenerator
+from .generator import ImageGenerator
 from .interpreter import PietInterpreter
-from .runtime import PietRuntime
 
 __all__ = [
-    "PietProgramGenerator",
+    "ImageGenerator",
     "PietInterpreter",
-    "PietRuntime",
 ]
 __version__ = "0.1.0"
