@@ -64,7 +64,7 @@ class Level:
         filters = [
             [
                 (
-                    Path(icons_dir_path, "button_sample4.png"),
+                    Path(icons_dir_path, "rishihara.png"),
                     ControlPanel(
                         "Ishihara",
                         {
