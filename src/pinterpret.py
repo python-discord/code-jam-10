@@ -1,4 +1,4 @@
-import inspect
+# import inspect
 import math
 import string
 import sys
@@ -231,13 +231,34 @@ class PietRuntime:
         self.output.write(chr(self.stack.pop()))
 
 
-class PietInterpreter:
-    class _StepReport:
-        def __init__(self, ie: bool, lc: CodelInfo, cc: CodelInfo) -> None:
-            self.instruction_executed: bool = ie
-            self.last_codel: CodelInfo = lc
-            self.current_codel: CodelInfo = cc
+class StepTrace(NamedTuple):
+    iteration: int
+    position: tuple[int, int]
+    instruction: Callable
+    did_flip: bool
+    last_codel: CodelInfo
+    current_codel: CodelInfo
 
+    def __repr__(self):
+        return (
+            f"StepTrace({self.iteration:0>4},"
+            f" instruction={self.instruction.__name__},"
+            f" position={self.position},"
+            f" did_flip={self.did_flip},"
+            f" last_codel={self.last_codel},"
+            f" current_codel={self.current_codel})"
+        )
+
+
+class EndOfProgram(BaseException):
+    pass
+
+
+class StepLimitReached(EndOfProgram):
+    pass
+
+
+class PietInterpreter:
     def __init__(
         self,
         image: Image.Image,
@@ -251,17 +272,33 @@ class PietInterpreter:
         self.reader = Reader(image)
         self.runtime = runtime or PietRuntime()
         self.stack = self.runtime.stack
-        self.instructions = dict()
-        self.current_position = (0, 0)
-        self.event_queue = list()
-        self.last_codel: CodelInfo
-        self.current_codel: CodelInfo
-        self.last_instruction = None
-        self.last_step = None
+        # self.instructions = dict()
+        self.position = (0, 0)
+        # self.event_queue = []
+        self.iteration = -1
+        self.last_codel = self.reader.codel_info(self.position)
+        self.current_codel = self.reader.codel_info(self.position)
+        self.steps: list[StepTrace] = []
+        self._flips = 0
+        self._move_to_furthest_pixel()
 
-        for name, obj in inspect.getmembers(self.runtime):
-            if name.startswith("p_"):
-                self.instructions.update({name: obj})
+        # for name, obj in inspect.getmembers(self.runtime):
+        #     if name.startswith("p_"):
+        #         self.instructions.update({name: obj})
+
+    @property
+    def last_step(self) -> StepTrace:
+        try:
+            return self.steps[-1]
+        except IndexError:
+            return StepTrace(
+                self.iteration,
+                self.position,
+                self.runtime.p_noop,
+                False,
+                self.last_codel,
+                self.current_codel,
+            )
 
     @staticmethod
     def _find_color_position(c: tuple):
@@ -282,17 +319,17 @@ class PietInterpreter:
         )
         return (row, column)
 
-    def _determine_color_delta(self) -> tuple[int, ...]:
+    def _determine_color_delta(self) -> tuple[int, int]:
         c1_pos = self._find_color_position(self.last_codel.color)
         c2_pos = self._find_color_position(self.current_codel.color)
-        c_delta = [c2_pos[0] - c1_pos[0], c2_pos[1] - c1_pos[1]]
+        lightness, hue = c2_pos[0] - c1_pos[0], c2_pos[1] - c1_pos[1]
 
-        if c_delta[0] < 0:
-            c_delta[0] = c_delta[0] + 3
-        if c_delta[1] < 0:
-            c_delta[1] = c_delta[1] + 6
+        if lightness < 0:
+            lightness += 3
+        if hue < 0:
+            hue += 6
 
-        return tuple(c_delta)
+        return lightness, hue
 
     def _get_polars(self, coords):
         largest_x = max(coords, key=lambda x: x[1])[1]
@@ -373,36 +410,76 @@ class PietInterpreter:
 
     def step(self):
         "Execute a single step."
+        if self.iteration >= self.step_limit:
+            raise StepLimitReached("Step limit reached.")
+        self.iteration += 1
+        if self._flips >= 4:
+            raise EndOfProgram("End of program reached.")
 
-        # move to farthest pixel in current codel
-        farthest_pixel = self._determine_farthest_pixel(self.current_codel)
-        self.current_position = farthest_pixel
-
-        # move one pixel over to next codel
-        self.last_codel = self.current_codel
-        self._move()
-        self.current_codel = self.reader.codel_info(self.current_position)
-
-        # determine color delta between current and previous codel
-        # and execute relevant instruction
-        delta = self._determine_color_delta()
-        instruction = self.runtime.DELTA_TABLE[delta]  # type: ignore
         args = []
-        if delta == (1, 0):
-            args.append(self.last_codel.size)
-        instruction(*args)
+        did_flip = False
 
-        return
+        next_y, next_x = self._next_move()
+        try:
+            blocked = np.array_equal(self.reader.im_array[next_y][next_x], BLACK)
+        except IndexError:
+            blocked = True
+
+        if not blocked:
+            # move one pixel over to next codel
+            self.last_codel = self.current_codel
+            self._move()
+            y, x = self.position
+            if tuple(self.reader.im_array[y][x]) == WHITE:
+                # Skip the codel_info call if the current codel is white for performance reasons.
+                self.current_codel = CodelInfo(1, WHITE, {(y, x)})
+            else:
+                self.current_codel = self.reader.codel_info(self.position)
+
+            self._move_to_furthest_pixel()
+
+            # determine color delta between current and previous codel
+            # and execute relevant instruction
+            if WHITE in (self.last_codel.color, self.current_codel.color):
+                instruction = self.runtime.p_noop
+                if self.last_codel.color != self.current_codel.color:
+                    self._flips = 0
+            else:
+                delta = self._determine_color_delta()
+                instruction = self.runtime.delta_map[delta]
+                if delta == (1, 0):
+                    args.append(self.last_codel.size)
+                self._flips = 0
+        else:
+            if not self.last_step.did_flip:
+                self.runtime.codel_chooser.flip()
+                self._move_to_furthest_pixel()
+                instruction = self.runtime.p_blocked
+                did_flip = True
+                self._flips += 1
+            else:
+                self.runtime.pointer.rotate()
+                self._move_to_furthest_pixel()
+                instruction = self.runtime.p_blocked
+        instruction(*args)
+        step = StepTrace(
+            self.iteration,
+            self.position,
+            instruction,
+            did_flip,
+            self.last_codel,
+            self.current_codel,
+        )
+        self.steps.append(step)
+        if self.debug:
+            print(step, file=sys.stderr)
 
     def run(self, speed: int = -1):
         """Start execution at pos(0,0). Run at `speed` steps/sec (-1 is unlimited (default))."""
-        # initialization
-        self.current_codel = self.reader.codel_info((0, 0))
-        self.current_position = (0, 0)
 
         last_second = math.floor(time.time())
         steps_this_second = 0
-        while 1:
+        while True:
             this_second = math.floor(time.time())
             if this_second > last_second:
                 last_second = this_second
@@ -410,6 +487,8 @@ class PietInterpreter:
             if speed != -1 and steps_this_second == speed:
                 continue
 
-            self.step()
+            try:
+                self.step()
+            except EndOfProgram as exc:
+                return exc
             steps_this_second += 1
-        return
