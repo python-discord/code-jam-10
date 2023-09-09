@@ -147,6 +147,16 @@ class ControlPanel(QWidget):
             "border: 1px solid 'black';"
             "border-radius: 6px;"
             "background-color: 'white'; }"
+
+            "QSlider::handle:horizontal {"
+            "background-color: gray;"
+            "width: 20px;"
+            "border-radius: 3px; }"
+
+            "QSlider::handle:vertical {"
+            "background-color: black;"
+            "height: 20px;"
+            "border-radius: 3px; }"
         )
 
         if horizontal:
