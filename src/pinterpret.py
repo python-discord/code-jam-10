@@ -1,15 +1,14 @@
 import inspect
 import math
+import string
 import sys
 import time
+from collections import deque
 from enum import IntEnum
-from os import PathLike
-from string import whitespace
-from typing import NamedTuple, Optional, SupportsInt, Tuple
+from typing import Callable, Iterable, NamedTuple, Optional
 from warnings import warn
 
 import numpy as np
-from numpy.typing import ArrayLike
 from PIL import Image
 
 from imagereader import CodelInfo, Reader
@@ -97,51 +96,41 @@ class CodelChooser:
 
 
 class PietStack:
-    def __init__(self) -> None:
-        self._stack = np.array([], dtype=np.int64)
+    def __init__(self):
+        self._stack = deque()
 
-    def __getitem__(self, val):
+    def __getitem__(self, val) -> int:
         return self._stack[val]
 
     @property
     def top(self) -> int:
         return self._stack[-1]
 
-    def pop(self) -> np.int64:
+    def pop(self) -> int:
         """Pop the top item off of the stack"""
-        popped = self._stack[-1]
-        self._stack = np.delete(self._stack, -1)
-        return popped
+        return self._stack.pop()
 
-    def popx(self, count: int = 2) -> np.ndarray:
-        """Pop the top X items off the stack (default: 2)"""
-        popped = self._stack[-count:]
-        self._stack = np.delete(self._stack, tuple(range(-count, 0)))
-        return popped
+    def pop_multiple(self, count: int = 2, /) -> list[int]:
+        """Pop the top `count` items off the stack (default: 2)"""
+        return [self.pop() for _ in range(count)]
 
-    def push(self, item: ArrayLike) -> None:
+    def push(self, item: int, /):
         """Push an item (int) on to the top of the stack"""
-        if not isinstance(item, SupportsInt):
-            raise ValueError(f"The pushed item must be an integer, not `{type(item)}`!")
-        if isinstance(item, float):
-            warn(
-                "`PietStack.push()` expects an int, but float was recieved. Value will be rounded down.\n"
-                "If this is undesirable, please check your inputs and try again.",
-                RuntimeWarning,
-            )
-            item = int(np.floor(item))
+        self._stack.append(item)
 
-        self._stack = np.append(self._stack, np.int64(item))
+    def extend(self, items: Iterable[int], /):
+        """Push multiple items on to the stack"""
+        self._stack.extend(items)
 
 
 class PietRuntime:
-    def __init__(self, input_buffer: str, stack: Optional[PietStack] = None) -> None:
-        self.output = sys.stdout
+    def __init__(self, output_buffer=sys.stdout, input_buffer: str = "", stack: Optional[PietStack] = None):
+        self.output = output_buffer
         self.stack = stack or PietStack()
         self.pointer = DirectionPointer()
         self.codel_chooser = CodelChooser()
         self.input_buffer = input_buffer
-        self.DELTA_TABLE = {
+        self.delta_map: dict[tuple[int, int], Callable] = {
             (0, 0): self.p_noop,
             (0, 1): self.p_add,
             (0, 2): self.p_divide,
@@ -162,35 +151,43 @@ class PietRuntime:
             (2, 5): self.p_output_char,
         }
 
-    def p_noop(self) -> None:
+    def p_blocked(self):
         pass
 
-    def p_push(self, num_codel: int) -> None:
-        self.stack.push(num_codel)
+    def p_noop(self):
+        pass
 
-    def p_pop(self) -> None:
-        _ = self.stack.pop()
+    def p_push(self, value: int, /):
+        self.stack.push(value)
+
+    def p_pop(self):
+        self.stack.pop()
 
     def p_add(self):
-        self.stack.push(np.sum(self.stack.popx()))
+        self.stack.push(sum(self.stack.pop_multiple()))
 
     def p_subtract(self):
-        self.stack.push(np.diff(np.flip(self.stack.popx())))
+        first, second = self.stack.pop_multiple()
+        self.stack.push(second - first)
 
     def p_multiply(self):
-        self.stack.push(np.prod(self.stack.popx()))
+        first, second = self.stack.pop_multiple()
+        self.stack.push(second * first)
 
     def p_divide(self):
-        self.stack.push(np.floor_divide(*self.stack.popx()))
+        first, second = self.stack.pop_multiple()
+        self.stack.push(second // first)
 
     def p_modulo(self):
-        self.stack.push(np.mod(*self.stack.popx()))
+        first, second = self.stack.pop_multiple()
+        self.stack.push(second % first)
 
     def p_not(self):
-        self.stack.push(np.int64(not bool(self.stack.pop())))
+        self.stack.push(int(not self.stack.pop()))
 
     def p_greater(self):
-        self.stack.push(np.int64(np.greater(*self.stack.popx())))
+        first, second = self.stack.pop_multiple()
+        self.stack.push(int(second > first))
 
     def p_pointer(self):
         self.pointer.rotate(int(self.stack.pop()))
@@ -202,38 +199,36 @@ class PietRuntime:
         self.stack.push(self.stack.top)
 
     def p_roll(self):
-        y, x = self.stack.popx()
-        values = self.stack.popx(y)
-        rolled = np.roll(values, x)
-        for num in np.nditer(rolled):
-            self.stack.push(int(num))  # type: ignore
+        first, second = self.stack.pop_multiple()
+        values = deque(self.stack.pop_multiple(second))
+        values.rotate(first)
+        self.stack.extend(values)
 
     def p_input_num(self):
-        buff = ""
+        buffer = ""
         for char in self.input_buffer:
-            if char in whitespace and buff:
+            if char in string.whitespace and buffer:
                 break
             self.input_buffer = self.input_buffer[1:]
-            buff += char
-            if char in whitespace and not buff:
+            buffer += char
+            if char in string.whitespace and not buffer:
                 break
-
         try:
-            self.stack.push(np.int64(buff))
+            self.stack.push(int(buffer))
         except ValueError:
-            self.input_buffer = buff + self.input_buffer
-            warn(f"Conversion of '{buff}' to integer failed. Check input.", RuntimeWarning)
+            self.input_buffer = buffer + self.input_buffer
+            warn(f"Conversion of '{buffer}' to integer failed. Check input.", RuntimeWarning)
 
     def p_input_char(self):
         char = self.input_buffer[0]
         self.input_buffer = self.input_buffer[1:]
-        self.stack.push(np.int64(ord(char)))
+        self.stack.push(ord(char))
 
     def p_output_num(self):
         self.output.write(str(self.stack.pop()))
 
     def p_output_char(self):
-        self.output.write(chr(self.stack.pop()))  # type: ignore
+        self.output.write(chr(self.stack.pop()))
 
 
 class PietInterpreter:
@@ -244,11 +239,17 @@ class PietInterpreter:
             self.current_codel: CodelInfo = cc
 
     def __init__(
-        self, image: PathLike, runtime: Optional[PietRuntime] = None, input_buffer: Optional[str] = None
-    ) -> None:
-        with open(image, "rb") as fp:
-            self.reader = Reader(Image.open(fp))
-        self.runtime = runtime or PietRuntime(input_buffer or "")
+        self,
+        image: Image.Image,
+        *,
+        step_limit: int = 1000000,
+        debug: bool = False,
+        runtime: Optional[PietRuntime] = None,
+    ):
+        self.step_limit = step_limit
+        self.debug = debug
+        self.reader = Reader(image)
+        self.runtime = runtime or PietRuntime()
         self.stack = self.runtime.stack
         self.instructions = dict()
         self.current_position = (0, 0)
@@ -281,7 +282,7 @@ class PietInterpreter:
         )
         return (row, column)
 
-    def _determine_color_delta(self) -> Tuple[int, ...]:
+    def _determine_color_delta(self) -> tuple[int, ...]:
         c1_pos = self._find_color_position(self.last_codel.color)
         c2_pos = self._find_color_position(self.current_codel.color)
         c_delta = [c2_pos[0] - c1_pos[0], c2_pos[1] - c1_pos[1]]
