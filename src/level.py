@@ -31,7 +31,7 @@ class Level:
         if self.level_number == 2:
             return Path(image_dir_path, "clockwork.jpg")
         if self.level_number == 3:
-            return Path(image_dir_path, "desert.png")
+            return Path(image_dir_path, "land_n_poles.png")
         return Path(image_dir_path, "default.png")
 
     def get_secret_answer(self) -> str:
@@ -47,6 +47,8 @@ class Level:
             return "secret2"
         if self.level_number == 3:
             return "Very secret"
+        if self.level_number == 4:
+            return "Turbo secret"
         return "pythoncodejam2023"
 
     def get_filters(self) -> FilterList:
@@ -79,13 +81,17 @@ class Level:
                     Path(icons_dir_path, "button_sample2.png"),
                     ControlPanel(
                         "Double Exposure",
-                        [
-                            (
-                                "Exposure",
-                                ("Image 1", "Image 2"),
-                                Qt.Orientation.Horizontal,
-                            )
-                        ],
+                        {
+                            "sliders": [
+                                (
+                                    "Exposure",
+                                    ("Image 1", "Image 2"),
+                                    Qt.Orientation.Horizontal,
+                                )
+                            ],
+                            "dropdowns": []
+                        }
+
                     ),
                     {
                         "second_image": Path(image_dir_path, "desert.jpg"),
@@ -96,11 +102,13 @@ class Level:
                     Path(icons_dir_path, "button_sample3.png"),
                     ControlPanel(
                         "Motion Manipulation",
-                        [
-                            ("Wavelength", (0, 100), Qt.Orientation.Horizontal),
-                            ("Gap", (0, 100), Qt.Orientation.Horizontal),
-                            ("Wave Height", (0, 100), Qt.Orientation.Horizontal),
-                        ],
+                        {
+                            "sliders": [
+                                ("Wavelength", (0, 100), Qt.Orientation.Horizontal),
+                                ("Gap", (0, 100), Qt.Orientation.Horizontal),
+                                ("Wave Height", (0, 100), Qt.Orientation.Horizontal),
+                            ]
+                        }
                     ),
                     {
                         "second_image": Path(image_dir_path, "desert.jpg"),
@@ -113,10 +121,14 @@ class Level:
                     Path(icons_dir_path, "button_sample.png"),
                     ControlPanel(
                         "Image Differencing",
-                        [
-                            ("X", (0, 100), Qt.Orientation.Horizontal),
-                            ("Y", (0, 100), Qt.Orientation.Horizontal),
-                        ],
+                        {
+                            "sliders": [
+                                ("X", (0, 100), Qt.Orientation.Horizontal),
+                                ("Y", (0, 100), Qt.Orientation.Horizontal),
+                            ],
+
+                            "dropdowns": []
+                        }
                     ),
                     {
                         "second_image": Path(image_dir_path, "doggo.jpg"),
@@ -127,13 +139,17 @@ class Level:
                     Path(icons_dir_path, "button_sample2.png"),
                     ControlPanel(
                         "Double Exposure",
-                        [
-                            (
-                                "Exposure",
-                                ("Image 1", "Image 2"),
-                                Qt.Orientation.Horizontal,
-                            )
-                        ],
+
+                        {
+                            "sliders": [
+                                (
+                                    "Exposure",
+                                    ("Image 1", "Image 2"),
+                                    Qt.Orientation.Horizontal,
+                                )
+                            ],
+                            "dropdowns": []
+                        }
                     ),
                     {
                         "second_image": Path(image_dir_path, "doggo.jpg"),
@@ -144,11 +160,14 @@ class Level:
                     Path(icons_dir_path, "button_sample3.png"),
                     ControlPanel(
                         "Motion Manipulation",
-                        [
-                            ("Wavelength", (0, 100), Qt.Orientation.Horizontal),
-                            ("Gap", (0, 100), Qt.Orientation.Horizontal),
-                            ("Wave Height", (0, 100), Qt.Orientation.Horizontal),
-                        ],
+                        {
+                            "sliders": [
+                                ("Wavelength", (0, 100), Qt.Orientation.Horizontal),
+                                ("Gap", (0, 100), Qt.Orientation.Horizontal),
+                                ("Wave Height", (0, 100), Qt.Orientation.Horizontal),
+                            ],
+                            "dropdowns": []
+                        }
                     ),
                     {
                         "second_image": Path(image_dir_path, "doggo.jpg"),
@@ -156,6 +175,30 @@ class Level:
                     },
                 ),
             ],
+            [
+                (
+                    Path(icons_dir_path, "button_sample4.png"),
+                    ControlPanel(
+                        "Color Swap",
+                        {
+                            "sliders": [],
+                            "dropdowns": [
+                                [
+                                    "Rust",
+                                    "Chocolate",
+                                    "Flamenco",
+                                    "Casablanca",
+                                    "Buff"
+                                ]
+                            ],
+                            "buttons": [
+                                1  # TODO MAKE THIS HAVE INFO
+                            ]
+                        }
+                    ),
+                    {}
+                )
+            ]
         ]
 
         if 0 <= self.level_number - 1 < len(filters):
