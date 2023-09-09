@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Dict, List, Tuple, cast
+
 from PIL import Image
 from PyQt6.QtCore import Qt
 
@@ -149,7 +150,7 @@ class Level:
                     ),
                     {
                         "second_image": None,
-                        "secret_code": "42",
+                        "secret_code": "Turbo secret",
                         "MotionTransformer": MotionTransformer(
                             Image.open(image_dir_path / "desert.jpg")
                         ),

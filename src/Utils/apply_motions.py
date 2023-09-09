@@ -5,6 +5,7 @@ from lib.motions.motions import MotionTransformer
 def apply_motion(args: dict) -> QPixmap:
     """
     Apply a motion to an image
+
     :param args: a dictionary of arguments
     :return: QPixmap of the image
     """
@@ -30,7 +31,6 @@ def apply_motion(args: dict) -> QPixmap:
         image = mt.calculate_output(
             (horizontal_wave, vertical_wave, vertical_spike, horizontal_spike)
         )
-
         image = image.convert("RGBA")
         data = image.tobytes("raw", "BGRA")
         qim = QImage(data, image.size[0], image.size[1], QImage.Format.Format_ARGB32)

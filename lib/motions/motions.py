@@ -1,10 +1,10 @@
 import math
 from enum import Enum, auto
 from typing import Callable, Iterable
-
 import numpy as np
 from numpy.typing import NDArray
 from PIL import Image
+from collections import OrderedDict
 
 
 class PIXEL_INTERPOLATION_METHOD(Enum):
@@ -32,7 +32,7 @@ class Effect:
 
     @staticmethod
     def explode(
-        xmesh: NDArray, ymesh: NDArray, magnitude: float = 1
+            xmesh: NDArray, ymesh: NDArray, magnitude: float = 1
     ) -> tuple[NDArray, NDArray]:
         """
         Creates a motion outward from the center - work in progress
@@ -44,10 +44,10 @@ class Effect:
         """
         height, width = xmesh.shape
         normalized_distance = (
-            (xmesh / width - 0.5) ** 2 + (ymesh / height - 0.5) ** 2
-        ) ** 0.5
+                                      (xmesh / width - 0.5) ** 2 + (ymesh / height - 0.5) ** 2
+                              ) ** 0.5
         new_distance = normalized_distance / (
-            np.maximum((1 - normalized_distance) * 3 * magnitude, 1) + 0.1
+                np.maximum((1 - normalized_distance) * 3 * magnitude, 1) + 0.1
         )
         xmesh = (xmesh - width / 2) * new_distance / normalized_distance + width / 2
         ymesh = (ymesh - height / 2) * new_distance / normalized_distance + height / 2
@@ -55,7 +55,7 @@ class Effect:
 
     @staticmethod
     def vertical_wave(
-        xmesh: NDArray, ymesh: NDArray, magnitude: float = 1, wavenum: float = 1.5
+            xmesh: NDArray, ymesh: NDArray, magnitude: float = 1, wavenum: float = 1.5
     ) -> tuple[NDArray, NDArray]:
         """
         Add vertical waves to Image
@@ -72,7 +72,7 @@ class Effect:
 
     @staticmethod
     def horizontal_wave(
-        xmesh: NDArray, ymesh: NDArray, magnitude: float = 1, wavenum: float = 1.5
+            xmesh: NDArray, ymesh: NDArray, magnitude: float = 1, wavenum: float = 1.5
     ) -> tuple[NDArray, NDArray]:
         """
         Add horizontal waves to Image
@@ -89,7 +89,7 @@ class Effect:
 
     @staticmethod
     def vertical_spike(
-        xmesh: NDArray, ymesh: NDArray, magnitude: float = 1, spikenum: float = 5
+            xmesh: NDArray, ymesh: NDArray, magnitude: float = 1, spikenum: float = 5
     ) -> tuple[NDArray, NDArray]:
         """
         Add vertical spikes to Image
@@ -107,7 +107,7 @@ class Effect:
 
     @staticmethod
     def horizontal_spike(
-        xmesh: NDArray, ymesh: NDArray, magnitude: float = 1, spikenum: float = 5
+            xmesh: NDArray, ymesh: NDArray, magnitude: float = 1, spikenum: float = 5
     ) -> tuple[NDArray, NDArray]:
         """
         Add horizontal spikes to Image
@@ -128,16 +128,16 @@ class MotionTransformer:
     """Processes all motion effects together to save on pre-processing and post-processing required for each"""
 
     def __init__(
-        self,
-        img: Image.Image,
-        interpolation: PIXEL_INTERPOLATION_METHOD = PIXEL_INTERPOLATION_METHOD.INTEGER,
-        fill_method: OFF_CANVAS_FILL = OFF_CANVAS_FILL.MIRROR,
-        funclist: Iterable[Callable] = (
-            Effect.horizontal_wave,
-            Effect.vertical_wave,
-            Effect.vertical_spike,
-            Effect.horizontal_spike,
-        ),
+            self,
+            img: Image.Image,
+            interpolation: PIXEL_INTERPOLATION_METHOD = PIXEL_INTERPOLATION_METHOD.INTEGER,
+            fill_method: OFF_CANVAS_FILL = OFF_CANVAS_FILL.MIRROR,
+            funclist: Iterable[Callable] = (
+                    Effect.horizontal_wave,
+                    Effect.vertical_wave,
+                    Effect.vertical_spike,
+                    Effect.horizontal_spike,
+            ),
     ) -> None:
         self.img = img
         self.interpolation = interpolation
@@ -146,7 +146,8 @@ class MotionTransformer:
         self._generate_mesh()
         self.xmesh: NDArray
         self.ymesh: NDArray
-        self.cache: dict
+        self.cache: OrderedDict[tuple[str, float], tuple[NDArray, NDArray]] = OrderedDict()
+        self.cache_capacity = 10
 
     def reset_cache(self) -> None:
         """
@@ -154,7 +155,7 @@ class MotionTransformer:
 
         :return:
         """
-        self.cache = {}
+        self.cache = OrderedDict()
 
     def update_image(self, img: Image.Image) -> None:
         """
@@ -176,7 +177,19 @@ class MotionTransformer:
         """
         xmesh, ymesh = self.xmesh, self.ymesh
         for func, magnitude in zip(self.funclist, magnitudelist):
-            xmesh, ymesh = func(xmesh, ymesh, magnitude)
+            cache_key = (func.__name__, magnitude)
+            if cache_key in self.cache:
+                # If the result is already in the cache, use it
+                xmesh, ymesh = self.cache[cache_key]
+            else:
+                xmesh_copy, ymesh_copy = func(xmesh, ymesh, magnitude)
+                self.cache[cache_key] = (xmesh_copy, ymesh_copy)  # Store a copy of the result in the cache
+                xmesh, ymesh = xmesh_copy, ymesh_copy
+
+                # Check cache size and remove the oldest entry if it exceeds the capacity
+                if len(self.cache) > self.cache_capacity:
+                    self.cache.popitem(last=False)  # Remove the oldest entry
+
         xmesh = xmesh.astype(int) % self.img.width
         ymesh = ymesh.astype(int) % self.img.height
         np_img = np.array(self.img)
