@@ -143,7 +143,7 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
 def key_popup(root, after_exec):
     """Opens up an edit key window"""
 
-    def command():
+    def enter_key():
         if not root._valid_key():
             return
         after_exec()
@@ -161,6 +161,7 @@ def key_popup(root, after_exec):
         textvariable=root.key_method_text,
     )
     root.key_method.pack(pady=30)
+    root.popup.bind("<Return>", lambda e: enter_key())
 
     root.error = Label(
         root.popup,
@@ -181,6 +182,6 @@ def key_popup(root, after_exec):
         pady=3,
         cursor="hand2",
         bd=0,
-        command=command,
+        command=enter_key,
     )
     submit.pack()
