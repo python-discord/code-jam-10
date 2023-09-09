@@ -4,26 +4,29 @@ from typing import NamedTuple, Tuple
 import numpy as np
 from PIL import Image
 
+DIRECTIONS = ((1, 0), (-1, 0), (0, 1), (0, -1))
+
 
 class CodelInfo(NamedTuple):
     size: int
-    pixels: tuple
-    color: tuple
+    color: tuple[int, int, int]
+    pixels: set
+
+    def __repr__(self) -> str:
+        return f"CodelInfo(size={self.size}, color={self.color})"
 
 
 class Reader:
     def __init__(self, im: Image.Image) -> None:
-        self.im_rgb = im.convert("RGB")
-        # self.current = self.im_rgb.getpixel((0, 0))
+        self.im_array = np.asarray(im.convert("RGB"))
 
     def codel_info(self, pos: tuple[int, int]) -> CodelInfo:
         "returns information about the codel that contains pos(y,x)"
-        im = self.im_rgb
         y, x = pos
-        im_array = np.asarray(im)
+        im_array = self.im_array
         pixel = im_array[y][x]
 
-        rows, cols = len(im_array), len(im_array[0])
+        rows, cols, *_ = im_array.shape
         visited = set()
 
         size = 1
@@ -32,8 +35,7 @@ class Reader:
         q.append((y, x))
         while q:
             row, col = q.popleft()
-            directions = [[1, 0], [-1, 0], [0, 1], [0, -1]]
-            for dr, dc in directions:
+            for dr, dc in DIRECTIONS:
                 r, c = row + dr, col + dc
                 if (
                     r in range(rows)
@@ -45,13 +47,12 @@ class Reader:
                     visited.add((r, c))
                     size += 1
 
-        flipped_pos: Tuple[int, int] = tuple(np.flip(pos))  # type: ignore
-        return CodelInfo(size, tuple(visited), self.im_rgb.getpixel(flipped_pos))
+        r, g, b = pixel
+        return CodelInfo(size, (r, g, b), visited)
 
     def smallest_codel(self) -> int:
         "returns side-length in pixels of the smallest codel"
-        im = self.im_rgb
-        im_array = np.asarray(im)
+        im_array = self.im_array
         pixel = im_array[0][0]
         rows, cols = len(im_array), len(im_array[0])
         smallest = rows
@@ -90,7 +91,6 @@ class Reader:
 
     def image_size(self) -> Tuple[int, int]:
         "returns size of image after scaling it down to a codel size of 1 pixel"
-        im = self.im_rgb
-        width, height = im.size
+        height, width = self.im_array.shape
         codel_size = self.smallest_codel()
         return (width // codel_size, height // codel_size)
