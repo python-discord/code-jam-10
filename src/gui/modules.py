@@ -150,7 +150,15 @@ def key_popup(root, after_exec):
         root.popup.destroy()
 
     root.popup = Toplevel(root, bg=DARK_GRAY)
-    root.popup.geometry("350x200")
+
+    # Centering the popup in the center of the window
+    w = 350
+    h = 200
+    x = root.winfo_x() + (root.winfo_width() // 2) - (w // 2)
+    y = root.winfo_y() + (root.winfo_height() // 2) - (h // 2)
+
+    root.popup.geometry(f"{w}x{h}+{x}+{y}")
+
     # ? if you want to show the previous key as default value in the pop uncomment next line
     root.key_method_text = StringVar(root.popup, "")
     root.key_method = Entry(
