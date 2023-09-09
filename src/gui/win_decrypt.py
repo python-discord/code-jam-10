@@ -1,74 +1,87 @@
 from tkinter import *
 from tkinter import filedialog as fd
+
+from PIL import ImageTk
+
+from backend.typingcolors import TypingColors
 from gui.modules import *
 
 
 class DecryptWin(Frame):
     """Window for decryption"""
 
-    def __init__(self, root, object, text, key):
+    def __init__(self, root, object, decoded_text):
         """Creates the layout"""
-        print(root, object, text, key)
         self.root = root
+        if isinstance(object, TypingColors):
+            self.mode = "Typing Colors"
+            self.image = object.canvas
+            self.ar_width, self.ar_height = object.ar_width, object.ar_height
+        else:
+            self.mode = "Steganography"
+            self.image = Image.fromarray(object.input_image)
+            self.aspect_ratio = self.image.width / self.image.height
+        # create window
         super().__init__(root, bg=DARK_GRAY)
         dynamic_menu_bar(root, self)
-        root.title("Decrypted - Typing Colors")
-        self.root.columnconfigure(0, weight=1)
-        self.root.columnconfigure(1, weight=1, minsize=280)
-        self.root.grid_rowconfigure(0, weight=1)
+        root.title(f"Decrypted - {self.mode}")
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(0, weight=1, minsize=280)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=0, minsize=25)
 
-        self.object = object  # the main backend
         self.file = None  # open files
         # split layout
-        self.root.mainframe = Frame(self, bg=DARK_GRAY)
-        self.root.text = Text(
-            self.root.mainframe,
+        self.mainframe = Frame(self, bg=DARK_GRAY)
+        self.text = Text(
+            self.mainframe,
             width=30,
             height=15,
             bg=DARK_GRAY,
             fg="white",
             font=("Consolas", 14),
         )
-        self.root.text.insert("end", text)
-        self.root.text.configure(state="disabled")
+        self.text.insert("end", decoded_text)
+        self.text.configure(state="disabled")
         self.canvas = Label(
-            self.root.mainframe, image=self.object.img_scaled(), bg=DARK_GRAY
+            self.mainframe, image=ImageTk.PhotoImage(self.image), bg=DARK_GRAY
         )
-        self.root.key = StringVar()
-        self.root.key.set(f"Secret Key: {key}")
-        self.root.info = StringVar()
-        self.root.info.set("0 characters   |   8px x 9px")
+        self.key = StringVar()
+        self.key.set(f"Secret Key: {root.key}")
+        self.info = StringVar()
+        self.info.set(f"{len(decoded_text)} characters   |   {self.image.width}px x {self.image.height}px")
         self.canvas.pack(side="left", fill="both", anchor="w")
-        self.root.text.pack(side="right", expand=True, fill="both", anchor="ne")
-        self.root.mainframe.grid(row=0, column=0, columnspan=2, sticky='nsew')
-        Label(self.root, textvariable=self.root.key, bg=DARK_GRAY, fg="white").grid(
+        self.text.pack(side="right", expand=True, fill="both", anchor="ne")
+        self.mainframe.grid(row=0, column=0, columnspan=2, sticky='nsew')
+        Label(self, textvariable=self.key, bg=DARK_GRAY, fg="white").grid(
             row=1, column=0, sticky="w"
         )
-        Label(self.root, textvariable=self.root.info, bg=DARK_GRAY, fg="white").grid(
+        Label(self, textvariable=self.info, bg=DARK_GRAY, fg="white").grid(
             row=1, column=1, sticky="e"
         )
         root.bind("<Configure>", self.updatecanvas)
 
     def updatecanvas(self, event=None):
         """Updates the canvas to fill the screen"""
-        sf = max(1, (self.bbox()[3] - 26) / self.object.ar_height)
-        img = self.object.img_scaled(int(sf))
-        self.canvas.configure(image=img, width=self.object.ar_width*sf, height=self.object.ar_height*sf)
+        if self.mode == "Typing Colors":
+            sf = max(1, (self.grid_bbox(0, 0)[3]) // self.ar_height)
+            w, h = int(self.ar_width*sf), int(self.ar_height*sf)
+        else:
+            if self.aspect_ratio < 1:  # tall image, use width
+                sf = max(1, self.grid_bbox(0, 0)[2] // self.image.width)
+            else:  # opposite
+                sf = max(1, self.grid_bbox(0, 0)[3] // self.image.height)
+            w, h = int(self.image.width*sf), int(self.image.height*sf)
+        img = ImageTk.PhotoImage(self.image.resize((w, h), Image.BOX))
+        self.canvas.configure(image=img, width=w, height=h)
         self.canvas.image = img
 
     def open(self):
-        """Opens and loads a selected text file"""
-        filename = fd.askopenfilename(title="Open", filetypes=[("All", "*.*")])
-        if filename:
-            content = open(filename, "r").read()
-            self.file = filename
-            self.root.winfo_toplevel().title(f"{filename} - Typing Colors")
-            self.root.text.delete(1.0, "end")
-            self.root.text.insert("end", content)
-            self.typingColors.update(content)
+        """Opens and loads a selected image file"""
+        self.root.decrypt(self.root.key)
 
     def export(self):
-        """Exports the canvas to a PNG"""
-        filename = fd.asksaveasfilename(title="Export As", filetypes=[("PNG", "*.png")])
+        """Exports the decrypted text to a file"""
+        filename = fd.asksaveasfilename(title="Export As", filetypes=[("TXT", "*.txt")])
         if filename:
-            self.typingColors.save_as(filename)
+            open(filename, 'w').write(self.text.get(1.0, 'end'))

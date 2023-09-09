@@ -1,6 +1,5 @@
-from tkinter import *
 from itertools import count, cycle
-from tkinter import filedialog as fd
+from tkinter import *
 
 from PIL import Image, ImageTk
 
@@ -80,8 +79,6 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
         root = Tk root object
         win = The class method to be called
     """
-    from gui.win_steganography import SteganographyWin
-    from gui.win_typingcolors import TypingColorsWin
     layouts = {
         "Import": {
             "command": win.open,
@@ -102,19 +99,19 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
         "Encrypt": {
             "dropdown": {
                 "Typing Colors": {
-                    "command": lambda: TypingColorsWin.__init__(TypingColorsWin),
+                    "command": root.switch_typingcolors,
                     "accelerator": "Ctrl+T",
                     "state": "disabled" if win.__class__.__name__ == "TypingColorsWin" else "normal"
                 },
                 "Steganograpy": {
-                    "command": lambda: SteganographyWin.__init__(SteganographyWin),
+                    "command": root.switch_steganography,
                     "accelerator": "Ctrl+S",
                     "state": "disabled" if win.__class__.__name__ == "SteganographyWin" else "normal"
                 }
             }
         },
         "Decrypt": {
-            "command": lambda: switch_to_decrypt(root),
+            "command": root.switch_decrypt,
             "accelerator": "Ctrl+D",
             "state": "disabled" if win.__class__.__name__ == "DecryptWin" else "normal"
         }
@@ -165,16 +162,6 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
     root.configure(background=DARK_GRAY, menu=menubar)
 
 
-def callback(callback: callable, destroy: list[Widget] = None, *args):
-    """Callback a function while destroying existing widgets"""
-    if (
-        len(destroy) > 0
-    ):  # Destroy the previous image labels for a fresh home screen application.
-        for i in destroy:
-            i.destroy()
-    callback(*args)
-
-
 def edit_key(root: Tk, after_exec: callable = None, *args):
     """Opens up an edit key window"""
     root.popup = Toplevel(root, bg=DARK_GRAY)
@@ -203,54 +190,6 @@ def edit_key(root: Tk, after_exec: callable = None, *args):
         pady=3,
         cursor="hand2",
         bd=0,
-        command=lambda: _valid_key(root, root.key_method.get("1.0", "end-1c"),
-                                   root.key_method, root.error, True, after_exec, *args)
+        command=lambda: after_exec(*args) if root._valid_key() else None
     )
     submit.pack()
-
-
-def _valid_key(root: Tk, key: str, key_method: Text, error: Label,
-               switch_to_decrypt: bool = False, after_exec: callable = None, *args):
-    """Checks if key is valid"""
-    print(key)
-    status = False
-    if not (4 <= len(key) <= 24 or len(key) == 0):
-        key_method.configure(bg=RED, fg=WHITE)
-        error.configure(text="Key must be between 4 and 24 characters long")
-    elif " " in key:
-        key_method.configure(bg=RED, fg=WHITE)
-        error.configure(text="Key can't contain whitespaces")
-    else:
-        status = True
-    if after_exec:
-        if switch_to_decrypt:  # checks if the decrypt window needs to open
-            after_exec(*args, key, root, key_method, error)
-        else:
-            after_exec(*args, key)
-    return status
-
-
-def switch_to_decrypt(win):
-    """Switches the window to the decrypt window"""
-    filename = fd.askopenfilename(
-        title="Select Image", filetypes=[("PNG", "*.png")]
-    )
-
-    edit_key(win, decrypt, filename)
-
-
-def decrypt(filename, key: str, root: Tk = None, key_method: Text = None, error: Label = None):
-    """Opens the decryption page with the secret key"""
-    from gui.win_decrypt import DecryptWin
-    from backend import utils
-    # TODO: find out what method used to encrypt here
-    # decrypting typingcolors image
-    try:
-        typingColors, decoded_text = utils.decrypt(filename, key)
-    except KeyError:  # invalid decryption key
-        key_method.configure(bg=RED, fg=WHITE)
-        error.configure(text="Invalid secret key")
-        return
-    callback(
-        lambda: DecryptWin(root, typingColors, decoded_text, key).pack(expand=True, fill='both'), []
-    )

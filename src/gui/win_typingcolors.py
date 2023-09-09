@@ -1,14 +1,16 @@
 from tkinter import *
 from tkinter import filedialog as fd
 
+from backend.typingcolors import TypingColors
 from gui.modules import *
 
 
 class TypingColorsWin(Frame):
     """Window for typingcolors"""
 
-    def __init__(self, root: Tk, typingcolors: classmethod, key: str):
+    def __init__(self, root: Tk):
         """Creates the layout"""
+        self.root = root
         super().__init__(root, bg=DARK_GRAY)
         dynamic_menu_bar(root, self)
         root.title("New File - Typing Colors")
@@ -18,7 +20,8 @@ class TypingColorsWin(Frame):
         self.grid_rowconfigure(1, weight=0, minsize=25)
         root.bind("<Configure>", self.updatecanvas)
 
-        self.typingColors = typingcolors  # the main backend
+        self.typingColors = TypingColors()  # the main backend
+        self.typingColors.set_key(root.key)
         self.file = None  # open files
         # split layout
         self.mainframe = Frame(self, bg=DARK_GRAY)
@@ -34,7 +37,7 @@ class TypingColorsWin(Frame):
             self.mainframe, image=self.typingColors.img_scaled(), bg=DARK_GRAY
         )
         self.key = StringVar()
-        self.key.set(f"Secret Key: {key}")
+        self.key.set(f"Secret Key: {root.key}")
         self.info = StringVar()
         self.info.set("0 characters   |   8px x 9px")
         self.text.pack(side="left", expand=True, fill="both", anchor="w")
@@ -73,7 +76,7 @@ class TypingColorsWin(Frame):
         if filename:
             content = open(filename, "r").read()
             self.file = filename
-            self.winfo_toplevel().title(f"{filename} - Typing Colors")
+            self.root.title(f"{filename} - Typing Colors")
             self.text.delete(1.0, "end")
             self.text.insert("end", content)
             self.typingColors.update(content)

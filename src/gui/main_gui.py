@@ -1,12 +1,10 @@
 from pathlib import Path
 from random import choices
 from tkinter import *
-# from .modules import *
-from . import modules
 from tkinter import filedialog as fd
 
-from backend.typingcolors import TypingColors
 from backend import utils
+from backend.typingcolors import TypingColors
 from gui.modules import *
 from gui.win_decrypt import DecryptWin
 from gui.win_steganography import SteganographyWin
@@ -25,11 +23,10 @@ class GUI(Tk):
         # Creates the window
         super().__init__()
 
-    def callback(self, callback: callable, destroy: list[Widget] = None, *args):
+    def callback(self, callback: callable, *args):
         """Callback a function while destroying existing widgets"""
-        # Destroy the previous image labels for a fresh home screen application.
-        for i in destroy:
-            i.destroy()
+        for widget in self.winfo_children():
+            widget.destroy()
         callback(*args)
 
     # function to create the place to write text to create image
@@ -52,11 +49,11 @@ class GUI(Tk):
             loading.load(
                 IMGS / "loading.gif",
                 False,
-                lambda: callback(self.create_main_window, [loading, gif]),
+                lambda: self.callback(self.create_main_window),
             )
 
         # gif.load(IMGS / "title.gif", False, lambda: loading_animation(self))
-        gif.load(IMGS / "title.gif", False, lambda: callback(self.create_main_window, [gif]))
+        gif.load(IMGS / "title.gif", False, lambda: self.callback(self.create_main_window))
         self.configure(background=DARK_GRAY)
         self.mainloop()
 
@@ -162,46 +159,74 @@ class GUI(Tk):
     def check_key(self, encrypt: bool, mode: int = 0):
         """Opens the encrypt/decrypt page"""
         self.key = self.key_method.get(1.0, "end-1c")
-        if modules._valid_key(self, self.key, self.key_method, self.error):
+        if self._valid_key():
             self.key_method.configure(bg=DARK_GRAY, fg=WHITE)
             self.error.configure(text="")
             if encrypt:
-                self.encrypt(self.key, mode)
+                self.encrypt(mode)
             elif len(self.key) > 0:  # checks if key is not empty for decryption
-                self.decrypt(self.key)
+                self.decrypt()
             else:
                 self.key_method.configure(bg=RED, fg=WHITE)
                 self.error.configure(text="Invalid secret key")
 
-    def encrypt(self, key: str = None, mode: int = 0):
+    def encrypt(self, mode: int = 0):
         """Opens the encryption page with the secret key"""
         # Mode 0 is for Typing Colors
         # Mode 1 is for Masked Image
         if mode == 0:
-            self.typingColors = TypingColors()
-            if len(key) == 0:
-                key = "".join(choices(PRINTABLE.replace("\t", ""), k=16))
-            self.typingColors.set_key(key)
-            callback(
-                lambda: TypingColorsWin(self, self.typingColors, key
-                                        ).pack(expand=True, fill='both'), [self.main])
+            if len(self.key) == 0:
+                self.key = "".join(choices(PRINTABLE.replace("\t", ""), k=16))
+
+            def create_win():
+                self.currentwin = TypingColorsWin(self)
+                self.currentwin.pack(expand=True, fill='both')
+            self.callback(create_win)
         else:
-            self.steganographyWin = SteganographyWin()
+            self.switch_steganography()
 
     def decrypt(self, key: str = None):
         """Opens the decryption page with the secret key"""
-        # TODO: find out what method used to encrypt here
-        # decrypting typingcolors image
         filename = fd.askopenfilename(
             title="Select Image", filetypes=[("PNG", "*.png")]
         )
+        if not filename:
+            return
         try:
-            self.typingColors, decoded_text = utils.decrypt(filename, key)
+            object, decoded_text = utils.decrypt(filename, key)
         except KeyError:  # invalid decryption key
             self.key_method.configure(bg=RED, fg=WHITE)
             self.error.configure(text="Invalid secret key")
             return
 
-        callback(
-            lambda: DecryptWin(self, self.typingColors, decoded_text, key).pack(expand=True, fill='both'), [self.main]
+        def create_win():
+            self.currentwin = DecryptWin(self, object, decoded_text)
+            self.currentwin.pack(expand=True, fill='both')
+        self.callback(create_win)
+
+    def switch_typingcolors(self):
+        """Switches to typing colors mode"""
+        self.typingColors = TypingColors()
+        self.typingColors.set_key(self.key)
+
+        def create_win():
+            self.currentwin = TypingColorsWin(self)
+            self.currentwin.pack(expand=True, fill='both')
+        self.callback(create_win)
+
+    def switch_steganography(self):
+        """Switches to encrypt steganography"""
+        filename = fd.askopenfilename(
+            title="Select Image", filetypes=[("PNG", "*.png")]
         )
+        if not filename:
+            return
+
+        def create_win():
+            self.currentwin = SteganographyWin(self, filename)
+            self.currentwin.pack(expand=True, fill='both')
+        self.callback(create_win)
+
+    def switch_decrypt(self):
+        """Switches to decrypt mode"""
+        edit_key(self, after_exec=lambda: self.decrypt(self.key))

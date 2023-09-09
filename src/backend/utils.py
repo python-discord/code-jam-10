@@ -39,7 +39,6 @@ class Palette:
 
 def decrypt(file_path, key):
     """Calls the appropriate decryptor and returns the encryptor class and secret message"""
-    print(file_path, key)
     img = Image.open(file_path)
     lastPixel = img.load()[-1, -1]
 
