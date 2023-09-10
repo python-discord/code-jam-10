@@ -87,7 +87,7 @@ def main():
             sg.Text("Enter text:", size=(8, 1)),
             sg.Input(
                 "",
-                (48, 1),
+                (43, 1),
                 focus=True,
                 tooltip="Enter text for obfuscation.",
                 pad=((2, 5), 2),
@@ -95,6 +95,7 @@ def main():
             ),
             sg.Radio("Box", "obfus-type", key="box", default=True, size=(3, 1)),
             sg.Radio("Blur", "obfus-type", key="blur", size=(3, 1)),
+            sg.Checkbox("Regex", key="is_regex", size=(5, 1)),
             sg.Button("Apply", key=UIKey.APPLY_OBFUSCATE, size=(8, 1), pad=((5, 0), 2)),
         ],
     ]
@@ -226,7 +227,7 @@ def main():
                 window[UIKey.WATERMARK_TEXT_INPUT].Update(decoded_text)
         elif event == UIKey.APPLY_OBFUSCATE:
             text = values[UIKey.OBFUSCATE_TEXT_INPUT]
-            bounds = find_bounds(filename, text)
+            bounds = find_bounds(filename, text, values['is_regex'])
             img = Image.open(filename)
             if values["box"] is True:
                 colour_box = ColourBox((0, 0, 0))
