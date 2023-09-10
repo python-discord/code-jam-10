@@ -8,7 +8,6 @@ from PyQt6.QtWidgets import (
 )
 
 from src.dock import Dock
-from src.image_viewer import ImageViewer
 from src.level import Level
 
 
@@ -47,7 +46,7 @@ class Window(QMainWindow):
         main_layout.addWidget(image_display, 1, 1)
 
         # Central dock
-        self.dock = Dock(self.level, self.img_label, self._update_secret_code)
+        self.dock = Dock(self.level, self.img_label, image_display, self._update_secret_code)
         main_layout.addWidget(self.dock, 2, 1)
 
         return main_layout
@@ -77,16 +76,6 @@ class Window(QMainWindow):
         scale_factor = min(width_scale, height_scale)
         qsize = QSize(int(img_size.width() * scale_factor), int(img_size.height() * scale_factor))
         scaled_img = img.scaled(qsize)
-
-        # if self.level.level_number == 4:
-        #     image_viewer = ImageViewer(self, qsize)  # TODO LEO should this be without self?
-        #     image_viewer.set_image(img)
-        #     layout.addWidget(image_viewer)
-        # else:
-        #     # Convert img_label to an instance variable
-        #     self.img_label = QLabel(self)
-        #     self.img_label.setPixmap(scaled_img)
-        #     self.img_label.setScaledContents(True)  # Removes the discrepancy between true image size and QLabel size
 
         # Convert img_label to an instance variable
         self.img_label = QLabel(self)

@@ -17,7 +17,7 @@ class Filter(QWidget):
     """Filter"""
 
     # Define a custom signal to be emitted when any slider changes its value
-    sliderValueChanged = pyqtSignal(str, int)  # TODO LEO there are two of this signal?
+    sliderValueChanged = pyqtSignal(str, int)
 
     def __init__(self, name: str, sliders_info: list):
         """Init"""
