@@ -1,6 +1,5 @@
 import functools
 import string
-import sys
 from collections import deque
 from enum import Enum, IntEnum
 from io import BytesIO
@@ -87,13 +86,11 @@ def pass_on_empty_stack(func: Callable) -> Callable:
 class PietRuntime:
     def __init__(
         self,
-        output_buffer: BinaryIO | None = None,
-        input_buffer: BinaryIO | None = None,
-        stack: PietStack | None = None,
+        input: BinaryIO | None = None,
     ):
-        self.output = output_buffer or open(sys.stdout.fileno(), "wb", closefd=False)
-        self.input = input_buffer or BytesIO()
-        self.stack = stack or PietStack()
+        self.input = input or BytesIO()
+        self.output: BinaryIO = BytesIO()
+        self.stack = PietStack()
         self.pointer = DirectionPointer()
         self.codel_chooser = CodelChooser()
         self.delta_map: dict[tuple[int, int], Callable] = {

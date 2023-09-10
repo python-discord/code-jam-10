@@ -9,7 +9,7 @@ from src.piet.runtime import CodelChooserDirection, PietRuntime, PietStack, Poin
 
 @pytest.fixture(name="runtime")
 def fixture_runtime():
-    return PietRuntime(output_buffer=BytesIO())
+    return PietRuntime()
 
 
 def test_push_instruction(runtime: PietRuntime):

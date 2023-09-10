@@ -1,3 +1,4 @@
+import sys
 from enum import Enum
 
 from PIL import Image
@@ -32,10 +33,17 @@ class PietCommand(Enum):
 
 
 class ImageGenerator:
-    def __init__(self):
+    def __init__(
+        self,
+        *,
+        input: str | bytes = b"",
+        step_limit: int = 1_000_000,
+        debug: bool = False,
+    ):
         self.commands = SelfExpandingList(default=SelfExpandingList[PietCommand](default=PietCommand._NONE))
         self.colors = SelfExpandingList(default=SelfExpandingList(default=BLACK))
-        self.interpreter = PietInterpreter(self.image, debug=False)
+        self.interpreter = PietInterpreter(self.image, input=input, step_limit=step_limit, debug=debug)
+        self.interpreter.runtime.output = open(sys.stdout.fileno(), "wb", closefd=False)
         self._current_hue = 0
         self._current_lightness = 0
         self._previous_color = WHITE
