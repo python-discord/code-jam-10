@@ -76,16 +76,24 @@ class Window(QMainWindow):
         scale_factor = min(width_scale, height_scale)
         scaled_img = img.scaled(QSize(int(img_size.width() * scale_factor), int(img_size.height() * scale_factor)))
 
-        # Scroll area for zooming
-        scroll_area = QScrollArea(self)
+        if self.level.level_number == 4:
+            # Scroll area for zooming
+            scroll_area = QScrollArea(self)
 
-        # Convert img_label to an instance variable
-        self.img_label = QLabel(scroll_area)
-        self.img_label.setPixmap(scaled_img)
-        scroll_area.setWidget(self.img_label)
-        scroll_area.setWidgetResizable(True)
+            # Convert img_label to an instance variable
+            self.img_label = QLabel(scroll_area)
+            self.img_label.setPixmap(scaled_img)
+            scroll_area.setWidget(self.img_label)
+            scroll_area.setWidgetResizable(True)
 
-        layout.addWidget(scroll_area)
+            layout.addWidget(scroll_area)
+        else:
+            # Convert img_label to an instance variable
+            self.img_label = QLabel(self)
+            self.img_label.setPixmap(scaled_img)
+            self.img_label.setScaledContents(True)  # Removes the discrepancy between true image size and QLabel size
+
+            layout.addWidget(self.img_label)
         layout.addLayout(self._create_tabbed_controls())
 
         return frame
