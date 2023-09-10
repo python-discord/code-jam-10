@@ -61,7 +61,6 @@ class DecryptWin(Frame):
 
         self.key_status = Label(self, textvariable=self.key, bg=DARK_GRAY, fg="white")
         self.key_status.grid(row=1, column=0, sticky="w")
-
         self.key_status.bind("<Button-1>", self.copy_key_to_clipboard)
 
         Label(self, textvariable=self.info, bg=DARK_GRAY, fg="white").grid(
@@ -83,9 +82,9 @@ class DecryptWin(Frame):
     def updatecanvas(self, event=None):
         """Updates the canvas to fill the screen"""
         w, h = self.mainframe.winfo_width() // 2, self.mainframe.winfo_height()
-        if w*h < 100:  # not rendered yet
+        if w * h < 100:  # not rendered yet
             w, h = 100, 100
-        if self.mode == 'Steganography':
+        if self.mode == "Steganography":
             new = self.image.copy()
             new.thumbnail((w, h), BOX)
             img = ImageTk.PhotoImage(new)

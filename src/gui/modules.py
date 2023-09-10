@@ -9,38 +9,54 @@ PRINTABLE = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$
 
 def loading_animation(root):
     """Animates the loading screen"""
+
     def drawtext(text, red=192):
         """Draws the text"""
+
         def dropletter(letter, n=0):
             """Animates a single letter"""
             if n == 30:  # animation done
                 return
             if n == 10:  # start next letter
-                drawtext(text[1:], red+3)  # generate nice spectrum
-            canvas.scale(letter, letterx, centery, .9, .9)  # move towards given position
-            root.after(10,
-                       lambda: dropletter(letter, n+1))  # continue animation
+                drawtext(text[1:], red + 3)  # generate nice spectrum
+            canvas.scale(
+                letter, letterx, centery, 0.9, 0.9
+            )  # move towards given position
+            root.after(10, lambda: dropletter(letter, n + 1))  # continue animation
 
         if not text:  # animation complete
-            root.after(1500,  # create main window
-                       lambda: root.callback(root.create_main_window))
+            root.after(
+                1500,  # create main window
+                lambda: root.callback(root.create_main_window),
+            )
             return
-        if text[0] == ' ':  # skip spaces
+        if text[0] == " ":  # skip spaces
             drawtext(text[1:], red)
             return
         # render next letter
-        letterx = 770 - 36*len(text)  # calculate letter position
+        letterx = 770 - 36 * len(text)  # calculate letter position
         dropletter(
-            canvas.create_text(378, -42, text=text[0],  # start letter at y-42
-                               fill='#%02x66ff' % red,  # convert to hex
-                               font=("Cascadia Mono", 42)),
+            canvas.create_text(
+                378,
+                -42,
+                text=text[0],  # start letter at y-42
+                fill="#%02x66ff" % red,  # convert to hex
+                font=("Cascadia Mono", 42),
+            ),
         )
 
     centery = root.winfo_height() // 2
-    canvas = Canvas(root, bg=DARK_GRAY, width=756, height=centery+25,
-                    bd=0, highlightthickness=0, relief='ridge')
-    canvas.place(relx=.5, rely=0, anchor='n')
-    drawtext('The Neverending Loops')
+    canvas = Canvas(
+        root,
+        bg=DARK_GRAY,
+        width=756,
+        height=centery + 25,
+        bd=0,
+        highlightthickness=0,
+        relief="ridge",
+    )
+    canvas.place(relx=0.5, rely=0, anchor="n")
+    drawtext("The Neverending Loops")
 
 
 def center(root: Tk, WIN_W: int, WIN_H: int):
@@ -152,6 +168,8 @@ def key_popup(root, after_exec):
         root.popup.destroy()
 
     root.popup = Toplevel(root, bg=DARK_GRAY)
+    # TODO: CHANGE TITLE
+    root.popup.title("Enter New Key")
 
     # Centering the popup in the center of the window
     w = 350

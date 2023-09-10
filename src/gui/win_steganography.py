@@ -40,19 +40,33 @@ class SteganographyWin(Frame):
             self.mainframe, image=ImageTk.PhotoImage(self.image), bg=DARK_GRAY
         )
         self.key = StringVar()
-        self.key.set(f"Secret Key: {root.key}")
+        self.key.set(f"Secret Key: {root.key} | (Click to Copy)")
+
         self.info = StringVar()
         self.info.set("0 characters")
-        self.text.pack(side="left", expand=True, fill='both', anchor='w')
-        self.canvas.pack(side="right", anchor='e')
+        self.text.pack(side="left", expand=True, fill="both", anchor="w")
+        self.canvas.pack(side="right", anchor="e")
         self.mainframe.grid(row=0, column=0, columnspan=2, sticky="nsew")
-        Label(self, textvariable=self.key, bg=DARK_GRAY, fg="white").grid(
-            row=1, column=0, sticky="w"
-        )
+
+        self.key_status = Label(self, textvariable=self.key, bg=DARK_GRAY, fg="white")
+        self.key_status.grid(row=1, column=0, sticky="w")
+        self.key_status.bind("<Button-1>", self.copy_key_to_clipboard)
+
         Label(self, textvariable=self.info, bg=DARK_GRAY, fg="white").grid(
             row=1, column=1, sticky="e"
         )
         self._updateinfo()
+
+    def copy_key_to_clipboard(self, _event):
+        """Copies key used to encrypt images to the clipboard"""
+        # Copying to clipboard
+        self.clipboard_clear()
+        self.clipboard_append(self.root.key)
+        # Updating UI
+        self.key.set(f"Secret Key: {self.root.key} | (Copied)")
+        self.root.after(
+            2000, lambda: self.key.set(f"Secret Key: {self.root.key} | (Click to Copy)")
+        )
 
     def _updateinfo(self):
         """Updates text length"""
@@ -63,7 +77,7 @@ class SteganographyWin(Frame):
     def updatecanvas(self, event=None):
         """Updates the image to fit window size"""
         w, h = self.mainframe.winfo_width() // 2, self.mainframe.winfo_height()
-        if w*h < 100:  # not rendered yet
+        if w * h < 100:  # not rendered yet
             w, h = 100, 100
         thumbnail = self.image.copy()
         thumbnail.thumbnail((w, h))
@@ -96,6 +110,6 @@ class SteganographyWin(Frame):
 
         def after():
             self.steganography = ExistingImage(self.image, self.root.key)
-            self.key.set(f"Secret Key: {self.root.key}")
+            self.key.set(f"Secret Key: {self.root.key} | (Click to Copy)")
 
         key_popup(self.root, after)

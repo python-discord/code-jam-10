@@ -34,19 +34,26 @@ class TypingColorsWin(Frame):
             fg="white",
             font=("Consolas", 14),
         )
+        # TODO: CHANGE THE DEFAULT TEXT
+        self.text.insert(END, "Edit me !")
         self.canvas = Label(
-            self.mainframe, image=self.typingColors.img_scaled(0.6*self.root.winfo_width()), bg=DARK_GRAY
+            self.mainframe,
+            image=self.typingColors.img_scaled(0.6 * self.root.winfo_width()),
+            bg=DARK_GRAY,
         )
         self.key = StringVar()
-        self.key.set(f"Secret Key: {root.key}")
+        self.key.set(f"Secret Key: {root.key} | (Click to Copy)")
+
         self.info = StringVar()
         self.info.set("0 characters   |   8px x 9px")
         self.text.pack(side="left", expand=True, fill="both", anchor="w")
         self.canvas.pack(side="right", fill="both", anchor="e")
-        self.mainframe.grid(row=0, column=0, columnspan=2, sticky='nsew')
-        Label(self, textvariable=self.key, bg=DARK_GRAY, fg="white").grid(
-            row=1, column=0, sticky="w"
-        )
+        self.mainframe.grid(row=0, column=0, columnspan=2, sticky="nsew")
+
+        self.key_status = Label(self, textvariable=self.key, bg=DARK_GRAY, fg="white")
+        self.key_status.grid(row=1, column=0, sticky="w")
+        self.key_status.bind("<Button-1>", self.copy_key_to_clipboard)
+
         Label(self, textvariable=self.info, bg=DARK_GRAY, fg="white").grid(
             row=1, column=1, sticky="e"
         )
@@ -64,11 +71,26 @@ class TypingColorsWin(Frame):
             )
         self.after(50, lambda: self._typingcolors_update(txt))
 
+    def copy_key_to_clipboard(self, _event):
+        """Copies key used to encrypt images to the clipboard"""
+        # Copying to clipboard
+        self.clipboard_clear()
+        self.clipboard_append(self.root.key)
+        # Updating UI
+        self.key.set(f"Secret Key: {self.root.key} | (Copied)")
+        self.root.after(
+            2000, lambda: self.key.set(f"Secret Key: {self.root.key} | (Click to Copy)")
+        )
+
     def updatecanvas(self, event=None):
         """Updates the canvas to fill the screen"""
         sf = max(1, (self.grid_bbox(0, 0)[3]) // self.typingColors.ar_height)
         img = self.typingColors.img_scaled(int(sf), self.root.winfo_width())
-        self.canvas.configure(image=img, width=self.typingColors.ar_width*sf, height=self.typingColors.ar_height*sf)
+        self.canvas.configure(
+            image=img,
+            width=self.typingColors.ar_width * sf,
+            height=self.typingColors.ar_height * sf,
+        )
         self.canvas.image = img
 
     def open(self):
@@ -86,12 +108,14 @@ class TypingColorsWin(Frame):
         """Exports the canvas to a PNG"""
         filename = fd.asksaveasfilename(title="Export As", filetypes=[("PNG", "*.png")])
         if filename:
-            self.typingColors.save_as(filename+".png")
+            self.typingColors.save_as(filename + ".png")
 
     def edit_key(self):
         """Editing the encryption key"""
+
         def after():
             self.typingColors.set_key(self.root.key)
             self.typingColors.force_update()
-            self.key.set(f"Secret Key: {self.root.key}")
+            self.key.set(f"Secret Key: {self.root.key} | (Click to Copy)")
+
         key_popup(self.root, after)
