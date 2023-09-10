@@ -36,7 +36,7 @@ def apply_double_exposure(img1: tuple, img2: tuple, slider_value: int, w: int, h
     adjusted_slider_value = float(slider_value * 5) / 100
 
     # Apply double exposure
-    blended_image = double_exposure(img2, img1, adjusted_slider_value)
+    blended_image = double_exposure(img1, img2, adjusted_slider_value)
 
     # Convert blended image to QPixmap
     image_np = np.array(blended_image)
