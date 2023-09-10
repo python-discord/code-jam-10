@@ -31,9 +31,9 @@ class Level:
         if self.level_number == 1:
             return Path(image_dir_path, "reverse_ishihara.png")
         if self.level_number == 2:
-            return Path(image_dir_path, "clockwork.jpg")
+            return Path(image_dir_path, "snake.png")
         if self.level_number == 3:
-            return Path(image_dir_path, "number_hidden_image.png")
+            return Path(image_dir_path, "goldfish.png")
         if self.level_number == 4:
             return Path(image_dir_path, "desert.jpg")
         if self.level_number == 5:
@@ -50,7 +50,7 @@ class Level:
         if self.level_number == 1:
             return "42"
         if self.level_number == 2:
-            return "secret2"
+            return "snake_case"
         if self.level_number == 3:
             return "200012"
         if self.level_number == 4:
@@ -117,23 +117,17 @@ class Level:
                                 )
                             ],
                             "dropdowns": [],
-                            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
-                                           "tempor incididunt ut labore et dolore magna aliqua. Nullam ac tortor "
-                                           "vitae purus faucibus. Velit euismod in pellentesque massa placerat duis "
-                                           "ultricies lacus sed. Et sollicitudin ac orci phasellus egestas tellus. "
-                                           "Non blandit massa enim nec dui nunc mattis enim. Eu non diam phasellus "
-                                           "vestibulum lorem sed risus ultricies. Nisl tincidunt eget nullam non nisi "
-                                           "est sit amet facilisis. Nulla aliquet enim tortor at auctor urna nunc id. "
-                                           "Facilisis magna etiam tempor orci eu lobortis. Purus gravida quis blandit "
-                                           "turpis cursus. Feugiat pretium nibh ipsum consequat nisl vel pretium. "
-                                           "Donec massa sapien faucibus et molestie. Pellentesque habitant morbi "
-                                           "tristique senectus et netus et. Neque volutpat ac tincidunt vitae semper. "
-                                           "Faucibus vitae aliquet nec ullamcorper sit amet risus nullam."
+                            "description": "Within the shadowy depths of the digital realm, a mysterious symbol "
+                                           "weaves a cryptic tale. As you tread cautiously through this enigmatic "
+                                           "landscape, look beyond the obvious, for the answer lies in the "
+                                           "unspoken_connector that guides the way. What compound_word emerges from "
+                                           "the darkness, uniting the virtual and the tangible with its "
+                                           "discreet_presence?"
                         },
                     ),
                     {
-                        "second_image": Path(image_dir_path, "doggo.jpg"),
-                        "secret_code": "secret",
+                        "second_image": Path(image_dir_path, "cases.jpeg"),
+                        "secret_code": "snake_case",
                         "MotionTransformer": None,
                     },
                 ),
