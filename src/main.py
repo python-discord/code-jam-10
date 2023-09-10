@@ -10,7 +10,7 @@ def main() -> None:
     """Main function"""
     app = QApplication(sys.argv)
     # Assuming the player is at level 1
-    current_level = Level(1)
+    current_level = Level(3)
     window = Window(current_level)
     window.showMaximized()
     sys.exit(app.exec())

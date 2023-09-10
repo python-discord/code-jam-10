@@ -4,11 +4,12 @@ from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import (
     QApplication, QFrame, QGridLayout, QHBoxLayout, QLabel, QMainWindow,
-    QMessageBox, QStackedLayout, QWidget, QScrollArea
+    QMessageBox, QStackedLayout, QWidget
 )
 
 from src.dock import Dock
 from src.level import Level
+from src.image_viewer import ImageViewer
 
 
 class Window(QMainWindow):
@@ -77,16 +78,23 @@ class Window(QMainWindow):
         scaled_img = img.scaled(QSize(int(img_size.width() * scale_factor), int(img_size.height() * scale_factor)))
 
         if self.level.level_number == 4:
-            # Scroll area for zooming
-            scroll_area = QScrollArea(self)
+            # # Scroll area for zooming
+            # scroll_area = QScrollArea(self)
+            #
+            # # Convert img_label to an instance variable
+            # self.img_label = QLabel(scroll_area)
+            # self.img_label.setPixmap(scaled_img)
+            # scroll_area.setWidget(self.img_label)
+            # scroll_area.setWidgetResizable(True)
+            #
+            # layout.addWidget(scroll_area)
 
-            # Convert img_label to an instance variable
-            self.img_label = QLabel(scroll_area)
-            self.img_label.setPixmap(scaled_img)
-            scroll_area.setWidget(self.img_label)
-            scroll_area.setWidgetResizable(True)
+            image_viewer = ImageViewer(self)
+            image_viewer.setImage(img)
+            layout.addWidget(image_viewer)
 
-            layout.addWidget(scroll_area)
+
+
         else:
             # Convert img_label to an instance variable
             self.img_label = QLabel(self)
