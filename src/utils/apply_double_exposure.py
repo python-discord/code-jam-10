@@ -49,12 +49,3 @@ def apply_double_exposure(img1: tuple, img2: tuple, slider_value: int, w: int, h
     pixmap = QPixmap.fromImage(qimage)
     pixmap = pixmap.scaled(w, h)
     return pixmap
-
-
-def qimage_to_pil_image(qimage: QImage) -> Image:
-    """Converts a PyQt QImage to a PIL Image."""
-    buffer = QBuffer()
-    buffer.open(QBuffer.OpenModeFlag.ReadWrite)
-    qimage.save(buffer, "PNG")
-    pil_im = Image.open(io.BytesIO(bytes(buffer.data())))
-    return pil_im
