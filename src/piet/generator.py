@@ -1,5 +1,6 @@
 import sys
 from enum import Enum
+from io import BytesIO
 
 from PIL import Image
 
@@ -129,20 +130,36 @@ class ImageGenerator:
         image.putdata(color_ints)
         return image
 
-    def generate_image(self, data: bytes, cols: int = 4) -> Image.Image:
+    def generate_image(self, data: bytes, cols: int = 4, key: bytes = b"") -> Image.Image:
         """Construct a Piet program that outputs the data given."""
         length = len(data)
         self.set_next_command(PietCommand.NOOP, 6)
         for i, byte in enumerate(data):
-            self.set_next_command(PietCommand.NOOP, 256 - byte)
-            # self._current_lightness = random.randint(0, 2)
-            # self._current_hue = random.randint(0, 5)
-            self.set_next_command(PietCommand.OUT_CHAR, byte)
-            # self.set_next_command(
-            #     random.choice([x for x in PietCommand if isinstance(x.value, ColorChange)]),
-            #     byte,
-            # )
-            self.set_next_command(PietCommand.PUSH)
+            if key:
+                self.interpreter.runtime.input = BytesIO(key)
+                # shift = key[i % len(key)]
+                shift = key[i]
+                shifted_byte = (byte + shift) % 256
+                self.set_next_command(PietCommand.NOOP, 256 - shifted_byte)
+                # self._current_lightness = random.randint(0, 2)
+                # self._current_hue = random.randint(0, 5)
+                self.set_next_command(PietCommand.OUT_CHAR, shifted_byte)
+                # self.set_next_command(
+                #     random.choice([x for x in PietCommand if isinstance(x.value, ColorChange)]),
+                #     byte,
+                # )
+                self.set_next_command(PietCommand.PUSH)
+                self.set_next_command(PietCommand.IN_CHAR)
+                self.set_next_command(PietCommand.SUBTRACT, 16)
+                self.set_next_command(PietCommand.PUSH)
+                self.set_next_command(PietCommand.DUPLICATE)
+                self.set_next_command(PietCommand.MULTIPLY)
+                self.set_next_command(PietCommand.MOD)
+            else:
+                self.set_next_command(PietCommand.NOOP, 256 - byte)
+                self.set_next_command(PietCommand.OUT_CHAR, byte)
+                self.set_next_command(PietCommand.PUSH)
+
             if (i + 1) % cols == 0:
                 self.set_next_command(PietCommand.OUT_CHAR, 3 if (i + 1) % (cols * 2) == 0 else 1)
                 self.set_next_command(PietCommand.PUSH)
