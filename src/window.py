@@ -8,8 +8,8 @@ from PyQt6.QtWidgets import (
 )
 
 from src.dock import Dock
-from src.level import Level
 from src.image_viewer import ImageViewer
+from src.level import Level
 
 
 class Window(QMainWindow):
@@ -75,10 +75,11 @@ class Window(QMainWindow):
         width_scale = max_width / img_size.width()
         height_scale = max_height / img_size.height()
         scale_factor = min(width_scale, height_scale)
-        scaled_img = img.scaled(QSize(int(img_size.width() * scale_factor), int(img_size.height() * scale_factor)))
+        qsize = QSize(int(img_size.width() * scale_factor), int(img_size.height() * scale_factor))
+        scaled_img = img.scaled(qsize)
 
         if self.level.level_number == 4:
-            image_viewer = ImageViewer(self)
+            image_viewer = ImageViewer(self, qsize)
             image_viewer.set_image(img)
             layout.addWidget(image_viewer)
         else:

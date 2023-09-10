@@ -1,13 +1,17 @@
-from PyQt6.QtWidgets import (QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QFrame, )
-from PyQt6.QtCore import pyqtSignal, QRectF, QPointF, Qt
+from PyQt6.QtCore import QPointF, QRectF, Qt, pyqtSignal
 from PyQt6.QtGui import QBrush, QColor, QPixmap
+from PyQt6.QtWidgets import (
+    QFrame, QGraphicsPixmapItem, QGraphicsScene, QGraphicsView
+)
 
 
 class ImageViewer(QGraphicsView):
+    """ImageViewer"""
     imageClicked = pyqtSignal(QPointF)
 
-    def __init__(self, parent):
+    def __init__(self, parent, qsize):
         super(ImageViewer, self).__init__(parent)
+        self._qsize = qsize
         self._zoom = 0
         self._empty = True
         self._scene = QGraphicsScene(self)
@@ -18,7 +22,6 @@ class ImageViewer(QGraphicsView):
         self.setResizeAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setBackgroundBrush(QBrush(QColor(30, 30, 30)))
         self.setFrameShape(QFrame.Shape.NoFrame)
 
     def fitInView(self, scale: bool = True, **kwargs):
@@ -33,12 +36,9 @@ class ImageViewer(QGraphicsView):
         if not rect.isNull():
             self.setSceneRect(rect)
             if not self._empty:
-                unity = self.transform().mapRect(QRectF(0, 0, 1, 1))
-                self.scale(1 / unity.width(), 1 / unity.height())
-                viewport_rect = self.viewport().rect()
-                scene_rect = self.transform().mapRect(rect)
-                factor = min(viewport_rect.width() / scene_rect.width(),
-                             viewport_rect.height() / scene_rect.height())
+                scene_rect = self.transform().mapRect(rect)  # Dimensions of th image and applies transformation
+                factor = min(self._qsize.width() / scene_rect.width(),
+                             self._qsize.height() / scene_rect.height())
                 self.scale(factor, factor)
             self._zoom = 0
 
