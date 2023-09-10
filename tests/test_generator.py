@@ -1,7 +1,6 @@
 import pytest
-
-from src.piet import ImageGenerator, PietInterpreter
-from src.piet.interpreter import StepLimitReached
+from piet import ImageGenerator, PietInterpreter
+from piet.interpreter import StepLimitReached
 
 
 @pytest.mark.parametrize(

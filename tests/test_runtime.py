@@ -3,8 +3,7 @@ import string
 from io import BytesIO
 
 import pytest
-
-from src.piet.runtime import CodelChooserDirection, PietRuntime, PietStack, PointerDirection
+from piet.runtime import CodelChooserDirection, PietRuntime, PietStack, PointerDirection
 
 
 @pytest.fixture(name="runtime")
