@@ -12,8 +12,8 @@ class ImageViewer(QGraphicsView):
 
     imageClicked = pyqtSignal(QPointF)
 
-    def __init__(self, parent: QGraphicsView, qsize: QSize):
-        super(ImageViewer, self).__init__(parent)
+    def __init__(self, qsize: QSize):
+        super(ImageViewer, self).__init__()
         self._qsize = qsize
         self._zoom = 0
         self._empty = True

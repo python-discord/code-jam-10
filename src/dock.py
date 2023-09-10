@@ -218,7 +218,7 @@ class Dock(QWidget):
         new_image = apply_filter(filter_title, args_to_pass)
 
         # Replace QLabel image with ImageViewer to allow mouse wheel and drag event for zooming
-        image_viewer = ImageViewer(self, QSize(self.img_label.width(), self.img_label.height()))
+        image_viewer = ImageViewer(QSize(self.img_label.width(), self.img_label.height()))
         image_viewer.set_image(new_image)
 
         frame_layout = self.image_display.layout()

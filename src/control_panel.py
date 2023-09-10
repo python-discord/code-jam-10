@@ -110,7 +110,7 @@ class ControlPanel(QWidget):
             button = QPushButton()
             button.setText(button_text)
             if button_text == "Unlock Digital Glyphs":
-                button.clicked.connect(lambda checked: self.convert_to_ascii_art(checked))
+                button.clicked.connect(lambda btn=button: self.convert_to_ascii_art(button))
 
             layout.addWidget(button)
 
@@ -122,9 +122,9 @@ class ControlPanel(QWidget):
         value2 = combo_box2.currentText()
         self.comboBoxesSwapped.emit(value1, value2)
 
-    def convert_to_ascii_art(self, checked: bool) -> None:
+    def convert_to_ascii_art(self, button: QPushButton) -> None:
         """Request to update the image to ASCII art"""
-        print(f"CHECKED: {checked}")
+        button.setDisabled(True)
         self.ascii.emit()
 
     def forward_signal(self, label: str, value: int) -> None:
