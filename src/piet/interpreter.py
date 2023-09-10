@@ -19,6 +19,10 @@ class StepLimitReached(EndOfProgram):
     pass
 
 
+class InvalidColorError(ValueError):
+    pass
+
+
 class StepTrace(NamedTuple):
     iteration: int
     position: OrderedPair
@@ -82,23 +86,28 @@ class PietInterpreter:
 
     @staticmethod
     def _find_color_position(color: Color) -> OrderedPair:
-        row = next(
-            i for i, v in enumerate((color in PIET_COLORS[0], color in PIET_COLORS[1], color in PIET_COLORS[2])) if v
-        )
-        column = next(
-            i
-            for i, v in enumerate(
-                (
-                    color == PIET_COLORS[row][0],
-                    color == PIET_COLORS[row][1],
-                    color == PIET_COLORS[row][2],
-                    color == PIET_COLORS[row][3],
-                    color == PIET_COLORS[row][4],
-                    color == PIET_COLORS[row][5],
-                )
+        try:
+            row = next(
+                i
+                for i, v in enumerate((color in PIET_COLORS[0], color in PIET_COLORS[1], color in PIET_COLORS[2]))
+                if v
             )
-            if v
-        )
+            column = next(
+                i
+                for i, v in enumerate(
+                    (
+                        color == PIET_COLORS[row][0],
+                        color == PIET_COLORS[row][1],
+                        color == PIET_COLORS[row][2],
+                        color == PIET_COLORS[row][3],
+                        color == PIET_COLORS[row][4],
+                        color == PIET_COLORS[row][5],
+                    )
+                )
+                if v
+            )
+        except StopIteration as exc:
+            raise InvalidColorError(f"Color {color} is not a valid Piet color.") from exc
         return OrderedPair(row, column)
 
     def _determine_color_change(self) -> ColorChange:
