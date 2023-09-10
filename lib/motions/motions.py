@@ -1,7 +1,6 @@
 import math
 from collections import OrderedDict
 from enum import Enum, auto
-from os import stat
 from typing import Callable, Iterable
 
 import numpy as np
