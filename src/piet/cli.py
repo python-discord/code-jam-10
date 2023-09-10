@@ -48,7 +48,11 @@ def run(
     step_limit: int = 1_000_000,
     debug: bool = False,
 ):
+    print("Executing Piet program...")
+    data = image_path.read_bytes()
     image = Image.open(image_path).convert("RGB")
+    if input:
+        input *= len(data) // len(input) + 1
     interpreter = PietInterpreter(
         image,
         input=input,
