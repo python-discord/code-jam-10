@@ -79,6 +79,7 @@ class Window(QMainWindow):
         # Convert img_label to an instance variable
         self.img_label = QLabel(self)
         self.img_label.setPixmap(scaled_img)
+        self.img_label.setScaledContents(True)  # Removes the discrepancy between true image size and QLabel size
 
         layout.addWidget(self.img_label)
         layout.addLayout(self._create_tabbed_controls())
