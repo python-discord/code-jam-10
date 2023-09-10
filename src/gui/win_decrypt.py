@@ -85,7 +85,7 @@ class DecryptWin(Frame):
         w, h = self.mainframe.winfo_width() // 2, self.mainframe.winfo_height()
         if w*h < 100:  # not rendered yet
             w, h = 100, 100
-        if self.mode == 'Steganograpy':
+        if self.mode == 'Steganography':
             new = self.image.copy()
             new.thumbnail((w, h), BOX)
             img = ImageTk.PhotoImage(new)
