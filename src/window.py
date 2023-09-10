@@ -90,7 +90,7 @@ class Window(QMainWindow):
             # layout.addWidget(scroll_area)
 
             image_viewer = ImageViewer(self)
-            image_viewer.setImage(img)
+            image_viewer.set_image(img)
             layout.addWidget(image_viewer)
 
 
