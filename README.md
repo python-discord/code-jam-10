@@ -31,6 +31,8 @@ $ .venv/bin/Activate.ps1
 
 - Dependencies required to develop and run tests: `$ pip install -r dev-requirements.txt`
 
+NOTE: Requires Python 3.11+
+
 #### Running Tests
 `$ pytest`
 
