@@ -1,13 +1,19 @@
 import sys
+from typing import Any
 
 from PyQt6.QtWidgets import QApplication
-from sklearn.externals._packaging.version import parse
 
 from src.level import Level
 from src.window import Window
 
 
-def parse_level_input(args):
+def parse_level_input(args: Any) -> int:
+    """
+    Parse the level input
+
+    :param args: arguments
+    :return:
+    """
     max_level = 5
     if len(args) == 0:
         level = 1
