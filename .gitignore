@@ -7,6 +7,7 @@ __pycache__/
 venv
 .env
 env
+pyvenv.cfg
 
 # Unittest reports
 .coverage*
@@ -29,3 +30,6 @@ build/
 .vscode/
 # MacOS
 .DS_Store
+itinerant-iterators-1de9231dfc80.json
+img1.png
+img2.webp
