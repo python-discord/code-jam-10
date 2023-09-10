@@ -187,7 +187,7 @@ class MotionTransformer:
 
         self.offsets = []
         for letter in self.answer.upper():
-            self.offsets.append(ord(letter))
+            self.offsets.append(ord(letter)-65)
 
     def reset_cache(self) -> None:
         """
