@@ -1,4 +1,4 @@
-import sys
+from io import BytesIO
 from pathlib import Path
 from typing import Annotated, Optional
 
@@ -44,6 +44,7 @@ def generate(
 def run(
     image_path: Path,
     output_path: Annotated[Optional[Path], typer.Argument()] = None,
+    execute: bool = False,
     input: str = "",
     step_limit: int = 1_000_000,
     debug: bool = False,
@@ -59,10 +60,12 @@ def run(
         step_limit=step_limit,
         debug=debug,
     )
-    interpreter.runtime.output = (
-        output_path.open("wb") if output_path else open(sys.stdout.fileno(), "wb", closefd=False)
-    )
+    interpreter.runtime.output = output_path.open("wb") if output_path else BytesIO()
     interpreter.run()
+    if not output_path:
+        print(interpreter.output.decode())
+    if execute:
+        exec(interpreter.output)
     print("\n")
     print("Successfully executed the Piet program!")
 
