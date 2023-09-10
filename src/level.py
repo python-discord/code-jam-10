@@ -33,7 +33,7 @@ class Level:
         if self.level_number == 2:
             return Path(image_dir_path, "snake.png")
         if self.level_number == 3:
-            return Path(image_dir_path, "goldfish.png")
+            return Path(image_dir_path, "number_hidden_image.png")
         if self.level_number == 4:
             return Path(image_dir_path, "desert.jpg")
         if self.level_number == 5:
