@@ -1,89 +1,73 @@
-# (Modified) Python Discord Code Jam Repository Template
+# The Neverending Loops
 
-## Setting up for teammates - Tools
+Python Discord Code Jam Repository For The Neverending Loops
 
-### flake8: general style rules
+## Table of Contents
 
-Our first and probably most important tool is flake8. It will run a set of plugins on your codebase and warn you about any non-conforming lines.
-Here is a sample output:
-```
-~> flake8
-./app.py:1:6: N802 function name 'helloWorld' should be lowercase
-./app.py:1:16: E201 whitespace after '('
-./app.py:2:1: D400 First line should end with a period
-./app.py:2:1: D403 First word of the first line should be properly capitalized
-./app.py:3:19: E225 missing whitespace around operator
-```
+1. [About The Project](#about-the-project)
+    - [Made With](#made-with)
+    - [Features](#features)
+2. [Getting Started](#getting-started)
+    - [Requirements](#requirements)
+    - [Installation](#installation)
+3. [Screenshots](#screenshots)
+4. [License](#license)
+5. [Contributors](#contributors)
 
-Each line corresponds to an error. The first part is the file path, then the line number, and the column index.
-Then comes the error code, a unique identifier of the error, and then a human-readable message.
+## About The Project
 
-If, for any reason, you do not wish to comply with this specific error on a specific line, you can add `# noqa: CODE` at the end of the line.
-For example:
-```python
-def helloWorld():  # noqa: N802
-    ...
-```
-will pass linting. Although we do not recommend ignoring errors unless you have a good reason to do so.
+### Made With
 
-It is run by calling `flake8` in the project root.
+This project was made with Python’s PIL library for image processing and numpy for image manipulation.
 
-### ISort: automatic import sorting
+### Features
 
-This second tool will sort your imports according to the [PEP8](https://www.python.org/dev/peps/pep-0008/#imports). That's it! One less thing for you to do!
+- Typing Colors
 
-It is run by calling `isort .` in the project root. Notice the dot at the end, it tells ISort to use the current directory.
+    Typing Colors is a
 
-### Pre-commit: run linting before committing
+- Steganography
 
-This third tool doesn't check your code, but rather makes sure that you actually *do* check it.
+    We also have a steganography
 
-It makes use of a feature called [Git hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) which allow you to run a piece of code before running `git commit`.
-The good thing about it is that it will cancel your commit if the lint doesn't pass. You won't have to wait for Github Actions to report and have a second fix commit.
 
-It is *installed* by running `pre-commit install` and can be run manually by calling only `pre-commit`.
+## Getting Started
 
-[Lint before you push!](https://soundcloud.com/lemonsaurusrex/lint-before-you-push)
+### Requirements
 
-### Using the Default Pip Setup
+- [Python 3](https://www.python.org/downloads/)
+- [Pillow](https://pypi.org/project/Pillow/)
+- [Numpy](https://pypi.org/project/numpy/)
 
-Our default setup includes a bare requirement file to be used with a [virtual environment](https://docs.python.org/3/library/venv.html).
+### Installation
 
-We recommend this if you never have used any other dependency manager, although if you have, feel free to switch to it. More on that below.
-
-#### Creating the environment
-Create a virtual environment in the folder `.venv`.
-```shell
-$ python -m venv .venv
+```bash
+git clone https://github.com/inkontoasty/the-neverending-loops
+cd the-neverending-loops
+pip install -r requirements.txt
+python src/main.py
 ```
 
-#### Enter the environment
-It will change based on your operating system and shell.
-```shell
-# Linux, Bash
-$ source .venv/bin/activate
-# Linux, Fish
-$ source .venv/bin/activate.fish
-# Linux, Csh
-$ source .venv/bin/activate.csh
-# Linux, PowerShell Core
-$ .venv/bin/Activate.ps1
-# Windows, cmd.exe
-> .venv\Scripts\activate.bat
-# Windows, PowerShell
-> .venv\Scripts\Activate.ps1
-```
+# Screenshots
 
-#### Installing the Dependencies
-Once the environment is created and activated, use this command to install the development dependencies.
-```shell
-$ pip install -r dev-requirements.txt
-```
+![Untitled](images/menu.png)
 
-#### Exiting the environment
-Interestingly enough, it is the same for every platform
-```shell
-$ deactivate
-```
+![Untitled](images/typing_colors.png)
 
-Once the environment is activated, all the commands listed previously should work. We highly recommend that you run `pre-commit install` as soon as possible.
+![Untitled](images/steg.png)
+
+![Untitled](images/decrypt.png)
+
+## License
+
+This repository is licensed under the MIT license, which you can find in the LICENSE file.
+
+## Contributors
+
+- [inkontoasty](https://github.com/inkontoasty)
+- [thisismudith](https://github.com/thisismudith)
+- [13_hh](https://github.com/hH-13)
+- [0xkarambit](https://github.com/HarshitJoshi9152)
+- [_rowhan_](https://github.com/rowhan1111)
+
+> [Discord server used for the code jam](https://discord.gg/Q8QBreaRh8)
