@@ -1,8 +1,46 @@
+from typing import Any
+
 from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtGui import QMouseEvent
 from PyQt6.QtWidgets import (
-    QComboBox, QFrame, QHBoxLayout, QLabel, QPushButton, QSlider, QVBoxLayout,
-    QWidget
+    QComboBox, QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea, QSlider,
+    QVBoxLayout, QWidget
 )
+
+
+class NoDragSlider(QSlider):
+    """QSlider subclass to disable dragging."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super(NoDragSlider, self).__init__(*args, **kwargs)
+
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        """Suppress the mouseMoveEvent to disable dragging."""
+        pass
+
+
+class ScrollLabel(QScrollArea):
+    """A QLabel that uses a scroll bar if the text is too long"""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.setWidgetResizable(True)
+        content = QWidget(self)
+        self.setWidget(content)
+        lay = QVBoxLayout(content)
+        self.label = QLabel(content)
+        self.label.setWordWrap(True)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        lay.addWidget(self.label)
+
+    def setText(self, text: str) -> None:
+        """
+        Set the text of the label
+
+        :param text: The text to set
+        :return:
+        """
+        self.label.setText(text)
 
 
 class ControlPanel(QWidget):
@@ -18,14 +56,18 @@ class ControlPanel(QWidget):
         layout = QVBoxLayout(self)
         self.title = title
         self.combo_boxes = []
+        self.description = widget_info.get('description', None)
 
-        title_box = self.create_panel_title(title)
+        title_box = self.create_panel_title(title, self.description)
         layout.addWidget(title_box)
 
         for info in widget_info.get('sliders', []):
-            label, slider_range, orientation = info
+            label, slider_range, orientation, disable_mouse_drag = info
             layout.addWidget(QLabel(label))
-            slider = QSlider(orientation)
+            if disable_mouse_drag:
+                slider = NoDragSlider(orientation)
+            else:
+                slider = QSlider(orientation)
             slider.setMinimum(0)
             slider.setMaximum(20)
             slider.setTickInterval(1)
@@ -96,11 +138,12 @@ class ControlPanel(QWidget):
         self.sliderValueChanged.emit(label, value)
 
     @staticmethod
-    def create_panel_title(name: str) -> QFrame:
+    def create_panel_title(name: str, description: str) -> QFrame:
         """
         Stylised control panel title for consistency
 
         :param name:
+        :param description:
         :return: QFrame panel title
         """
         title_box = QFrame()
@@ -115,14 +158,18 @@ class ControlPanel(QWidget):
             "background-color: 'white'; }"
         )
 
-        title_centre = QHBoxLayout(title_box)
+        title_centre = QVBoxLayout(title_box)  # Change QHBoxLayout to QVBoxLayout for vertical stacking
 
         title = QLabel(name)
         title.setStyleSheet("font-size: 22px")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        title_centre.addWidget(QLabel())
+        desc_label: ScrollLabel = ScrollLabel()
+        desc_label.setText(description)
+        desc_label.setStyleSheet("font-size: 16px;")  # Add some styling for the description
+
         title_centre.addWidget(title)
-        title_centre.addWidget(QLabel())
+        title_centre.addWidget(desc_label)
 
         return title_box
 
@@ -143,6 +190,16 @@ class ControlPanel(QWidget):
             "border: 1px solid 'black';"
             "border-radius: 6px;"
             "background-color: 'white'; }"
+
+            "QSlider::handle:horizontal {"
+            "background-color: gray;"
+            "width: 20px;"
+            "border-radius: 3px; }"
+
+            "QSlider::handle:vertical {"
+            "background-color: black;"
+            "height: 20px;"
+            "border-radius: 3px; }"
         )
 
         if horizontal:

@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (
 
 from src.utils.apply_color_swap import apply_color_swap
 from src.utils.apply_double_exposure import apply_double_exposure
+from src.utils.apply_motions import apply_motion
 from src.utils.apply_unmask_reverse_ishihara import (
     apply_unmask_reverse_ishihara
 )
@@ -175,4 +176,18 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
             args["image_label_w"],
             args["image_label_h"]
         )
-    pass
+    if filter_name == "Motion":
+        args_for_filter = {}
+        for key, value in args.items():
+            if key == "horizontal wave":
+                args_for_filter["horizontal wave"] = value
+            elif key == "vertical wave":
+                args_for_filter["vertical wave"] = value
+            elif key == "horizontal spike":
+                args_for_filter["horizontal spike"] = value
+            elif key == "vertical spike":
+                args_for_filter["vertical spike"] = value
+            elif key == "MotionTransformer":
+                args_for_filter["MotionTransformer"] = value
+        return apply_motion(args_for_filter)
+    return QPixmap()
