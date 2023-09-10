@@ -21,7 +21,6 @@ class GUI(Tk):
         # Creates the window
         super().__init__()
         self.title("The Neverending Loops")
-        self.iconbitmap("images\\logo.ico")
         self.sw, self.sh = self.winfo_screenwidth(), self.winfo_screenheight()
         self.minsize(width=int(self.sw * 0.45), height=int(self.sh * 0.45))
 
@@ -80,7 +79,7 @@ class GUI(Tk):
         # Encrypt OptionMenu
         method = StringVar()
         method.set("Encrypt ▼")
-        opts = ["Typing Colors", "Use Masked Image"]
+        opts = ["Typing Colors", "Image Masking"]
         encrypt = OptionMenu(
             buttons,
             method,
@@ -213,7 +212,7 @@ class GUI(Tk):
 
     def switch_steganography(self):
         """Switches to encrypt steganography"""
-        filename = fd.askopenfilename(title="Select Image", filetypes=[("PNG", "*.png")])
+        filename = fd.askopenfilename(title="Select Image to use as Mask", filetypes=[("PNG", "*.png")])
         if not filename:
             return
 
