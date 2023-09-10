@@ -81,11 +81,16 @@ class Level:
                                 ("B", (0, 100), Qt.Orientation.Horizontal, True),
                             ],
                             "dropdowns": [],
-                            "description": "Within the confines of a digital realm, a cryptic puzzle materializes on the screen. "
-                                           "It appears as a static image, unassuming at first glance. Yet, in this virtual world, the challenge is no less mysterious. "
-                                           "A seemingly ordinary image, pixel by pixel, conceals a hidden code. To unlock its secrets, you must change the image itself. "
-                                           "With each  alteration, the pixels shift, rearranging themselves into a new configuration. "
-                                           "The code, ever elusive, lurks just beneath the surface, waiting to be discovered. "
+                            "description": "Within the confines of a digital realm, "
+                                           "a cryptic puzzle materializes on the screen. "
+                                           "It appears as a static image, unassuming at first glance. "
+                                           "Yet, in this virtual world, the challenge is no less mysterious."
+                                           "A seemingly ordinary image, pixel by pixel, conceals a hidden code. "
+                                           "To unlock its secrets, you must change the image itself. "
+                                           "With each  alteration, the pixels shift, "
+                                           "rearranging themselves into a new configuration. "
+                                           "The code, ever elusive, lurks just beneath the surface, "
+                                           "waiting to be discovered."
                         },
                     ),
                     {
@@ -135,9 +140,15 @@ class Level:
                             "dropdowns": [
                                 ["Rust", "Chocolate", "Flamenco", "Casablanca", "Buff"]
                             ],
-                            "description": "The code is a lifeline, a thread of order within the digital chaos, a signal in the noise. "
-                                           "As you decrypt its meaning, you can't help but wonder what secrets it holds, what mysteries it guards. "
-                                           "The digital world stretches out before you, a labyrinth of information and intrigue, daring you to continue your quest, to unravel the enigma hidden within the noisy image. ",
+                            "description": "The code is a lifeline, a thread of order within the digital chaos, "
+                                           "a signal in the noise. "
+                                           "As you decrypt its meaning, "
+                                           "you can't help but wonder what secrets it holds, "
+                                           "what mysteries it guards. "
+                                           "The digital world stretches out before you, "
+                                           "a labyrinth of information and intrigue, "
+                                           "daring you to continue your quest, "
+                                           "to unravel the enigma hidden within the noisy image.",
                             "combo_box_buttons": ["swap"],
                         },
 
@@ -205,7 +216,8 @@ class Level:
                                 ("explode", (0, 100), Qt.Orientation.Horizontal, False),
                             ],
                             "dropdowns": [],
-                            "description": "We were unable to finish this level, but we really liked this image editing functionality. "
+                            "description": "We were unable to finish this level, "
+                                           "but we really liked this image editing functionality."
                                            "Thanks for playing!"
                         },
                     ),
