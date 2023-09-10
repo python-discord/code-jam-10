@@ -79,7 +79,7 @@ class GUI(Tk):
         # Encrypt OptionMenu
         method = StringVar()
         method.set("Encrypt ▼")
-        opts = ["Typing Colors", "Use Masked Image"]
+        opts = ["Typing Colors", "Image Masking"]
         encrypt = OptionMenu(
             buttons,
             method,
@@ -212,7 +212,7 @@ class GUI(Tk):
 
     def switch_steganography(self):
         """Switches to encrypt steganography"""
-        filename = fd.askopenfilename(title="Select Image", filetypes=[("PNG", "*.png")])
+        filename = fd.askopenfilename(title="Select Image to use as Mask", filetypes=[("PNG", "*.png")])
         if not filename:
             return
 

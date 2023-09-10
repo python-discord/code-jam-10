@@ -41,7 +41,7 @@ class TypingColorsWin(Frame):
             bg=TYPINGCOLSCOL,
         )
         self.key = StringVar()
-        self.key.set(f"Secret Key: {root.key} | (Click to Copy)")
+        self.key.set(f"Secret Key: {root.key}  (Click to Copy)")
 
         self.info = StringVar()
         self.info.set("0 characters   |   8px x 9px")
@@ -49,15 +49,11 @@ class TypingColorsWin(Frame):
         self.canvas.pack(side="right", fill="both", anchor="e")
         self.mainframe.grid(row=0, column=0, columnspan=2, sticky="nsew")
 
-        self.key_status = Label(
-            self, textvariable=self.key, bg=TYPINGCOLSCOL, fg="white"
-        )
+        self.key_status = Label(self, textvariable=self.key, bg=TYPINGCOLSCOL, fg="white")
         self.key_status.grid(row=1, column=0, sticky="w")
         self.key_status.bind("<Button-1>", self.copy_key_to_clipboard)
 
-        Label(self, textvariable=self.info, bg=TYPINGCOLSCOL, fg="white").grid(
-            row=1, column=1, sticky="e"
-        )
+        Label(self, textvariable=self.info, bg=TYPINGCOLSCOL, fg="white").grid(row=1, column=1, sticky="e")
         # start the loop
         self._typingcolors_update("")
 
@@ -78,10 +74,8 @@ class TypingColorsWin(Frame):
         self.clipboard_clear()
         self.clipboard_append(self.root.key)
         # Updating UI
-        self.key.set(f"Secret Key: {self.root.key} | (Copied)")
-        self.root.after(
-            2000, lambda: self.key.set(f"Secret Key: {self.root.key} | (Click to Copy)")
-        )
+        self.key.set(f"Secret Key: {self.root.key} | (Copied!)")
+        self.root.after(2000, lambda: self.key.set(f"Secret Key: {self.root.key}  (Click to Copy)"))
 
     def updatecanvas(self, event=None):
         """Updates the canvas to fill the screen"""
@@ -117,6 +111,6 @@ class TypingColorsWin(Frame):
         def after():
             self.typingColors.set_key(self.root.key)
             self.typingColors.force_update()
-            self.key.set(f"Secret Key: {self.root.key} | (Click to Copy)")
+            self.key.set(f"Secret Key: {self.root.key}  (Click to Copy)")
 
         key_popup(self.root, after)

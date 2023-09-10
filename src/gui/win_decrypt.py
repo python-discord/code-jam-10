@@ -43,16 +43,12 @@ class DecryptWin(Frame):
         )
         self.text.insert("end", decoded_text)
         self.text.configure(state="disabled")
-        self.canvas = Label(
-            self.mainframe, image=ImageTk.PhotoImage(self.image), bg=DECRYPTCOL
-        )
+        self.canvas = Label(self.mainframe, image=ImageTk.PhotoImage(self.image), bg=DECRYPTCOL)
         self.key = StringVar()
-        self.key.set(f"Secret Key: {root.key} | (Click to Copy)")
+        self.key.set(f"Secret Key: {root.key}  (Click to Copy)")
 
         self.info = StringVar()
-        self.info.set(
-            f"{len(decoded_text)} characters   |   {self.image.width}px x {self.image.height}px"
-        )
+        self.info.set(f"{len(decoded_text)} characters   |   {self.image.width}px x {self.image.height}px")
         self.text.pack(side="right", expand=True, fill="both", anchor="ne")
         self.canvas.pack(side="left", anchor="w")
         self.mainframe.grid(row=0, column=0, columnspan=2, sticky="nsew")
@@ -61,9 +57,7 @@ class DecryptWin(Frame):
         self.key_status.grid(row=1, column=0, sticky="w")
         self.key_status.bind("<Button-1>", self.copy_key_to_clipboard)
 
-        Label(self, textvariable=self.info, bg=DECRYPTCOL, fg="white").grid(
-            row=1, column=1, sticky="e"
-        )
+        Label(self, textvariable=self.info, bg=DECRYPTCOL, fg="white").grid(row=1, column=1, sticky="e")
         root.bind("<Configure>", self.updatecanvas)
 
     def copy_key_to_clipboard(self, _event):
@@ -72,10 +66,8 @@ class DecryptWin(Frame):
         self.clipboard_clear()
         self.clipboard_append(self.root.key)
         # Updating UI
-        self.key.set(f"Secret Key: {self.root.key} | (Copied)")
-        self.root.after(
-            2000, lambda: self.key.set(f"Secret Key: {self.root.key} | (Click to Copy)")
-        )
+        self.key.set(f"Secret Key: {self.root.key} | (Copied!)")
+        self.root.after(2000, lambda: self.key.set(f"Secret Key: {self.root.key}  (Click to Copy)"))
 
     def updatecanvas(self, event=None):
         """Updates the canvas to fill the screen"""

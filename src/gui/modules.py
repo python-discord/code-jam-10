@@ -1,7 +1,7 @@
 from tkinter import *
 
 DARK_GRAY, GRAY, WHITE = "#222831", "#393E46", "#EEEEEE"
-TYPINGCOLSCOL, STEGCOL, DECRYPTCOL = "#001C30", "#272D35", "#0C1E35"
+TYPINGCOLSCOL, STEGCOL, DECRYPTCOL = "#041C32", "#021A30", "#00041F"
 RED, GREEN = "#cd0000", "#1BAA4A"
 BRIGHT_RED = "#ff0000"
 PRINTABLE = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\t"
@@ -19,9 +19,7 @@ def loading_animation(root):
                 return
             if n == 4:  # start next letter
                 drawtext(text[1:], red + 3)  # generate nice spectrum
-            canvas.scale(
-                letter, letterx, centery, 0.9, 0.9
-            )  # move towards given position
+            canvas.scale(letter, letterx, centery, 0.9, 0.9)  # move towards given position
             root.after(10, lambda: dropletter(letter, n + 1))  # continue animation
 
         if not text:  # animation complete
@@ -85,16 +83,12 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
                 "Typing Colors": {
                     "command": root.switch_typingcolors,
                     "accelerator": "Ctrl+T",
-                    "state": "disabled"
-                    if win.__class__.__name__ == "TypingColorsWin"
-                    else "normal",
+                    "state": "disabled" if win.__class__.__name__ == "TypingColorsWin" else "normal",
                 },
                 "Steganograpy": {
                     "command": root.switch_steganography,
                     "accelerator": "Ctrl+S",
-                    "state": "disabled"
-                    if win.__class__.__name__ == "SteganographyWin"
-                    else "normal",
+                    "state": "disabled" if win.__class__.__name__ == "SteganographyWin" else "normal",
                 },
             }
         },
@@ -127,12 +121,8 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
                             command=layout["command"],
                             accelerator=layout["accelerator"],
                             state=layout["state"],
-                            activeforeground=WHITE
-                            if layout["state"] == "normal"
-                            else GRAY,
-                            activebackground=GRAY
-                            if layout["state"] == "normal"
-                            else WHITE,
+                            activeforeground=WHITE if layout["state"] == "normal" else GRAY,
+                            activebackground=GRAY if layout["state"] == "normal" else WHITE,
                         )
                     menubar.add_cascade(
                         label=name,
@@ -148,7 +138,7 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
                     accelerator=data["accelerator"],
                     state=data["state"],
                     activeforeground=WHITE,
-                    activebackground=GRAY,
+                    activebackground=DECRYPTCOL,
                 )
 
     root.configure(background=DARK_GRAY, menu=menubar)
