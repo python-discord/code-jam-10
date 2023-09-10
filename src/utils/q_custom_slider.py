@@ -1,13 +1,19 @@
-from PyQt6.QtGui import QPainter, QPen, QFont, QMouseEvent
-from PyQt6.QtWidgets import QAbstractButton, QSlider, QWidget, QVBoxLayout, QHBoxLayout, \
-    QStyleOptionSlider, QStyle
-from PyQt6.QtCore import Qt, QRect, QPoint
-import numpy as np
+import typing
+
+from PyQt6.QtCore import QPoint, QRect, Qt
+from PyQt6.QtGui import QMouseEvent, QPainter
+from PyQt6.QtWidgets import (
+    QHBoxLayout, QSlider, QStyle, QStyleOptionSlider, QVBoxLayout, QWidget
+)
 
 
 class QCustomSlider(QWidget):
-    def __init__(self, minimum, maximum, interval=1, orientation=Qt.Orientation.Horizontal,
-                 labels=None, p0=0, parent=None, suppress_mouse_move=False):
+    """A custom slider with tick labels"""
+
+    def __init__(self, minimum: int, maximum: int, interval: int = 1,
+                 orientation: Qt.Orientation = Qt.Orientation.Horizontal,
+                 labels: list | None = None, p0: typing.Any = 0, parent: typing.Any = None,
+                 suppress_mouse_move: bool = False) -> None:
         super().__init__(parent=parent)
 
         levels = range(minimum, maximum + interval, interval)
@@ -62,7 +68,8 @@ class QCustomSlider(QWidget):
             return
         super().mouseMoveEvent(event)  # Call the base class implementation for normal behavior
 
-    def paintEvent(self, e):
+    def paintEvent(self, e: typing.Any) -> None:
+        """Paint the tick labels"""
         super().paintEvent(e)
 
         style = self.sl.style()

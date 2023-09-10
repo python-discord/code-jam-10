@@ -1,5 +1,3 @@
-import random
-import string
 from pathlib import Path
 from typing import Dict, List, Tuple, cast
 
@@ -93,17 +91,17 @@ class Level:
                             ],
                             "dropdowns": [],
                             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
-                                           "tempor incididunt ut labore et dolore magna aliqua. Nullam ac tortor "
-                                           "vitae purus faucibus. Velit euismod in pellentesque massa placerat duis "
-                                           "ultricies lacus sed. Et sollicitudin ac orci phasellus egestas tellus. "
-                                           "Non blandit massa enim nec dui nunc mattis enim. Eu non diam phasellus "
-                                           "vestibulum lorem sed risus ultricies. Nisl tincidunt eget nullam non nisi "
-                                           "est sit amet facilisis. Nulla aliquet enim tortor at auctor urna nunc id. "
-                                           "Facilisis magna etiam tempor orci eu lobortis. Purus gravida quis blandit "
-                                           "turpis cursus. Feugiat pretium nibh ipsum consequat nisl vel pretium. "
-                                           "Donec massa sapien faucibus et molestie. Pellentesque habitant morbi "
-                                           "tristique senectus et netus et. Neque volutpat ac tincidunt vitae semper. "
-                                           "Faucibus vitae aliquet nec ullamcorper sit amet risus nullam."
+                            "tempor incididunt ut labore et dolore magna aliqua. Nullam ac tortor "
+                            "vitae purus faucibus. Velit euismod in pellentesque massa placerat duis "
+                            "ultricies lacus sed. Et sollicitudin ac orci phasellus egestas tellus. "
+                            "Non blandit massa enim nec dui nunc mattis enim. Eu non diam phasellus "
+                            "vestibulum lorem sed risus ultricies. Nisl tincidunt eget nullam non nisi "
+                            "est sit amet facilisis. Nulla aliquet enim tortor at auctor urna nunc id. "
+                            "Facilisis magna etiam tempor orci eu lobortis. Purus gravida quis blandit "
+                            "turpis cursus. Feugiat pretium nibh ipsum consequat nisl vel pretium. "
+                            "Donec massa sapien faucibus et molestie. Pellentesque habitant morbi "
+                            "tristique senectus et netus et. Neque volutpat ac tincidunt vitae semper. "
+                            "Faucibus vitae aliquet nec ullamcorper sit amet risus nullam.",
                         },
                     ),
                     {
@@ -130,17 +128,17 @@ class Level:
                             ],
                             "dropdowns": [],
                             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
-                                           "tempor incididunt ut labore et dolore magna aliqua. Nullam ac tortor "
-                                           "vitae purus faucibus. Velit euismod in pellentesque massa placerat duis "
-                                           "ultricies lacus sed. Et sollicitudin ac orci phasellus egestas tellus. "
-                                           "Non blandit massa enim nec dui nunc mattis enim. Eu non diam phasellus "
-                                           "vestibulum lorem sed risus ultricies. Nisl tincidunt eget nullam non nisi "
-                                           "est sit amet facilisis. Nulla aliquet enim tortor at auctor urna nunc id. "
-                                           "Facilisis magna etiam tempor orci eu lobortis. Purus gravida quis blandit "
-                                           "turpis cursus. Feugiat pretium nibh ipsum consequat nisl vel pretium. "
-                                           "Donec massa sapien faucibus et molestie. Pellentesque habitant morbi "
-                                           "tristique senectus et netus et. Neque volutpat ac tincidunt vitae semper. "
-                                           "Faucibus vitae aliquet nec ullamcorper sit amet risus nullam."
+                            "tempor incididunt ut labore et dolore magna aliqua. Nullam ac tortor "
+                            "vitae purus faucibus. Velit euismod in pellentesque massa placerat duis "
+                            "ultricies lacus sed. Et sollicitudin ac orci phasellus egestas tellus. "
+                            "Non blandit massa enim nec dui nunc mattis enim. Eu non diam phasellus "
+                            "vestibulum lorem sed risus ultricies. Nisl tincidunt eget nullam non nisi "
+                            "est sit amet facilisis. Nulla aliquet enim tortor at auctor urna nunc id. "
+                            "Facilisis magna etiam tempor orci eu lobortis. Purus gravida quis blandit "
+                            "turpis cursus. Feugiat pretium nibh ipsum consequat nisl vel pretium. "
+                            "Donec massa sapien faucibus et molestie. Pellentesque habitant morbi "
+                            "tristique senectus et netus et. Neque volutpat ac tincidunt vitae semper. "
+                            "Faucibus vitae aliquet nec ullamcorper sit amet risus nullam.",
                         },
                     ),
                     {
@@ -161,20 +159,19 @@ class Level:
                                 ["Rust", "Chocolate", "Flamenco", "Casablanca", "Buff"]
                             ],
                             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
-                                           "tempor incididunt ut labore et dolore magna aliqua. Nullam ac tortor "
-                                           "vitae purus faucibus. Velit euismod in pellentesque massa placerat duis "
-                                           "ultricies lacus sed. Et sollicitudin ac orci phasellus egestas tellus. "
-                                           "Non blandit massa enim nec dui nunc mattis enim. Eu non diam phasellus "
-                                           "vestibulum lorem sed risus ultricies. Nisl tincidunt eget nullam non nisi "
-                                           "est sit amet facilisis. Nulla aliquet enim tortor at auctor urna nunc id. "
-                                           "Facilisis magna etiam tempor orci eu lobortis. Purus gravida quis blandit "
-                                           "turpis cursus. Feugiat pretium nibh ipsum consequat nisl vel pretium. "
-                                           "Donec massa sapien faucibus et molestie. Pellentesque habitant morbi "
-                                           "tristique senectus et netus et. Neque volutpat ac tincidunt vitae semper. "
-                                           "Faucibus vitae aliquet nec ullamcorper sit amet risus nullam.",
+                            "tempor incididunt ut labore et dolore magna aliqua. Nullam ac tortor "
+                            "vitae purus faucibus. Velit euismod in pellentesque massa placerat duis "
+                            "ultricies lacus sed. Et sollicitudin ac orci phasellus egestas tellus. "
+                            "Non blandit massa enim nec dui nunc mattis enim. Eu non diam phasellus "
+                            "vestibulum lorem sed risus ultricies. Nisl tincidunt eget nullam non nisi "
+                            "est sit amet facilisis. Nulla aliquet enim tortor at auctor urna nunc id. "
+                            "Facilisis magna etiam tempor orci eu lobortis. Purus gravida quis blandit "
+                            "turpis cursus. Feugiat pretium nibh ipsum consequat nisl vel pretium. "
+                            "Donec massa sapien faucibus et molestie. Pellentesque habitant morbi "
+                            "tristique senectus et netus et. Neque volutpat ac tincidunt vitae semper. "
+                            "Faucibus vitae aliquet nec ullamcorper sit amet risus nullam.",
                             "buttons": ["swap"],
                         },
-
                     ),
                     {},
                 )
@@ -205,53 +202,163 @@ class Level:
                             "sliders": [
                                 (
                                     "horizontal wave",
-                                    ['T', 'J', 'P', 'D', 'M', 'Z', 'E', 'C', 'L', 'A', 'V', 'X', 'W', 'H', 'K', 'N', 'B', 'Y', 'S', 'Q', 'O'],
+                                    [
+                                        "T",
+                                        "J",
+                                        "P",
+                                        "D",
+                                        "M",
+                                        "Z",
+                                        "E",
+                                        "C",
+                                        "L",
+                                        "A",
+                                        "V",
+                                        "X",
+                                        "W",
+                                        "H",
+                                        "K",
+                                        "N",
+                                        "B",
+                                        "Y",
+                                        "S",
+                                        "Q",
+                                        "O",
+                                    ],
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
                                     False,
                                 ),
                                 (
                                     "vertical wave",
-                                    ['T', 'J', 'P', 'D', 'M', 'Z', 'E', 'C', 'L', 'A', 'V', 'X', 'W', 'H', 'K', 'N', 'B', 'Y', 'S', 'Q', 'O'],
+                                    [
+                                        "T",
+                                        "J",
+                                        "P",
+                                        "D",
+                                        "M",
+                                        "Z",
+                                        "E",
+                                        "C",
+                                        "L",
+                                        "A",
+                                        "V",
+                                        "X",
+                                        "W",
+                                        "H",
+                                        "K",
+                                        "N",
+                                        "B",
+                                        "Y",
+                                        "S",
+                                        "Q",
+                                        "O",
+                                    ],
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
                                     False,
                                 ),
                                 (
                                     "vertical spike",
-                                    ['T', 'J', 'P', 'D', 'M', 'Z', 'E', 'C', 'L', 'A', 'V', 'X', 'W', 'H', 'K', 'N', 'B', 'Y', 'S', 'Q', 'O'],
+                                    [
+                                        "T",
+                                        "J",
+                                        "P",
+                                        "D",
+                                        "M",
+                                        "Z",
+                                        "E",
+                                        "C",
+                                        "L",
+                                        "A",
+                                        "V",
+                                        "X",
+                                        "W",
+                                        "H",
+                                        "K",
+                                        "N",
+                                        "B",
+                                        "Y",
+                                        "S",
+                                        "Q",
+                                        "O",
+                                    ],
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
                                     False,
                                 ),
                                 (
                                     "horizontal spike",
-                                    ['T', 'J', 'P', 'D', 'M', 'Z', 'E', 'C', 'L', 'A', 'V', 'X', 'W', 'H', 'K', 'N', 'B', 'Y', 'S', 'Q', 'O'],
+                                    [
+                                        "T",
+                                        "J",
+                                        "P",
+                                        "D",
+                                        "M",
+                                        "Z",
+                                        "E",
+                                        "C",
+                                        "L",
+                                        "A",
+                                        "V",
+                                        "X",
+                                        "W",
+                                        "H",
+                                        "K",
+                                        "N",
+                                        "B",
+                                        "Y",
+                                        "S",
+                                        "Q",
+                                        "O",
+                                    ],
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
                                     False,
                                 ),
                                 (
                                     "explode",
-                                    ['T', 'J', 'P', 'D', 'M', 'Z', 'E', 'C', 'L', 'A', 'V', 'X', 'W', 'H', 'K', 'N', 'B', 'Y', 'S', 'Q', 'O'],
+                                    [
+                                        "T",
+                                        "J",
+                                        "P",
+                                        "D",
+                                        "M",
+                                        "Z",
+                                        "E",
+                                        "C",
+                                        "L",
+                                        "A",
+                                        "V",
+                                        "X",
+                                        "W",
+                                        "H",
+                                        "K",
+                                        "N",
+                                        "B",
+                                        "Y",
+                                        "S",
+                                        "Q",
+                                        "O",
+                                    ],
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
-                                    False
+                                    False,
                                 ),
                             ],
                             "dropdowns": [],
                             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
-                                           "tempor incididunt ut labore et dolore magna aliqua. Nullam ac tortor "
-                                           "vitae purus faucibus. Velit euismod in pellentesque massa placerat duis "
-                                           "ultricies lacus sed. Et sollicitudin ac orci phasellus egestas tellus. "
-                                           "Non blandit massa enim nec dui nunc mattis enim. Eu non diam phasellus "
-                                           "vestibulum lorem sed risus ultricies. Nisl tincidunt eget nullam non nisi "
-                                           "est sit amet facilisis. Nulla aliquet enim tortor at auctor urna nunc id. "
-                                           "Facilisis magna etiam tempor orci eu lobortis. Purus gravida quis blandit "
-                                           "turpis cursus. Feugiat pretium nibh ipsum consequat nisl vel pretium. "
-                                           "Donec massa sapien faucibus et molestie. Pellentesque habitant morbi "
-                                           "tristique senectus et netus et. Neque volutpat ac tincidunt vitae semper. "
-                                           "Faucibus vitae aliquet nec ullamcorper sit amet risus nullam."
+                            "tempor incididunt ut labore et dolore magna aliqua. Nullam ac tortor "
+                            "vitae purus faucibus. Velit euismod in pellentesque massa placerat duis "
+                            "ultricies lacus sed. Et sollicitudin ac orci phasellus egestas tellus. "
+                            "Non blandit massa enim nec dui nunc mattis enim. Eu non diam phasellus "
+                            "vestibulum lorem sed risus ultricies. Nisl tincidunt eget nullam non nisi "
+                            "est sit amet facilisis. Nulla aliquet enim tortor at auctor urna nunc id. "
+                            "Facilisis magna etiam tempor orci eu lobortis. Purus gravida quis blandit "
+                            "turpis cursus. Feugiat pretium nibh ipsum consequat nisl vel pretium. "
+                            "Donec massa sapien faucibus et molestie. Pellentesque habitant morbi "
+                            "tristique senectus et netus et. Neque volutpat ac tincidunt vitae semper. "
+                            "Faucibus vitae aliquet nec ullamcorper sit amet risus nullam.",
                         },
                     ),
                     {
@@ -262,7 +369,7 @@ class Level:
                         ),
                     },
                 ),
-            ]
+            ],
         ]
 
         if 0 <= self.level_number - 1 < len(filters):

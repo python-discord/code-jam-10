@@ -57,25 +57,35 @@ class ControlPanel(QWidget):
         layout = QVBoxLayout(self)
         self.title = title
         self.combo_boxes = []
-        self.description = widget_info.get('description', None)
+        self.description = widget_info.get("description", None)
 
         title_box = self.create_panel_title(title, self.description)
         layout.addWidget(title_box)
 
-        for info in widget_info.get('sliders', []):
+        for info in widget_info.get("sliders", []):
             label, tickMarkLabels, slider_range, orientation, disable_mouse_drag = info
             layout.addWidget(QLabel(label))
             if tickMarkLabels:
-                slider = QCustomSlider(0, 20, 1, orientation, labels=tickMarkLabels, suppress_mouse_move= disable_mouse_drag)
+                slider = QCustomSlider(
+                    0,
+                    20,
+                    1,
+                    orientation,
+                    labels=tickMarkLabels,
+                    suppress_mouse_move=disable_mouse_drag,
+                )
             else:
                 slider = QCustomSlider(0, 20, 1, orientation)
-            slider.sl.valueChanged.connect(lambda value, lbl=label: self.forward_signal(lbl, value))
-            slider_frame = self.style_slider(slider, slider_range, orientation == Qt.Orientation.Horizontal)
+            slider.sl.valueChanged.connect(
+                lambda value, lbl=label: self.forward_signal(lbl, value)
+            )
+            slider_frame = self.style_slider(
+                slider, slider_range, orientation == Qt.Orientation.Horizontal
+            )
             slider_frame.setMaximumHeight(60)
             layout.addWidget(slider_frame)
-
         # Adding dropdowns
-        for info in widget_info.get('dropdowns', []):
+        for info in widget_info.get("dropdowns", []):
             combo_box1 = QComboBox()
             combo_box2 = QComboBox()
 
@@ -87,19 +97,21 @@ class ControlPanel(QWidget):
 
             # Append the QComboBoxes to the list
             self.combo_boxes.append((combo_box1, combo_box2))
-
         # Adding buttons
-        for button_text in widget_info.get('buttons', []):
+        for button_text in widget_info.get("buttons", []):
             button = QPushButton()
             button.setText(button_text)
 
             # Use default arguments in the lambda to capture the current values of combo_box1 and combo_box2
             # Assuming one button per pair of dropdowns.
-            cb1, cb2 = self.combo_boxes.pop(0)  # Pop the first pair of QComboBoxes from the list
-            button.clicked.connect(lambda checked, cb1=cb1, cb2=cb2: self.grab_values(cb1, cb2))
+            cb1, cb2 = self.combo_boxes.pop(
+                0
+            )  # Pop the first pair of QComboBoxes from the list
+            button.clicked.connect(
+                lambda checked, cb1=cb1, cb2=cb2: self.grab_values(cb1, cb2)
+            )
 
             layout.addWidget(button)
-
         layout.addStretch()
 
     def grab_values(self, combo_box1: QComboBox, combo_box2: QComboBox) -> None:
@@ -140,7 +152,9 @@ class ControlPanel(QWidget):
             "background-color: 'white'; }"
         )
 
-        title_centre = QVBoxLayout(title_box)  # Change QHBoxLayout to QVBoxLayout for vertical stacking
+        title_centre = QVBoxLayout(
+            title_box
+        )  # Change QHBoxLayout to QVBoxLayout for vertical stacking
 
         title = QLabel(name)
         title.setStyleSheet("font-size: 22px")
@@ -148,7 +162,9 @@ class ControlPanel(QWidget):
 
         desc_label: ScrollLabel = ScrollLabel()
         desc_label.setText(description)
-        desc_label.setStyleSheet("font-size: 16px;")  # Add some styling for the description
+        desc_label.setStyleSheet(
+            "font-size: 16px;"
+        )  # Add some styling for the description
 
         title_centre.addWidget(title)
         title_centre.addWidget(desc_label)
@@ -156,7 +172,9 @@ class ControlPanel(QWidget):
         return title_box
 
     @staticmethod
-    def style_slider(slider: QCustomSlider, range_value: tuple, horizontal: bool) -> QFrame:
+    def style_slider(
+        slider: QCustomSlider, range_value: tuple, horizontal: bool
+    ) -> QFrame:
         """
         Style PyQt6 sliders for consistency
 
@@ -172,12 +190,10 @@ class ControlPanel(QWidget):
             "border: 1px solid 'black';"
             "border-radius: 6px;"
             "background-color: 'white'; }"
-
             "QSlider::handle:horizontal {"
             "background-color: gray;"
             "width: 20px;"
             "border-radius: 3px; }"
-
             "QSlider::handle:vertical {"
             "background-color: black;"
             "height: 20px;"
@@ -188,7 +204,6 @@ class ControlPanel(QWidget):
             slider_layout = QHBoxLayout(slider_frame)
         else:
             slider_layout = QVBoxLayout(slider_frame)
-
         slider_layout.addWidget(QLabel(str(range_value[0])))
         slider_layout.addWidget(slider)
         slider_layout.addWidget(QLabel(str(range_value[-1])))
