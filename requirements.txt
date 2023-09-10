@@ -2,3 +2,5 @@
 # Don't forget to pin your dependencies!
 
 Pillow~=10.0.0
+typer~=0.9.0
+rich~=13.5.2
