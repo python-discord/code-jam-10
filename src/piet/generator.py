@@ -1,7 +1,9 @@
+import base64
 import math
 import sys
 from enum import Enum
 from io import BytesIO
+from typing import Iterator
 
 from PIL import Image
 
@@ -42,6 +44,9 @@ class ImageGenerator:
         step_limit: int = 1_000_000,
         debug: bool = False,
     ):
+        self.input = input
+        self.step_limit = step_limit
+        self.debug = debug
         self.commands = SelfExpandingList(default=SelfExpandingList[PietCommand](default=PietCommand._NONE))
         self.colors = SelfExpandingList(default=SelfExpandingList(default=BLACK))
         self.interpreter = PietInterpreter(self.image, input=input, step_limit=step_limit, debug=debug)
@@ -193,3 +198,24 @@ class ImageGenerator:
                 self.set_offset_command(PietCommand.BLOCK, DirectionOffset.LEFT)
                 self.set_offset_command(PietCommand.BLOCK, DirectionOffset.RIGHT)
         return self.image
+
+    def generate_recursive(self, data: bytes, keys: Iterator[bytes], max_depth: int = 3, depth: int = 1):
+        key = next(keys, b"")
+        if key:
+            key *= len(data) // len(key) + 1
+        generator = ImageGenerator(input=self.input, step_limit=self.step_limit, debug=self.debug)
+        encoded = generator.generate_image(data, key)
+        del generator
+        if depth >= max_depth:
+            return encoded
+        encoded.save(image_bytes := BytesIO(), format="png")
+        image_b64 = base64.b64encode(image_bytes.getvalue())
+        code = (
+            b"""import base64
+with open("out.png", "wb") as f:
+    f.write(base64.b64decode('''
+    """
+            + image_b64
+            + b"'''))"
+        )
+        return self.generate_recursive(code, keys, max_depth, depth + 1)

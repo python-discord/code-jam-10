@@ -16,7 +16,8 @@ def generate(
     input_path: Path,
     output_path: Path,
     cols: Optional[int] = None,
-    input: str = "",
+    recurse: int = 0,
+    input: list[str] = [],
     step_limit: int = 1_000_000,
     debug: bool = False,
 ):
@@ -27,12 +28,17 @@ def generate(
     else:
         data = str(input_path).encode()
     command = f'python -m {__package__} run "{output_path}"'
-    generator = ImageGenerator(input=input, step_limit=step_limit, debug=debug)
-    key = input.encode()
-    if key:
-        key *= len(data) // len(key) + 1
-        command += f' --input "{key.decode()}"'
-    image = generator.generate_image(data, key, cols)
+    first_input = next(iter(input), "")
+    generator = ImageGenerator(input=first_input, step_limit=step_limit, debug=debug)
+    if recurse:
+        image = generator.generate_recursive(data, (v.encode() for v in input), recurse)
+        command += " --execute"
+    else:
+        key = first_input.encode()
+        if key:
+            key *= len(data) // len(key) + 1
+            command += f' --input "{first_input}"'
+        image = generator.generate_image(data, key, cols)
     image.save(output_path)
     print("\n")
     print("Successfully generated a Piet program!")
