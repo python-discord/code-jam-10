@@ -130,7 +130,7 @@ class ImageGenerator:
         image.putdata(color_ints)
         return image
 
-    def generate_image(self, data: bytes, cols: int = 4, key: bytes = b"") -> Image.Image:
+    def generate_image(self, data: bytes, cols: int = 2, key: bytes = b"") -> Image.Image:
         """Construct a Piet program that outputs the data given."""
         length = len(data)
         self.set_next_command(PietCommand.NOOP, 6)
