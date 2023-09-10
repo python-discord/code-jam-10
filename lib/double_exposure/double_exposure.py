@@ -10,10 +10,6 @@ def double_exposure(img1: Image, img2: Image, alpha: float = 0.5) -> Image:
     :param alpha: int
     :return:
     """
-    # Ensure img1 is the smaller image, or swap if necessary
-    if img1.size[0] > img2.size[0] or img1.size[1] > img2.size[1]:
-        img1, img2 = img2, img1
-
     # Convert both images to RGB
     img1 = img1.convert("RGB")
     img2 = img2.convert("RGB")
