@@ -107,12 +107,21 @@ class Window(QMainWindow):
             msg_box.setIcon(QMessageBox.Icon.Warning)
             msg_box.exec()
         else:
-            # If the input matches the answer, show a notification
-            msg_box = QMessageBox(self)
-            msg_box.setWindowTitle("Success")
-            msg_box.setText("\nCorrect secret code.\n")
-            msg_box.setIcon(QMessageBox.Icon.Information)
-            msg_box.exec()
+            if self.level.level_number == 5:
+                msg_box = QMessageBox(self)
+                msg_box.setWindowTitle("Success")
+                msg_box.setText("\nCongratulations! You have completed the game.\n")
+                msg_box.setIcon(QMessageBox.Icon.Information)
+                msg_box.exec()
+                self.close()
+                return
+            else:
+                # If the input matches the answer, show a notification
+                msg_box = QMessageBox(self)
+                msg_box.setWindowTitle("Success")
+                msg_box.setText("\nCorrect secret code.\n")
+                msg_box.setIcon(QMessageBox.Icon.Information)
+                msg_box.exec()
 
-            self.level.level_up()
-            self._init_ui()
+                self.level.level_up()
+                self._init_ui()
