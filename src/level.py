@@ -344,10 +344,7 @@ class Level:
                     {
                         "second_image": None,
                         "secret_code": "codes",
-                        "MotionTransformer": MotionTransformer(
-                            Image.open(image_dir_path / "snake.jpg")
-                            "codes"
-                        ),
+                        "MotionTransformer": MotionTransformer(Image.open(image_dir_path / "snake.jpg")),
                     },
                 ),
             ],
