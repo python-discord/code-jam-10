@@ -76,6 +76,12 @@ class ImageViewer(QGraphicsView):
         super(ImageViewer, self).mousePressEvent(event)
 
     def set_image(self, pixmap=None):
+        """
+        Initialize image to the ImageViewer
+
+        :param pixmap:
+        :return:
+        """
         self._zoom = 0
         if pixmap and not pixmap.isNull():
             self._empty = False
