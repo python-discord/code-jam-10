@@ -31,7 +31,6 @@ Before you begin, ensure you have met the following requirements:
 
 - [Python 3.10.x](https://www.python.org/downloads/)
 - [Poetry](https://python-poetry.org/docs/#installation)
-- [Docker](https://docs.docker.com/engine/install)
 
 ## Installation & Setup
 

@@ -4,9 +4,6 @@ from typing import Dict, List, Tuple, cast
 from PIL import Image
 from PyQt6.QtCore import Qt
 
-from lib.hidden_in_ascii.hidden_in_ascii import (
-    ascii_to_img, generate_ascii_file, prepare_input, seed_secret
-)
 from lib.motions.motions import MotionTransformer
 from src.control_panel import ControlPanel
 
@@ -34,17 +31,11 @@ class Level:
         if self.level_number == 1:
             return Path(image_dir_path, "reverse_ishihara.png")
         if self.level_number == 2:
-            return Path(image_dir_path, "clockwork.jpg")
+            return Path(image_dir_path, "snake.png")
         if self.level_number == 3:
             return Path(image_dir_path, "number_hidden_image.png")
         if self.level_number == 4:
-            input_img, coordinates = prepare_input(Path(image_dir_path, "desert.jpg"))
-            output_img_path = Path(image_dir_path, "ascii_output.png")
-            ascii_file_path = Path(image_dir_path, "ascii.txt")
-            generate_ascii_file(input_img, ascii_file_path, 2)
-            seed_secret(ascii_file_path, self.get_secret_answer(), False)
-            ascii_to_img(ascii_file_path, coordinates, input_img.size, output_img_path)
-            return output_img_path
+            return Path(image_dir_path, "desert.jpg")
         if self.level_number == 5:
             return Path(image_dir_path, "snakepuzzle.jpg")
         return Path(image_dir_path, "default.png")
@@ -59,11 +50,11 @@ class Level:
         if self.level_number == 1:
             return "42"
         if self.level_number == 2:
-            return "secret2"
+            return "snake_case"
         if self.level_number == 3:
             return "200012"
         if self.level_number == 4:
-            return "secret"
+            return "obfuscation"
         if self.level_number == 5:
             return "secret"
         return "pythoncodejam2023"
@@ -90,18 +81,16 @@ class Level:
                                 ("B", [], (0, 100), Qt.Orientation.Horizontal, True),
                             ],
                             "dropdowns": [],
-                            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
-                            "tempor incididunt ut labore et dolore magna aliqua. Nullam ac tortor "
-                            "vitae purus faucibus. Velit euismod in pellentesque massa placerat duis "
-                            "ultricies lacus sed. Et sollicitudin ac orci phasellus egestas tellus. "
-                            "Non blandit massa enim nec dui nunc mattis enim. Eu non diam phasellus "
-                            "vestibulum lorem sed risus ultricies. Nisl tincidunt eget nullam non nisi "
-                            "est sit amet facilisis. Nulla aliquet enim tortor at auctor urna nunc id. "
-                            "Facilisis magna etiam tempor orci eu lobortis. Purus gravida quis blandit "
-                            "turpis cursus. Feugiat pretium nibh ipsum consequat nisl vel pretium. "
-                            "Donec massa sapien faucibus et molestie. Pellentesque habitant morbi "
-                            "tristique senectus et netus et. Neque volutpat ac tincidunt vitae semper. "
-                            "Faucibus vitae aliquet nec ullamcorper sit amet risus nullam.",
+                            "description": "Within the confines of a digital realm, "
+                                           "a cryptic puzzle materializes on the screen. "
+                                           "It appears as a static image, unassuming at first glance. "
+                                           "Yet, in this virtual world, the challenge is no less mysterious."
+                                           "A seemingly ordinary image, pixel by pixel, conceals a hidden code. "
+                                           "To unlock its secrets, you must change the image itself. "
+                                           "With each  alteration, the pixels shift, "
+                                           "rearranging themselves into a new configuration. "
+                                           "The code, ever elusive, lurks just beneath the surface, "
+                                           "waiting to be discovered."
                         },
                     ),
                     {
@@ -127,23 +116,17 @@ class Level:
                                 )
                             ],
                             "dropdowns": [],
-                            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
-                            "tempor incididunt ut labore et dolore magna aliqua. Nullam ac tortor "
-                            "vitae purus faucibus. Velit euismod in pellentesque massa placerat duis "
-                            "ultricies lacus sed. Et sollicitudin ac orci phasellus egestas tellus. "
-                            "Non blandit massa enim nec dui nunc mattis enim. Eu non diam phasellus "
-                            "vestibulum lorem sed risus ultricies. Nisl tincidunt eget nullam non nisi "
-                            "est sit amet facilisis. Nulla aliquet enim tortor at auctor urna nunc id. "
-                            "Facilisis magna etiam tempor orci eu lobortis. Purus gravida quis blandit "
-                            "turpis cursus. Feugiat pretium nibh ipsum consequat nisl vel pretium. "
-                            "Donec massa sapien faucibus et molestie. Pellentesque habitant morbi "
-                            "tristique senectus et netus et. Neque volutpat ac tincidunt vitae semper. "
-                            "Faucibus vitae aliquet nec ullamcorper sit amet risus nullam.",
+                            "description": "Within the shadowy depths of the digital realm, a mysterious symbol "
+                                           "weaves a cryptic tale. As you tread cautiously through this enigmatic "
+                                           "landscape, look beyond the obvious, for the answer lies in the "
+                                           "unspoken_connector that guides the way. What compound_word emerges from "
+                                           "the darkness, uniting the virtual and the tangible with its "
+                                           "discreet_presence?"
                         },
                     ),
                     {
-                        "second_image": Path(image_dir_path, "doggo.jpg"),
-                        "secret_code": "secret",
+                        "second_image": Path(image_dir_path, "cases.jpeg"),
+                        "secret_code": "snake_case",
                         "MotionTransformer": None,
                     },
                 ),
@@ -158,19 +141,16 @@ class Level:
                             "dropdowns": [
                                 ["Rust", "Chocolate", "Flamenco", "Casablanca", "Buff"]
                             ],
-                            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
-                            "tempor incididunt ut labore et dolore magna aliqua. Nullam ac tortor "
-                            "vitae purus faucibus. Velit euismod in pellentesque massa placerat duis "
-                            "ultricies lacus sed. Et sollicitudin ac orci phasellus egestas tellus. "
-                            "Non blandit massa enim nec dui nunc mattis enim. Eu non diam phasellus "
-                            "vestibulum lorem sed risus ultricies. Nisl tincidunt eget nullam non nisi "
-                            "est sit amet facilisis. Nulla aliquet enim tortor at auctor urna nunc id. "
-                            "Facilisis magna etiam tempor orci eu lobortis. Purus gravida quis blandit "
-                            "turpis cursus. Feugiat pretium nibh ipsum consequat nisl vel pretium. "
-                            "Donec massa sapien faucibus et molestie. Pellentesque habitant morbi "
-                            "tristique senectus et netus et. Neque volutpat ac tincidunt vitae semper. "
-                            "Faucibus vitae aliquet nec ullamcorper sit amet risus nullam.",
-                            "buttons": ["swap"],
+                            "description": "The code is a lifeline, a thread of order within the digital chaos, "
+                                           "a signal in the noise. "
+                                           "As you decrypt its meaning, "
+                                           "you can't help but wonder what secrets it holds, "
+                                           "what mysteries it guards. "
+                                           "The digital world stretches out before you, "
+                                           "a labyrinth of information and intrigue, "
+                                           "daring you to continue your quest, "
+                                           "to unravel the enigma hidden within the noisy image.",
+                            "combo_box_buttons": ["swap"],
                         },
                     ),
                     {},
@@ -184,11 +164,20 @@ class Level:
                         {
                             "sliders": [],
                             "dropdowns": [],
-                            # "buttons": [
-                            #     "zoom in",
-                            #     "zoom out"
-                            # ]
-                        },
+                            "description": "In the enigmatic world of 'Digital Shadows,' you're not just a player; "
+                                           "you're an intrepid explorer of the digital frontier. As you venture "
+                                           "through hidden corners of the web, you'll encounter mysterious images "
+                                           "that seem to whisper hidden truths. In this realm, secrets are veiled "
+                                           "within intricate patterns, waiting for the discerning eye to unravel "
+                                           "their significance. But remember, to truly understand, you must 'look "
+                                           "under a different eye,' unveiling the cryptic messages concealed in these "
+                                           "enigmatic visuals. Only then can you gain passage to the deeper layers of "
+                                           "underground hacker dens, forgotten warehouses, and secure safe houses. "
+                                           "Decoding these clandestine messages is your ticket to unlocking the next "
+                                           "level of intrigue. Are you ready to uncover the secrets lurking in the "
+                                           "Digital Shadows?",
+                            "buttons": ["Unlock Digital Glyphs"]
+                        }
                     ),
                     {},
                 )
@@ -347,23 +336,14 @@ class Level:
                                 ),
                             ],
                             "dropdowns": [],
-                            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
-                            "tempor incididunt ut labore et dolore magna aliqua. Nullam ac tortor "
-                            "vitae purus faucibus. Velit euismod in pellentesque massa placerat duis "
-                            "ultricies lacus sed. Et sollicitudin ac orci phasellus egestas tellus. "
-                            "Non blandit massa enim nec dui nunc mattis enim. Eu non diam phasellus "
-                            "vestibulum lorem sed risus ultricies. Nisl tincidunt eget nullam non nisi "
-                            "est sit amet facilisis. Nulla aliquet enim tortor at auctor urna nunc id. "
-                            "Facilisis magna etiam tempor orci eu lobortis. Purus gravida quis blandit "
-                            "turpis cursus. Feugiat pretium nibh ipsum consequat nisl vel pretium. "
-                            "Donec massa sapien faucibus et molestie. Pellentesque habitant morbi "
-                            "tristique senectus et netus et. Neque volutpat ac tincidunt vitae semper. "
-                            "Faucibus vitae aliquet nec ullamcorper sit amet risus nullam.",
+                            "description": "We were unable to finish this level, "
+                                           "but we really liked this image editing functionality."
+                                           "Thanks for playing!"
                         },
                     ),
                     {
                         "second_image": None,
-                        "secret_code": "Turbo secret",
+                        "secret_code": "Picasso",
                         "MotionTransformer": MotionTransformer(
                             Image.open(image_dir_path / "snakepuzzle.jpg")
                         ),
