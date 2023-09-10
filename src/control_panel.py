@@ -98,13 +98,10 @@ class ControlPanel(QWidget):
 
             # Append the QComboBoxes to the list
             self.combo_boxes.append((combo_box1, combo_box2))
-
-
         # Adding combo box buttons
-        for button_text in widget_info.get('combo_box_buttons', []):
+        for button_text in widget_info.get("combo_box_buttons", []):
             button = QPushButton()
             button.setText(button_text)
-
             # Use default arguments in the lambda to capture the current values of combo_box1 and combo_box2
             # Assuming one button per pair of dropdowns.
             cb1, cb2 = self.combo_boxes.pop(
@@ -115,17 +112,15 @@ class ControlPanel(QWidget):
             )
 
             layout.addWidget(button)
-            
-
         # ASCII art button
-        for button_text in widget_info.get('buttons', []):
+        for button_text in widget_info.get("buttons", []):
             button = QPushButton()
             button.setText(button_text)
             if button_text == "Unlock Digital Glyphs":
-                button.clicked.connect(lambda btn=button: self.convert_to_ascii_art(button))
-
+                button.clicked.connect(
+                    lambda btn=button: self.convert_to_ascii_art(button)
+                )
             layout.addWidget(button)
-
         layout.addStretch()
 
     def grab_values(self, combo_box1: QComboBox, combo_box2: QComboBox) -> None:
