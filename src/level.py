@@ -4,9 +4,6 @@ from typing import Dict, List, Tuple, cast
 from PIL import Image
 from PyQt6.QtCore import Qt
 
-from lib.hidden_in_ascii.hidden_in_ascii import (
-    ascii_to_img, generate_ascii_file, prepare_input, seed_secret
-)
 from lib.motions.motions import MotionTransformer
 from src.control_panel import ControlPanel
 

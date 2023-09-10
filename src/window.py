@@ -78,17 +78,22 @@ class Window(QMainWindow):
         qsize = QSize(int(img_size.width() * scale_factor), int(img_size.height() * scale_factor))
         scaled_img = img.scaled(qsize)
 
-        if self.level.level_number == 4:
-            image_viewer = ImageViewer(self, qsize)
-            image_viewer.set_image(img)
-            layout.addWidget(image_viewer)
-        else:
-            # Convert img_label to an instance variable
-            self.img_label = QLabel(self)
-            self.img_label.setPixmap(scaled_img)
-            self.img_label.setScaledContents(True)  # Removes the discrepancy between true image size and QLabel size
+        # if self.level.level_number == 4:
+        #     image_viewer = ImageViewer(self, qsize)  # TODO LEO should this be without self?
+        #     image_viewer.set_image(img)
+        #     layout.addWidget(image_viewer)
+        # else:
+        #     # Convert img_label to an instance variable
+        #     self.img_label = QLabel(self)
+        #     self.img_label.setPixmap(scaled_img)
+        #     self.img_label.setScaledContents(True)  # Removes the discrepancy between true image size and QLabel size
 
-            layout.addWidget(self.img_label)
+        # Convert img_label to an instance variable
+        self.img_label = QLabel(self)
+        self.img_label.setPixmap(scaled_img)
+        self.img_label.setScaledContents(True)  # Removes the discrepancy between true image size and QLabel size
+
+        layout.addWidget(self.img_label)
         layout.addLayout(self._create_tabbed_controls())
 
         return frame

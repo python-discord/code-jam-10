@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import (
     QFrame, QHBoxLayout, QLabel, QSlider, QVBoxLayout, QWidget
 )
 
+from src.utils.apply_ascii_art import apply_ascii_art
 from src.utils.apply_color_swap import apply_color_swap
 from src.utils.apply_double_exposure import apply_double_exposure
 from src.utils.apply_motions import apply_motion
@@ -16,7 +17,7 @@ class Filter(QWidget):
     """Filter"""
 
     # Define a custom signal to be emitted when any slider changes its value
-    sliderValueChanged = pyqtSignal(str, int)
+    sliderValueChanged = pyqtSignal(str, int)  # TODO LEO there are two of this signal?
 
     def __init__(self, name: str, sliders_info: list):
         """Init"""
@@ -173,18 +174,29 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
             args["image_label_w"],
             args["image_label_h"]
         )
+    if filter_name == "Hidden in ASCII":
+        args_for_filter = {}
+        for key, value in args.items():
+            if key in (
+                    "image_to_edit",
+                    "image_label_w",
+                    "image_label_h",
+                    "secret"
+            ):
+                args_for_filter[key] = value
+        return apply_ascii_art(args_for_filter)
     if filter_name == "Motion":
         args_for_filter = {}
         for key, value in args.items():
             if key in (
-                "MotionTransformer",
-                "horizontal wave",
-                "vertical wave",
-                "horizontal spike",
-                "vertical spike",
-                "explode",
-                "image_label_w",
-                "image_label_h"
+                    "MotionTransformer",
+                    "horizontal wave",
+                    "vertical wave",
+                    "horizontal spike",
+                    "vertical spike",
+                    "explode",
+                    "image_label_w",
+                    "image_label_h"
             ):
                 args_for_filter[key] = value
         return apply_motion(args_for_filter)
