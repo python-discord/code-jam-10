@@ -49,7 +49,7 @@ class Lsb(Steganography):
 
         bits = byteutils.iter_bits(bytes_input)
         pixel_data = img.pixels
-        for pixel in self.pixels_generator(img.pixels, bytes_input=bytes_input):
+        for pixel in self.pixels_generator(pixel_data, bytes_input=bytes_input):
             for idx, channel in enumerate(pixel):
                 try:
                     bit = next(bits)
