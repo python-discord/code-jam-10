@@ -12,25 +12,14 @@ def apply_motion(args: dict) -> QPixmap:
     """
     mt: MotionTransformer = args["MotionTransformer"]
     try:
-        if "horizontal wave" in args:
-            horizontal_wave = int(args["horizontal wave"]) * 5 / 100
-        else:
-            horizontal_wave = 0
-        if "vertical wave" in args:
-            vertical_wave = int(args["vertical wave"]) * 5 / 100
-        else:
-            vertical_wave = 0
-        if "vertical spike" in args:
-            vertical_spike = int(args["vertical spike"]) * 5 / 100
-        else:
-            vertical_spike = 0
-        if "horizontal spike" in args:
-            horizontal_spike = int(args["horizontal spike"]) * 5 / 100
-        else:
-            horizontal_spike = 0
-
         image = mt.calculate_output(
-            (horizontal_wave, vertical_wave, vertical_spike, horizontal_spike)
+            (
+                args.get("horizontal wave", 0) * 5 / 100,
+                args.get("vertical wave", 0) * 5 / 100,
+                args.get("vertical spike", 0) * 5 / 100,
+                args.get("horizontal spike", 0) * 5 / 100,
+                args.get("explode", 0) * 5 / 100,
+            )
         )
         image = image.convert("RGBA")
         data = image.tobytes("raw", "BGRA")

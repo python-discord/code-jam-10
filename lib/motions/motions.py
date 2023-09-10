@@ -101,6 +101,34 @@ class Effect:
         offset = np.abs(ymesh % spike_distance - spike_distance // 2) * magnitude * 2
         return xmesh + offset, ymesh
 
+    @staticmethod
+    def explode(
+        xmesh: NDArray, ymesh: NDArray, magnitude: float = 1
+    ) -> tuple[NDArray, NDArray]:
+        """
+        Creates a motion outward from the center
+
+        :param xmesh: a mesh grid for x-axis
+        :param ymesh: a mesh grid for y-axis
+        :param magnitude: the magnitude of the effect
+        :return: xmesh, ymesh
+        """
+        height, width = xmesh.shape
+        normalized_distance = (
+            (2 * xmesh / width - 1) ** 2 + (2 * ymesh / height - 1) ** 2
+        ) ** 0.5
+        new_distance = normalized_distance / (
+            np.maximum(
+                (1.5 - normalized_distance) * 3 * (abs(magnitude) + 0.000001) ** 0.8
+                + 0.2,
+                1,
+            )
+            + 0.0000001
+        )
+        xmesh = (xmesh - width / 2) * new_distance / normalized_distance + width / 2
+        ymesh = (ymesh - height / 2) * new_distance / normalized_distance + height / 2
+        return xmesh, ymesh
+
 
 def explode(
     xmesh: NDArray, ymesh: NDArray, magnitude: float = 1
@@ -138,6 +166,7 @@ class MotionTransformer:
             Effect.vertical_wave,
             Effect.vertical_spike,
             Effect.horizontal_spike,
+            Effect.explode,
         ),
     ) -> None:
         self.img = img
@@ -150,7 +179,7 @@ class MotionTransformer:
         self.cache: OrderedDict[
             tuple[str, float], tuple[NDArray, NDArray]
         ] = OrderedDict()
-        self.cache_capacity = 10
+        self.cache_capacity: int = 10
 
     def reset_cache(self) -> None:
         """
