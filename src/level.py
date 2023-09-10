@@ -37,7 +37,7 @@ class Level:
         if self.level_number == 4:
             return Path(image_dir_path, "desert.jpg")
         if self.level_number == 5:
-            return Path(image_dir_path, "snakepuzzle.jpg")
+            return Path(image_dir_path, "white.jpg")
         return Path(image_dir_path, "default.png")
 
     def get_secret_answer(self) -> str:
@@ -56,7 +56,7 @@ class Level:
         if self.level_number == 4:
             return "obfuscation"
         if self.level_number == 5:
-            return "secret"
+            return "codes"
         return "pythoncodejam2023"
 
     def get_filters(self) -> FilterList:
@@ -343,9 +343,10 @@ class Level:
                     ),
                     {
                         "second_image": None,
-                        "secret_code": "Picasso",
+                        "secret_code": "codes",
                         "MotionTransformer": MotionTransformer(
-                            Image.open(image_dir_path / "snakepuzzle.jpg")
+                            Image.open(image_dir_path / "snake.jpg")
+                            "codes"
                         ),
                     },
                 ),
