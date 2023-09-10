@@ -50,13 +50,13 @@ python src/main.py
 
 # Screenshots
 
-![Untitled](images/menu.png)
+![Untitled](images/menu.webp)
 
-![Untitled](images/typing_colors.png)
+![Untitled](images/typing_colors.webp)
 
-![Untitled](images/steg.png)
+![Untitled](images/steg.webp)
 
-![Untitled](images/decrypt.png)
+![Untitled](images/decrypt.webp)
 
 ## License
 
