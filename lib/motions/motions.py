@@ -7,7 +7,7 @@ import numpy as np
 from numpy.typing import NDArray
 from PIL import Image
 
-np.seterr(divide='ignore', invalid='ignore')
+np.seterr(divide="ignore", invalid="ignore")
 
 
 class PIXEL_INTERPOLATION_METHOD(Enum):
@@ -35,7 +35,7 @@ class Effect:
 
     @staticmethod
     def vertical_wave(
-            xmesh: NDArray, ymesh: NDArray, magnitude: float = 1, wavenum: float = 1.5
+        xmesh: NDArray, ymesh: NDArray, magnitude: float = 1, wavenum: float = 1.5
     ) -> tuple[NDArray, NDArray]:
         """
         Add vertical waves to Image
@@ -52,7 +52,7 @@ class Effect:
 
     @staticmethod
     def horizontal_wave(
-            xmesh: NDArray, ymesh: NDArray, magnitude: float = 1, wavenum: float = 1.5
+        xmesh: NDArray, ymesh: NDArray, magnitude: float = 1, wavenum: float = 1.5
     ) -> tuple[NDArray, NDArray]:
         """
         Add horizontal waves to Image
@@ -69,7 +69,7 @@ class Effect:
 
     @staticmethod
     def vertical_spike(
-            xmesh: NDArray, ymesh: NDArray, magnitude: float = 1, spikenum: float = 5
+        xmesh: NDArray, ymesh: NDArray, magnitude: float = 1, spikenum: float = 5
     ) -> tuple[NDArray, NDArray]:
         """
         Add vertical spikes to Image
@@ -87,7 +87,7 @@ class Effect:
 
     @staticmethod
     def horizontal_spike(
-            xmesh: NDArray, ymesh: NDArray, magnitude: float = 1, spikenum: float = 5
+        xmesh: NDArray, ymesh: NDArray, magnitude: float = 1, spikenum: float = 5
     ) -> tuple[NDArray, NDArray]:
         """
         Add horizontal spikes to Image
@@ -105,7 +105,7 @@ class Effect:
 
     @staticmethod
     def explode(
-            xmesh: NDArray, ymesh: NDArray, magnitude: float = 1
+        xmesh: NDArray, ymesh: NDArray, magnitude: float = 1
     ) -> tuple[NDArray, NDArray]:
         """
         Creates a motion outward from the center
@@ -117,15 +117,15 @@ class Effect:
         """
         height, width = xmesh.shape
         normalized_distance = (
-                                      (2 * xmesh / width - 1) ** 2 + (2 * ymesh / height - 1) ** 2
-                              ) ** 0.5
+            (2 * xmesh / width - 1) ** 2 + (2 * ymesh / height - 1) ** 2
+        ) ** 0.5
         new_distance = normalized_distance / (
-                np.maximum(
-                    (1.5 - normalized_distance) * 3 * (abs(magnitude) + 0.000001) ** 0.8
-                    + 0.2,
-                    1,
-                )
-                + 0.0000001
+            np.maximum(
+                (1.5 - normalized_distance) * 3 * (abs(magnitude) + 0.000001) ** 0.8
+                + 0.2,
+                1,
+            )
+            + 0.0000001
         )
         xmesh = (xmesh - width / 2) * new_distance / normalized_distance + width / 2
         ymesh = (ymesh - height / 2) * new_distance / normalized_distance + height / 2
@@ -133,7 +133,7 @@ class Effect:
 
 
 def explode(
-        xmesh: NDArray, ymesh: NDArray, magnitude: float = 1
+    xmesh: NDArray, ymesh: NDArray, magnitude: float = 1
 ) -> tuple[NDArray, NDArray]:
     """
     Creates a motion outward from the center - work in progress
@@ -145,10 +145,10 @@ def explode(
     """
     height, width = xmesh.shape
     normalized_distance = (
-                                  (xmesh / width - 0.5) ** 2 + (ymesh / height - 0.5) ** 2
-                          ) ** 0.5
+        (xmesh / width - 0.5) ** 2 + (ymesh / height - 0.5) ** 2
+    ) ** 0.5
     new_distance = normalized_distance / (
-            np.maximum((1 - normalized_distance) * 3 * magnitude, 1) + 0.1
+        np.maximum((1 - normalized_distance) * 3 * magnitude, 1) + 0.1
     )
     xmesh = (xmesh - width / 2) * new_distance / normalized_distance + width / 2
     ymesh = (ymesh - height / 2) * new_distance / normalized_distance + height / 2
@@ -159,17 +159,17 @@ class MotionTransformer:
     """Processes all motion effects together to save on pre-processing and post-processing required for each"""
 
     def __init__(
-            self,
-            img: Image.Image,
-            interpolation: PIXEL_INTERPOLATION_METHOD = PIXEL_INTERPOLATION_METHOD.INTEGER,
-            fill_method: OFF_CANVAS_FILL = OFF_CANVAS_FILL.MIRROR,
-            funclist: Iterable[Callable] = (
-                    Effect.horizontal_wave,
-                    Effect.vertical_wave,
-                    Effect.vertical_spike,
-                    Effect.horizontal_spike,
-                    Effect.explode,
-            ),
+        self,
+        img: Image.Image,
+        interpolation: PIXEL_INTERPOLATION_METHOD = PIXEL_INTERPOLATION_METHOD.INTEGER,
+        fill_method: OFF_CANVAS_FILL = OFF_CANVAS_FILL.MIRROR,
+        funclist: Iterable[Callable] = (
+            Effect.horizontal_wave,
+            Effect.vertical_wave,
+            Effect.vertical_spike,
+            Effect.horizontal_spike,
+            Effect.explode,
+        ),
     ) -> None:
         self.img = img
         self.interpolation = interpolation
