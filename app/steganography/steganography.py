@@ -11,7 +11,7 @@ class Image:
 
     def __init__(self, filename: Path):
         self.__filename = filename
-        self.__image = PIL.Image.open(str(filename))
+        self.__image = PIL.Image.open(str(filename)).convert('RGB')
 
     def __iter__(self):
         """Iterate over the image's pixels."""
