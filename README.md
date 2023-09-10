@@ -22,13 +22,13 @@ This Python Project is made using:
 - [Python 3](https://www.python.org/downloads/)
 - [Pillow](https://pypi.org/project/Pillow/)
 - [NumPy](https://pypi.org/project/numpy/)
-- Love
+- [Love ❤️](https://raw.githubusercontent.com/inkontoasty/the-neverending-loops/main/images/love.png)
 
 ### Features
 
 - Typing Colors
 
-  Typing Colors is a
+
 
 - Steganography
 
