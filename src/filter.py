@@ -34,8 +34,14 @@ class Filter(QWidget):
             layout.addWidget(QLabel(slider_label))
             slider = QSlider(slider_orientation)
             slider.setRange(*slider_range)
-            slider.valueChanged.connect(lambda value, lbl=slider_label: self._on_slider_value_changed(lbl, value))
-            slider_frame = self.style_slider(slider, slider_range, slider_orientation == Qt.Orientation.Horizontal)
+            slider.valueChanged.connect(
+                lambda value, lbl=slider_label: self._on_slider_value_changed(
+                    lbl, value
+                )
+            )
+            slider_frame = self.style_slider(
+                slider, slider_range, slider_orientation == Qt.Orientation.Horizontal
+            )
             layout.addWidget(slider_frame)
 
             self.sliders[slider_label] = slider
@@ -139,7 +145,7 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
         new_img = apply_double_exposure(
             args_for_filter["image_to_edit"],
             args_for_filter["second_image"],
-            args_for_filter["Exposure"]
+            args_for_filter["Exposure"],
         )
         return new_img
     if filter_name == "Ishihara":
@@ -151,39 +157,29 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
                 args_for_filter["B"] = value
             if key == "image_to_edit":
                 args_for_filter["image_to_edit"] = value
-        new_img = apply_unmask_reverse_ishihara(
-            args_for_filter
-        )
+        new_img = apply_unmask_reverse_ishihara(args_for_filter)
         return new_img
     if filter_name == "Color Swap":
         args_for_filter = {}
 
-        for key, value in args.items():
-            if key == "first_color":
-                args_for_filter["first_color"] = value
-            if key == "second_color":
-                args_for_filter["second_color"] = value
-            if key == "image_to_edit":
-                args_for_filter["image_to_edit"] = value
         new_img = apply_color_swap(
-            args_for_filter["image_to_edit"],
-            args_for_filter["first_color"],
-            args_for_filter["second_color"]
+            args.get("image_to_edit", 0),
+            args.get("first_color", 0),
+            args.get("second_color", 0),
         )
         return new_img
     if filter_name == "Motion":
         args_for_filter = {}
         for key, value in args.items():
-            if key == "horizontal wave":
-                args_for_filter["horizontal wave"] = value
-            elif key == "vertical wave":
-                args_for_filter["vertical wave"] = value
-            elif key == "horizontal spike":
-                args_for_filter["horizontal spike"] = value
-            elif key == "vertical spike":
-                args_for_filter["vertical spike"] = value
-            elif key == "MotionTransformer":
-                args_for_filter["MotionTransformer"] = value
+            if key in (
+                "MotionTransformer",
+                "horizontal wave",
+                "vertical wave",
+                "horizontal spike",
+                "vertical spike",
+                "explode",
+            ):
+                args_for_filter[key] = value
         new_img = apply_motion(args_for_filter)
         return new_img
     return QPixmap()
