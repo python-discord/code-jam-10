@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import (
 )
 
 from src.filter import apply_filter
+from src.image_viewer import ImageViewer
 from src.level import Level
 
 
@@ -18,12 +19,14 @@ class Dock(QWidget):
     # Define a new signal at the top of the class
     controlValueChanged = pyqtSignal(str, int)
 
-    def __init__(self, level: Level, image_label: QLabel, update_secret_code_callback: Callable) -> None:
+    def __init__(self, level: Level, image_label: QLabel, image_display: QWidget,
+                 update_secret_code_callback: Callable) -> None:
         super().__init__()
 
         self.level = level
         self._update_secret_code = update_secret_code_callback
         self.img_label = image_label
+        self.image_display = image_display
         self.filters = []
         self.args_cache: Dict[str, int | str] = {}
 
@@ -50,6 +53,8 @@ class Dock(QWidget):
                     }
                 )
             )
+
+            control_panel.ascii.connect(lambda cp=control_panel: self.update_image_to_ascii(cp.title))
             self.filters.append(control_panel)
 
         layout = self._create_central_dock()
@@ -200,3 +205,23 @@ class Dock(QWidget):
         :return:
         """
         self.img_label.setPixmap(image)
+
+    def update_image_to_ascii(self, filter_title: str) -> None:
+        """
+        Update the image to ascii art
+
+        :return:
+        """
+        args_to_pass = self.args_cache
+        args_to_pass["image_to_edit"] = str(self.level.get_image_source())
+        args_to_pass["secret"] = self.level.get_secret_answer()
+        new_image = apply_filter(filter_title, args_to_pass)
+
+        # Replace QLabel image with ImageViewer to allow mouse wheel and drag event for zooming
+        image_viewer = ImageViewer(QSize(self.img_label.width(), self.img_label.height()))
+        image_viewer.set_image(new_image)
+
+        frame_layout = self.image_display.layout()
+        frame_layout.replaceWidget(self.img_label, image_viewer)
+        self.img_label.deleteLater()
+        frame_layout.update()

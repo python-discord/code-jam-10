@@ -46,7 +46,7 @@ class Window(QMainWindow):
         main_layout.addWidget(image_display, 1, 1)
 
         # Central dock
-        self.dock = Dock(self.level, self.img_label, self._update_secret_code)
+        self.dock = Dock(self.level, self.img_label, image_display, self._update_secret_code)
         main_layout.addWidget(self.dock, 2, 1)
 
         return main_layout
@@ -74,7 +74,8 @@ class Window(QMainWindow):
         width_scale = max_width / img_size.width()
         height_scale = max_height / img_size.height()
         scale_factor = min(width_scale, height_scale)
-        scaled_img = img.scaled(QSize(int(img_size.width() * scale_factor), int(img_size.height() * scale_factor)))
+        qsize = QSize(int(img_size.width() * scale_factor), int(img_size.height() * scale_factor))
+        scaled_img = img.scaled(qsize)
 
         # Convert img_label to an instance variable
         self.img_label = QLabel(self)

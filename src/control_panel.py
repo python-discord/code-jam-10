@@ -49,6 +49,7 @@ class ControlPanel(QWidget):
     # Define a new signal at the top of the class
     sliderValueChanged = pyqtSignal(str, int)
     comboBoxesSwapped = pyqtSignal(str, str)
+    ascii = pyqtSignal()
 
     def __init__(self, title: str, widget_info: dict):
         super().__init__()
@@ -92,8 +93,8 @@ class ControlPanel(QWidget):
             # Append the QComboBoxes to the list
             self.combo_boxes.append((combo_box1, combo_box2))
 
-        # Adding buttons
-        for button_text in widget_info.get('buttons', []):
+        # Adding combo box buttons
+        for button_text in widget_info.get('combo_box_buttons', []):
             button = QPushButton()
             button.setText(button_text)
 
@@ -104,6 +105,15 @@ class ControlPanel(QWidget):
 
             layout.addWidget(button)
 
+        # ASCII art button
+        for button_text in widget_info.get('buttons', []):
+            button = QPushButton()
+            button.setText(button_text)
+            if button_text == "Unlock Digital Glyphs":
+                button.clicked.connect(lambda btn=button: self.convert_to_ascii_art(button))
+
+            layout.addWidget(button)
+
         layout.addStretch()
 
     def grab_values(self, combo_box1: QComboBox, combo_box2: QComboBox) -> None:
@@ -111,6 +121,11 @@ class ControlPanel(QWidget):
         value1 = combo_box1.currentText()
         value2 = combo_box2.currentText()
         self.comboBoxesSwapped.emit(value1, value2)
+
+    def convert_to_ascii_art(self, button: QPushButton) -> None:
+        """Request to update the image to ASCII art"""
+        button.setDisabled(True)
+        self.ascii.emit()
 
     def forward_signal(self, label: str, value: int) -> None:
         """
