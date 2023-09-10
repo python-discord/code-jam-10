@@ -4,8 +4,17 @@ import re
 from google.cloud import vision
 
 
-def find_bounds(image_file:str, text:str, regex:bool=False):
-    
+def find_bounds(image_file: str, text: str, regex: bool = False) -> list[tuple[int, int, int, int]]:
+    """Gets bounding boxes of text from an image based on text to match, which can be regex
+
+    Args:
+        image_file (str): File path to image
+        text (str): Text to match, or regex
+        regex (bool, optional): If the text is regex. Defaults to False.
+
+    Returns:
+        list[tuple[int, int, int, int]]: List of bounding boxes for each character to hide
+    """
     client = vision.ImageAnnotatorClient()
 
     bounds = []
@@ -17,8 +26,6 @@ def find_bounds(image_file:str, text:str, regex:bool=False):
 
     response = client.document_text_detection(image=image)
     document = response.full_text_annotation
-    
-
     if (text.lower() not in document.text.lower() and not regex):
         return []
 
@@ -29,14 +36,23 @@ def find_bounds(image_file:str, text:str, regex:bool=False):
                 text = list(itertools.chain(*matches))
             else:
                 text = matches
-    
     image_chars = []
     for page in document.pages:
         for block in page.blocks:
             for paragraph in block.paragraphs:
                 for word in paragraph.words:
                     for symbol in word.symbols:
-                        image_chars.append([symbol.text.lower(), (symbol.bounding_box.vertices[0].x, symbol.bounding_box.vertices[0].y, symbol.bounding_box.vertices[2].x, symbol.bounding_box.vertices[2].y)])
+                        image_chars.append(
+                            [
+                                symbol.text.lower(),
+                                (
+                                    symbol.bounding_box.vertices[0].x,
+                                    symbol.bounding_box.vertices[0].y,
+                                    symbol.bounding_box.vertices[2].x,
+                                    symbol.bounding_box.vertices[2].y
+                                )
+                            ]
+                        )
 
     if not regex:
         text_index = 0
@@ -47,12 +63,9 @@ def find_bounds(image_file:str, text:str, regex:bool=False):
                     text_index += 1
             except IndexError as e:
                 print(e)
-                # equal = False
                 text_index = 0
                 temp_bounds.clear()
             if text[text_index].lower() == image_char[0]:
-                # equal = True
-                
                 text_index += 1
                 temp_bounds.append(image_char[1])
                 if text_index == len(text):
@@ -62,17 +75,15 @@ def find_bounds(image_file:str, text:str, regex:bool=False):
             elif text[text_index].lower() != image_char[0]:
                 text_index = 0
                 temp_bounds.clear()
-                
-    
     return bounds
-
-
 
 
 if __name__ == "__main__":
     import pathlib
-    from .colour_box import ColourBox
+
     from PIL import Image
+
+    from .colour_box import ColourBox
     current_dir = str(pathlib.Path(__file__).parent)
     bounds = find_bounds(current_dir + '/img2.webp', "Oscar Wilde")
     print(bounds)
