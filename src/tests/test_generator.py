@@ -5,15 +5,15 @@ from src.piet.interpreter import StepLimitReached
 
 
 @pytest.mark.parametrize(
-    ("data", "cols"),
+    ("data",),
     [
-        (b"AB", 1),
-        (b"Hello, world! This a test string.", 4),
+        b"AB",
+        b"Hello, world! This a test string.",
     ],
 )
-def test_generator(data: bytes, cols: int):
+def test_generator(data: bytes):
     generator = ImageGenerator()
-    encoded = generator.generate_image(data, cols)
+    encoded = generator.generate_image(data)
     encoded.save(f"{__file__}.png")
     interpreter = PietInterpreter(encoded, debug=True)
     exc = interpreter.run()
@@ -24,16 +24,16 @@ def test_generator(data: bytes, cols: int):
 
 
 @pytest.mark.parametrize(
-    ("data", "cols", "key"),
+    ("data", "key"),
     [
-        (b"AB", 1, b"passkey"),
-        (b"Hello, world! This a test string.", 4, b"a longer passkey"),
+        (b"AB", b"passkey"),
+        (b"Hello, world! This a test string.", b"a longer passkey"),
     ],
 )
-def test_generator_with_key(data: bytes, cols: int, key: bytes):
+def test_generator_with_key(data: bytes, key: bytes):
     key *= len(data) // len(key) + 1
     generator = ImageGenerator()
-    encoded = generator.generate_image(data, cols, key)
+    encoded = generator.generate_image(data, key)
     encoded.save(f"{__file__}.png")
     interpreter = PietInterpreter(encoded, input=key, debug=True)
     exc = interpreter.run()

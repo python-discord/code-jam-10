@@ -15,7 +15,7 @@ app = typer.Typer()
 def generate(
     input_path: Path,
     output_path: Path,
-    cols: int = 2,
+    cols: Optional[int] = None,
     input: str = "",
     step_limit: int = 1_000_000,
     debug: bool = False,
@@ -32,7 +32,7 @@ def generate(
     if key:
         key *= len(data) // len(key) + 1
         command += f' --input "{key.decode()}"'
-    image = generator.generate_image(data, cols, key)
+    image = generator.generate_image(data, key, cols)
     image.save(output_path)
     print("\n")
     print("Successfully generated a Piet program!")

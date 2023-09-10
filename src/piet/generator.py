@@ -1,3 +1,4 @@
+import math
 import sys
 from enum import Enum
 from io import BytesIO
@@ -130,9 +131,11 @@ class ImageGenerator:
         image.putdata(color_ints)
         return image
 
-    def generate_image(self, data: bytes, cols: int = 2, key: bytes = b"") -> Image.Image:
+    def generate_image(self, data: bytes, key: bytes = b"", cols: int | None = None) -> Image.Image:
         """Construct a Piet program that outputs the data given."""
         length = len(data)
+        if not cols:
+            cols = math.ceil(math.sqrt(length / 256))
         self.set_next_command(PietCommand.NOOP, 6)
         for i, byte in enumerate(data):
             if key:
