@@ -54,7 +54,7 @@ class Level:
         if self.level_number == 3:
             return "200012"
         if self.level_number == 4:
-            return "secret"
+            return "obfuscation"
         if self.level_number == 5:
             return "secret"
         return "pythoncodejam2023"
