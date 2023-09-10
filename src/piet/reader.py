@@ -19,14 +19,17 @@ class Codel(NamedTuple):
 
 
 class ImageReader:
-    def __init__(self, image: Image.Image) -> None:
+    def __init__(self, image: Image.Image):
+        self.colors = self._image_to_colors(image)
+
+    def _image_to_colors(self, image: Image.Image) -> list[list[Color]]:
         colors: list[list[Color]] = []
         for y in range(image.height):
             row = []
             for x in range(image.width):
                 row.append(Color(*image.getpixel((x, y))))
             colors.append(row)
-        self.colors = colors
+        return colors
 
     def codel_info(self, pos: OrderedPair, /) -> Codel:
         """Return information about the codel that contains pos (y,x)."""
@@ -99,4 +102,4 @@ class ImageReader:
         """Return the size of image after scaling it down to a codel size of 1 pixel."""
         height, width = len(self.colors), len(self.colors[0])
         codel_size = self.smallest_codel()
-        return OrderedPair(width // codel_size, height // codel_size)
+        return OrderedPair(height // codel_size, width // codel_size)
