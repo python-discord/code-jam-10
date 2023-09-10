@@ -49,31 +49,23 @@ def find_bounds(image_content: bytes, text: str, regex: bool = False) -> list[tu
                 for word in paragraph.words:
                     for symbol in word.symbols:
                         if not regex:
-                            image_chars.append(
-                                [
-                                    symbol.text.lower(),
-                                    (
-                                        symbol.bounding_box.vertices[0].x,
-                                        symbol.bounding_box.vertices[0].y,
-                                        symbol.bounding_box.vertices[2].x,
-                                        symbol.bounding_box.vertices[2].y
-                                    )
-                                ]
-                            )
+                            image_chars.append([
+                                symbol.text.lower(),
+                                (symbol.bounding_box.vertices[0].x,
+                                 symbol.bounding_box.vertices[0].y,
+                                 symbol.bounding_box.vertices[2].x,
+                                 symbol.bounding_box.vertices[2].y)
+                            ])
                         else:
-                            image_chars.append(
-                                [
-                                    symbol.text,
-                                    (
-                                        symbol.bounding_box.vertices[0].x,
-                                        symbol.bounding_box.vertices[0].y,
-                                        symbol.bounding_box.vertices[2].x,
-                                        symbol.bounding_box.vertices[2].y
-                                    )
-                                ]
-                            )
-
+                            image_chars.append([
+                                symbol.text,
+                                (symbol.bounding_box.vertices[0].x,
+                                 symbol.bounding_box.vertices[0].y,
+                                 symbol.bounding_box.vertices[2].x,
+                                 symbol.bounding_box.vertices[2].y)
+                            ])
     if not regex:
+        text = text.lower()
         text_index = 0
         temp_bounds = []
         for image_char in image_chars:
@@ -84,14 +76,14 @@ def find_bounds(image_content: bytes, text: str, regex: bool = False) -> list[tu
                 print(e)
                 text_index = 0
                 temp_bounds.clear()
-            if text[text_index].lower() == image_char[0]:
+            if text[text_index].lower() == image_char[0].lower():
                 text_index += 1
                 temp_bounds.append(image_char[1])
                 if text_index == len(text):
                     bounds.extend(temp_bounds.copy())
                     temp_bounds.clear()
                     text_index = 0
-            elif text[text_index].lower() != image_char[0]:
+            elif text[text_index].lower() != image_char[0].lower():
                 text_index = 0
                 temp_bounds.clear()
     else:

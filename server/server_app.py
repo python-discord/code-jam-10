@@ -6,14 +6,15 @@ app = Flask(__name__)
 
 @app.get('/')
 def home():
-    """Just to show the site is working if we visit from browser"""
+    """We can check if the site is up"""
     return "<p>Hello</p>"
 
 
 @app.post("/")
 def send_boxes():
-    """Returns the data from the function call"""
-    return find_bounds(request.files['file'].read(), request.form["text"], request.form["regex"])
+    """Returns bounds"""
+    return find_bounds(request.files['file'].read(), request.form["text"],
+                       request.form["regex"] == "True")
 
 
 app.run(host='0.0.0.0', port=81)

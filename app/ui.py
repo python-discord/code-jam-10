@@ -166,7 +166,7 @@ def main():
                 no_window=True,
                 file_types=(("All Picture Files", "*.jpg *.png *.jpeg"),),
             )
-            print(filename)
+
             if filename:
                 # Open Image
                 image = Image.open(filename)
@@ -227,8 +227,6 @@ def main():
         elif event == UIKey.APPLY_OBFUSCATE:
             text = values[UIKey.OBFUSCATE_TEXT_INPUT]
             bounds = find_bounds(filename, text)
-            # print(text)
-            # print(bounds)
             img = Image.open(filename)
             if values["box"] is True:
                 colour_box = ColourBox((0, 0, 0))
