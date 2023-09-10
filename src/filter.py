@@ -1,11 +1,15 @@
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QSlider, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import (
+    QFrame, QHBoxLayout, QLabel, QSlider, QVBoxLayout, QWidget
+)
 
 from src.Utils.apply_color_swap import apply_color_swap
 from src.Utils.apply_double_exposure import apply_double_exposure
 from src.Utils.apply_motions import apply_motion
-from src.Utils.apply_unmask_reverse_ishihara import apply_unmask_reverse_ishihara
+from src.Utils.apply_unmask_reverse_ishihara import (
+    apply_unmask_reverse_ishihara
+)
 
 
 class Filter(QWidget):
