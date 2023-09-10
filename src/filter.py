@@ -178,4 +178,4 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
                 args_for_filter[key] = value
         new_img = apply_motion(args_for_filter)
         return new_img
-    pass
+    return QPixmap()

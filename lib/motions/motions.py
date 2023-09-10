@@ -131,6 +131,29 @@ class Effect:
         return xmesh, ymesh
 
 
+def explode(
+    xmesh: NDArray, ymesh: NDArray, magnitude: float = 1
+) -> tuple[NDArray, NDArray]:
+    """
+    Creates a motion outward from the center - work in progress
+
+    :param xmesh: a mesh grid for x-axis
+    :param ymesh: a mesh grid for y-axis
+    :param magnitude: the magnitude of the effect
+    :return: xmesh, ymesh
+    """
+    height, width = xmesh.shape
+    normalized_distance = (
+        (xmesh / width - 0.5) ** 2 + (ymesh / height - 0.5) ** 2
+    ) ** 0.5
+    new_distance = normalized_distance / (
+        np.maximum((1 - normalized_distance) * 3 * magnitude, 1) + 0.1
+    )
+    xmesh = (xmesh - width / 2) * new_distance / normalized_distance + width / 2
+    ymesh = (ymesh - height / 2) * new_distance / normalized_distance + height / 2
+    return xmesh, ymesh
+
+
 class MotionTransformer:
     """Processes all motion effects together to save on pre-processing and post-processing required for each"""
 
