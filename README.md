@@ -41,3 +41,10 @@ $ python3 -m app ui
 # run the CLI
 $ python3 -m app cli <options> <args>
 ```
+
+#### Example CLI
+```shell
+python3 -m app cli watermark encode "secret message" data/image.jpg data/encoded_image.png
+python3 -m app cli watermark decode data/encoded_image.png
+secret message
+```
