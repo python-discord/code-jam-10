@@ -9,6 +9,7 @@ from src.control_panel import ControlPanel
 
 FilterItem = Tuple[Path, ControlPanel, Dict[str, Path | str | None | int]]
 FilterList = List[FilterItem]
+letters = [chr(i) for i in range(65, 65 + 21)]
 
 
 class Level:
@@ -37,7 +38,7 @@ class Level:
         if self.level_number == 4:
             return Path(image_dir_path, "desert.jpg")
         if self.level_number == 5:
-            return Path(image_dir_path, "img2.jpg")
+            return Path(image_dir_path, "white.jpg")
         return Path(image_dir_path, "default.png")
 
     def get_secret_answer(self) -> str:
@@ -77,8 +78,8 @@ class Level:
                         "Ishihara",
                         {
                             "sliders": [
-                                ("A", (0, 100), Qt.Orientation.Horizontal, True),
-                                ("B", (0, 100), Qt.Orientation.Horizontal, True),
+                                ("A", [], (0, 100), Qt.Orientation.Horizontal, True),
+                                ("B", [], (0, 100), Qt.Orientation.Horizontal, True),
                             ],
                             "dropdowns": [],
                             "description": "Within the confines of a digital realm, "
@@ -151,7 +152,6 @@ class Level:
                                            "to unravel the enigma hidden within the noisy image.",
                             "combo_box_buttons": ["swap"],
                         },
-
                     ),
                     {},
                 )
@@ -191,49 +191,53 @@ class Level:
                             "sliders": [
                                 (
                                     "horizontal wave",
+                                    letters,
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
                                     False,
                                 ),
                                 (
                                     "vertical wave",
+                                    letters,
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
                                     False,
                                 ),
                                 (
                                     "vertical spike",
+                                    letters,
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
                                     False,
                                 ),
                                 (
                                     "horizontal spike",
+                                    letters,
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
                                     False,
                                 ),
-                                ("explode", (0, 100), Qt.Orientation.Horizontal, False),
+                                (
+                                    "explode",
+                                    letters,
+                                    (0, 100),
+                                    Qt.Orientation.Horizontal,
+                                    False,
+                                ),
                             ],
                             "dropdowns": [],
-                            "description": "Your task: to undo the distortions and reveal the hidden image beneath. "
-                                           "With each adjustment, the chaos unravels, and the true form emerges from the digital haze. "
-                                           "It's a journey from obscurity to clarity, "
-                                           "where the final picture holds secrets yet to be uncovered. "
-                                           "The distorted image yearns for your touch, inviting you "
-                                           "to continue the quest, to unveil its concealed truth."
+                            "description": "We were unable to finish this level, "
+                                           "but we really liked this image editing functionality."
+                                           "Thanks for playing!"
                         },
                     ),
                     {
                         "second_image": None,
                         "secret_code": "codes",
-                        "MotionTransformer": MotionTransformer(
-                            Image.open(image_dir_path / "img2.jpg"),
-                            "codes"
-                        ),
+                        "MotionTransformer": MotionTransformer(Image.open(image_dir_path / "snake.jpg"), "codes"),
                     },
                 ),
-            ]
+            ],
         ]
 
         if 0 <= self.level_number - 1 < len(filters):
