@@ -1,10 +1,13 @@
 import itertools
+import json
+import os
 import re
+import tempfile
 
 from google.cloud import vision
 
 
-def find_bounds(image_file: str, text: str, regex: bool = False) -> list[tuple[int, int, int, int]]:
+def find_bounds(image_content: bytes, text: str, regex: bool = False) -> list[tuple[int, int, int, int]]:
     """Gets bounding boxes of text from an image based on text to match, which can be regex
 
     Args:
@@ -15,14 +18,17 @@ def find_bounds(image_file: str, text: str, regex: bool = False) -> list[tuple[i
     Returns:
         list[tuple[int, int, int, int]]: List of bounding boxes for each character to hide
     """
-    client = vision.ImageAnnotatorClient()
+    print("Creating a named temporary file..")
+    temp = tempfile.NamedTemporaryFile()
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = temp.name
 
+    temp.write(bytes(json.dumps(dict(os.environ)), 'utf-8'))
+    temp.seek(0)
+    client = vision.ImageAnnotatorClient()
+    temp.close()
     bounds = []
 
-    with open(image_file, "rb") as image_file:
-        content = image_file.read()
-
-    image = vision.Image(content=content)
+    image = vision.Image(content=image_content)
 
     response = client.document_text_detection(image=image)
     document = response.full_text_annotation
@@ -113,17 +119,17 @@ def find_bounds(image_file: str, text: str, regex: bool = False) -> list[tuple[i
     return bounds
 
 
-if __name__ == "__main__":
-    import pathlib
+# if __name__ == "__main__":
+#     import pathlib
 
-    from PIL import Image
+#     from PIL import Image
 
-    from .colour_box import ColourBox
-    current_dir = str(pathlib.Path(__file__).parent)
-    bounds = find_bounds(current_dir + '/img2.webp', r"NO ([A-Z]+)", True)
-    print(bounds)
-    img = Image.open(current_dir + '/img2.webp')
-    colour_box = ColourBox((0, 0, 0))
-    for bound in bounds:
-        colour_box.hide(bound, img)
-    img.save(current_dir + '/res.png')
+#     from .colour_box import ColourBox
+#     current_dir = str(pathlib.Path(__file__).parent)
+#     bounds = find_bounds(current_dir + '/img2.webp', r"NO ([A-Z]+)", True)
+#     print(bounds)
+#     img = Image.open(current_dir + '/img2.webp')
+#     colour_box = ColourBox((0, 0, 0))
+#     for bound in bounds:
+#         colour_box.hide(bound, img)
+#     img.save(current_dir + '/res.png')
