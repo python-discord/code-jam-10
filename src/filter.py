@@ -189,5 +189,7 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
                 args_for_filter["vertical spike"] = value
             elif key == "MotionTransformer":
                 args_for_filter["MotionTransformer"] = value
+            args_for_filter["image_label_w"] = args["image_label_w"]
+            args_for_filter["image_label_h"] = args["image_label_h"]
         return apply_motion(args_for_filter)
     return QPixmap()
