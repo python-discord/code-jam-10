@@ -58,7 +58,6 @@ class Image:
         newdata = list([tuple(rgb) for rgb in newdata])
         self.image.putdata(newdata)
 
-
     def save(self, file: Path):
         """Save the image to the given file
 
