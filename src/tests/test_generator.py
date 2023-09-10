@@ -5,7 +5,7 @@ from src.piet.interpreter import StepLimitReached
 
 
 @pytest.mark.parametrize(
-    ("data",),
+    "data",
     [
         b"AB",
         b"Hello, world! This a test string.",
