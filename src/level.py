@@ -78,8 +78,8 @@ class Level:
                         "Ishihara",
                         {
                             "sliders": [
-                                ("A", [], (0, 100), Qt.Orientation.Horizontal, True),
-                                ("B", [], (0, 100), Qt.Orientation.Horizontal, True),
+                                ("A", (0, 100), Qt.Orientation.Horizontal, True),
+                                ("B", (0, 100), Qt.Orientation.Horizontal, True),
                             ],
                             "dropdowns": [],
                             "description": "Within the confines of a digital realm, "
