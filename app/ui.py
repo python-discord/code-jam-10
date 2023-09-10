@@ -5,6 +5,9 @@ import PySimpleGUI as sg
 from PIL import Image
 
 from app import steganography
+from app.obfuscate.blur_box import BlurBox
+from app.obfuscate.colour_box import ColourBox
+from app.obfuscate.find_bounds import find_bounds
 
 
 class UIKey(StrEnum):
@@ -19,12 +22,14 @@ class UIKey(StrEnum):
     WATERMARK_FRAME = "-WATERMARK-"
     OBFUSCATE_FRAME = "-OBFUSCATE-"
     IMAGE = "-IMAGE-"
+    IMAGE2 = "-IMAGE2-"
 
 
 def main():
     """Main entry point of the UI"""
     sg.set_options(element_padding=(0, 0))
     image = Image.new("RGB", (600, 400))
+    mode = "watermark"
 
     # ------ Menu Definition ------ #
     menu_def = [
@@ -72,7 +77,7 @@ def main():
         [sg.Text("Press 'File > Open' select image to start.", size=(40, 1))],
         [
             sg.Image(
-                key=UIKey.IMAGE,
+                key=UIKey.IMAGE2,
                 size=(600, 400),
                 pad=(2, (2, 20)),
                 tooltip="Press 'File > Open' select image to start.",
@@ -86,9 +91,10 @@ def main():
                 focus=True,
                 tooltip="Enter text for obfuscation.",
                 pad=((2, 5), 2),
+                key=UIKey.OBFUSCATE_TEXT_INPUT,
             ),
-            sg.Radio("Box", "obfus-type", True, size=(3, 1)),
-            sg.Radio("Blur", "obfus-type", size=(3, 1)),
+            sg.Radio("Box", "obfus-type", key="box", default=True, size=(3, 1)),
+            sg.Radio("Blur", "obfus-type", key="blur", size=(3, 1)),
             sg.Button("Apply", key=UIKey.APPLY_OBFUSCATE, size=(8, 1), pad=((5, 0), 2)),
         ],
     ]
@@ -160,11 +166,16 @@ def main():
                 no_window=True,
                 file_types=(("All Picture Files", "*.jpg *.png *.jpeg"),),
             )
+            print(filename)
             if filename:
                 # Open Image
                 image = Image.open(filename)
                 bio = _get_image_for_ui(image)
-                window[UIKey.IMAGE].update(bio.getvalue())
+                if mode == "watermark":
+                    window[UIKey.IMAGE].update(bio.getvalue())
+                elif mode == 'obfuscate':
+                    window[UIKey.IMAGE2].update(bio.getvalue())
+
         elif event == "Save":
             # Open a popup to save image
             if image:
@@ -184,10 +195,12 @@ def main():
             # Switch to watermark frame
             window[UIKey.WATERMARK_FRAME].update(visible=True)
             window[UIKey.OBFUSCATE_FRAME].update(visible=False)
+            mode = "watermark"
         elif event == "Obfuscate":
             # Switch to Obfuscate frame
             window[UIKey.WATERMARK_FRAME].update(visible=False)
             window[UIKey.OBFUSCATE_FRAME].update(visible=True)
+            mode = "obfuscate"
         elif event == UIKey.APPLY_WATERMARK:
             text = values[UIKey.WATERMARK_TEXT_INPUT]
             encoding_mode = values[UIKey.WATERMARK_ENCODING_MODE]
@@ -211,6 +224,22 @@ def main():
                 sg.Popup("Image does not contain any encoded data!")
             else:
                 window[UIKey.WATERMARK_TEXT_INPUT].Update(decoded_text)
+        elif event == UIKey.APPLY_OBFUSCATE:
+            text = values[UIKey.OBFUSCATE_TEXT_INPUT]
+            bounds = find_bounds(filename, text)
+            # print(text)
+            # print(bounds)
+            img = Image.open(filename)
+            if values["box"] is True:
+                colour_box = ColourBox((0, 0, 0))
+                for bound in bounds:
+                    colour_box.hide(bound, img)
+            elif values['blur'] is True:
+                blur_box = BlurBox()
+                for bound in bounds:
+                    blur_box.hide(bound, img)
+            bio = _get_image_for_ui(img)
+            window[UIKey.IMAGE2].update(bio.getvalue())
 
 
 def _get_image_for_ui(image: Image) -> io.BytesIO:
