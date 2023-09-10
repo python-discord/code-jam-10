@@ -49,7 +49,7 @@ class ControlPanel(QWidget):
     # Define a new signal at the top of the class
     sliderValueChanged = pyqtSignal(str, int)
     comboBoxesSwapped = pyqtSignal(str, str)
-    zoom = pyqtSignal(str)
+    ascii = pyqtSignal()
 
     def __init__(self, title: str, widget_info: dict):
         super().__init__()
@@ -105,12 +105,12 @@ class ControlPanel(QWidget):
 
             layout.addWidget(button)
 
-        # Adding zoom buttons
+        # ASCII art button
         for button_text in widget_info.get('buttons', []):
             button = QPushButton()
             button.setText(button_text)
-            if button_text == "zoom in" or button_text == "zoom out":
-                button.clicked.connect(lambda checked, button_text=button_text: self.zoom_image(button_text))
+            if button_text == "Unlock Digital Glyphs":
+                button.clicked.connect(lambda checked: self.convert_to_ascii_art(checked))
 
             layout.addWidget(button)
 
@@ -122,9 +122,10 @@ class ControlPanel(QWidget):
         value2 = combo_box2.currentText()
         self.comboBoxesSwapped.emit(value1, value2)
 
-    def zoom_image(self, direction: str) -> None:
-        """Zoom the image shown in image label"""
-        self.zoom.emit(direction)
+    def convert_to_ascii_art(self, checked: bool) -> None:
+        """Request to update the image to ASCII art"""
+        print(f"CHECKED: {checked}")
+        self.ascii.emit()
 
     def forward_signal(self, label: str, value: int) -> None:
         """

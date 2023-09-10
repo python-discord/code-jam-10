@@ -51,7 +51,7 @@ class Dock(QWidget):
                 )
             )
 
-            control_panel.zoom.connect(lambda direction, cp=control_panel: self.zoom_image(cp.title, direction))
+            control_panel.ascii.connect(lambda: self.update_image_to_ascii())
             self.filters.append(control_panel)
 
         layout = self._create_central_dock()
@@ -203,31 +203,29 @@ class Dock(QWidget):
         """
         self.img_label.setPixmap(image)
 
-    def zoom_image(self, filter_title: str, direction: str) -> None:
+    def update_image_to_ascii(self) -> None:
         """
-        Zoom in the image label
+        Update the image to ascii art
 
-        :param filter_title:
-        :param direction: zoom in or zoom out
         :return:
         """
-        print(f"ZOOM REQUESTED {filter_title} {direction}")
+        print(f"Update to ASCII Requested")
         print(self.img_label)
 
-        # Get the current pixmap and scale it
-        current_pixmap = self.img_label.pixmap()
-        if direction == "zoom in":
-            if current_pixmap:
-                scaled_pixmap = current_pixmap.scaled(
-                    int(current_pixmap.width() * 1.2), int(current_pixmap.height() * 1.2)
-                )
-                self.img_label.setPixmap(scaled_pixmap)
-        elif direction == "zoom out":
-            if current_pixmap:
-                scaled_pixmap = current_pixmap.scaled(
-                    int(current_pixmap.width() * 0.8), int(current_pixmap.height() * 0.8)
-                )
-                self.img_label.setPixmap(scaled_pixmap)
-        else:
-            pass
-            #  TODO reset image size
+        # # Get the current pixmap and scale it
+        # current_pixmap = self.img_label.pixmap()
+        # if direction == "zoom in":
+        #     if current_pixmap:
+        #         scaled_pixmap = current_pixmap.scaled(
+        #             int(current_pixmap.width() * 1.2), int(current_pixmap.height() * 1.2)
+        #         )
+        #         self.img_label.setPixmap(scaled_pixmap)
+        # elif direction == "zoom out":
+        #     if current_pixmap:
+        #         scaled_pixmap = current_pixmap.scaled(
+        #             int(current_pixmap.width() * 0.8), int(current_pixmap.height() * 0.8)
+        #         )
+        #         self.img_label.setPixmap(scaled_pixmap)
+        # else:
+        #     pass
+        #     #  TODO reset image size

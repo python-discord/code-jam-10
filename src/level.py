@@ -38,13 +38,15 @@ class Level:
         if self.level_number == 3:
             return Path(image_dir_path, "number_hidden_image.png")
         if self.level_number == 4:
-            input_img, coordinates = prepare_input(Path(image_dir_path, "desert.jpg"))
-            output_img_path = Path(image_dir_path, "ascii_output.png")
-            ascii_file_path = Path(image_dir_path, "ascii.txt")
-            generate_ascii_file(input_img, ascii_file_path, 2)
-            seed_secret(ascii_file_path, self.get_secret_answer(), False)
-            ascii_to_img(ascii_file_path, coordinates, input_img.size, output_img_path)
-            return output_img_path
+            return Path(image_dir_path, "desert.jpg")
+            
+            # input_img, coordinates = prepare_input(Path(image_dir_path, "desert.jpg"))
+            # output_img_path = Path(image_dir_path, "ascii_output.png")
+            # ascii_file_path = Path(image_dir_path, "ascii.txt")
+            # generate_ascii_file(input_img, ascii_file_path, 2)
+            # seed_secret(ascii_file_path, self.get_secret_answer(), False)
+            # ascii_to_img(ascii_file_path, coordinates, input_img.size, output_img_path)
+            # return output_img_path
         if self.level_number == 5:
             return Path(image_dir_path, "img2.jpg")
         return Path(image_dir_path, "default.png")
@@ -184,11 +186,19 @@ class Level:
                         {
                             "sliders": [],
                             "dropdowns": [],
-                            "buttons": [
-                                "zoom in",
-                                "zoom out",
-                                "reset size"
-                            ]
+                            "description": "In the enigmatic world of 'Digital Shadows,' you're not just a player; "
+                                           "you're an intrepid explorer of the digital frontier. As you venture "
+                                           "through hidden corners of the web, you'll encounter mysterious images "
+                                           "that seem to whisper hidden truths. In this realm, secrets are veiled "
+                                           "within intricate patterns, waiting for the discerning eye to unravel "
+                                           "their significance. But remember, to truly understand, you must 'look "
+                                           "under a different eye,' unveiling the cryptic messages concealed in these "
+                                           "enigmatic visuals. Only then can you gain passage to the deeper layers of "
+                                           "underground hacker dens, forgotten warehouses, and secure safe houses. "
+                                           "Decoding these clandestine messages is your ticket to unlocking the next "
+                                           "level of intrigue. Are you ready to uncover the secrets lurking in the "
+                                           "Digital Shadows?",
+                            "buttons": ["Unlock Digital Glyphs"]
                         }
                     ),
                     {},
