@@ -1,6 +1,7 @@
 import math
 import sys
 import time
+from io import BytesIO
 from typing import Callable, Iterable, NamedTuple
 
 from PIL import Image
@@ -42,6 +43,7 @@ class PietInterpreter:
         self,
         image: Image.Image,
         *,
+        input: str | bytes = b"",
         step_limit: int = 1_000_000,
         debug: bool = False,
         runtime: PietRuntime | None = None,
@@ -49,7 +51,9 @@ class PietInterpreter:
         self.step_limit = step_limit
         self.debug = debug
         self.reader = ImageReader(image)
-        self.runtime = runtime or PietRuntime()
+        if isinstance(input, str):
+            input = input.encode()
+        self.runtime = runtime or PietRuntime(input_buffer=BytesIO(input))
         self.iteration = 0
         self.steps: list[StepTrace] = []
         self._last_codel = self.reader.codel_info(self.position)

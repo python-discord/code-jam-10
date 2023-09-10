@@ -3,8 +3,8 @@ import string
 import sys
 from collections import deque
 from enum import Enum, IntEnum
-from io import StringIO
-from typing import Callable, TextIO
+from io import BytesIO
+from typing import BinaryIO, Callable
 from warnings import warn
 
 from .common import OrderedPair
@@ -87,12 +87,12 @@ def pass_on_empty_stack(func: Callable) -> Callable:
 class PietRuntime:
     def __init__(
         self,
-        output_buffer: TextIO = sys.stdout,
-        input_buffer: TextIO | None = None,
+        output_buffer: BinaryIO | None = None,
+        input_buffer: BinaryIO | None = None,
         stack: PietStack | None = None,
     ):
-        self.output = output_buffer
-        self.input = input_buffer or StringIO("")
+        self.output = output_buffer or open(sys.stdout.fileno(), "wb", closefd=False)
+        self.input = input_buffer or BytesIO()
         self.stack = stack or PietStack()
         self.pointer = DirectionPointer()
         self.codel_chooser = CodelChooser()
@@ -183,19 +183,20 @@ class PietRuntime:
         self.stack.extend(values)
 
     def p_input_num(self):
-        buffer = ""
+        whitespace = string.whitespace.encode()
+        buffer = b""
         pos = self.input.tell()
         while True:
             char = self.input.read(1)
-            if char in string.whitespace and buffer:
+            if char in whitespace and buffer:
                 self.input.seek(pos + len(buffer))
                 break
             buffer += char
-            if char in string.whitespace and not buffer:
+            if char in whitespace and not buffer:
                 self.input.seek(pos + len(buffer))
                 break
         try:
-            self.stack.push(int(buffer))
+            self.stack.push(int(buffer.decode()))
         except ValueError:
             self.input.seek(pos)
             warn(f"Conversion of '{buffer}' to integer failed. Check input.", RuntimeWarning)
@@ -207,8 +208,11 @@ class PietRuntime:
 
     @pass_on_empty_stack
     def p_output_num(self):
-        self.output.write(str(self.stack.pop()))
+        self.output.write(str(self.stack.pop()).encode())
 
-    @pass_on_empty_stack
     def p_output_char(self):
-        self.output.write(chr(self.stack.pop()))
+        try:
+            char = self.stack.pop()
+        except IndexError:
+            char = 0
+        self.output.write(chr(char).encode())

@@ -1,6 +1,6 @@
 import random
 import string
-from io import StringIO
+from io import BytesIO
 
 import pytest
 
@@ -9,7 +9,7 @@ from src.piet.runtime import CodelChooserDirection, PietRuntime, PietStack, Poin
 
 @pytest.fixture(name="runtime")
 def fixture_runtime():
-    return PietRuntime(output_buffer=StringIO())
+    return PietRuntime(output_buffer=BytesIO())
 
 
 def test_push_instruction(runtime: PietRuntime):
@@ -118,15 +118,15 @@ def test_roll_instruction(runtime: PietRuntime):
 
 
 def test_input_num_instruction(runtime: PietRuntime):
-    runtime.input = StringIO("69 test")
+    runtime.input = BytesIO(b"69 test")
     runtime.p_input_num()
     result = runtime.input.read()
     assert runtime.stack.top == 69
-    assert result == " test"
+    assert result == b" test"
 
 
 def test_input_char_instruction(runtime: PietRuntime):
-    runtime.input = StringIO("test")
+    runtime.input = BytesIO(b"test")
     runtime.p_input_char()
     runtime.p_input_char()
     runtime.p_input_char()
@@ -139,11 +139,11 @@ def test_output_num_instruction(runtime: PietRuntime):
     runtime.p_push(num)
     runtime.p_output_num()
     runtime.output.seek(0)
-    assert runtime.output.read() == str(num)
+    assert runtime.output.read() == str(num).encode()
 
 
 def test_output_char_instruction(runtime: PietRuntime):
-    char = random.choice(string.ascii_letters)
+    char = random.choice(string.ascii_letters).encode()
     runtime.p_push(ord(char))
     runtime.p_output_char()
     runtime.output.seek(0)

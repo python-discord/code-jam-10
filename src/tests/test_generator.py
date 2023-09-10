@@ -1,4 +1,4 @@
-from io import StringIO
+from io import BytesIO
 
 import pytest
 
@@ -18,10 +18,10 @@ def test_generator(data: bytes, cols: int):
     generator = ImageGenerator()
     encoded = generator.generate_image(data, cols)
     encoded.save(f"{__file__}.png")
-    output_buffer = StringIO()
+    output_buffer = BytesIO()
     interpreter = PietInterpreter(encoded, debug=True, runtime=PietRuntime(output_buffer=output_buffer))
     exc = interpreter.run()
     if isinstance(exc, StepLimitReached):
         raise exc
-    result = output_buffer.getvalue().encode()
+    result = output_buffer.getvalue()
     assert result == data, f"Output does not match input.\n{result}"
