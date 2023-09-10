@@ -23,7 +23,6 @@ def apply_ascii_art(args: dict) -> QPixmap:
         seed_secret(ascii_file_path, str(args.get("secret")), False)
         ascii_to_img(ascii_file_path, coordinates, input_img.size, output_img_path)
         pixmap = QPixmap(str(output_img_path))
-        # pixmap = pixmap.scaled(args["image_label_w"], args["image_label_h"])
         return pixmap
     except Exception as e:
         print(e)
