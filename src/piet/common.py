@@ -58,7 +58,7 @@ class SelfExpandingList(list[T]):
                 super().__setitem__(index, value)
         except IndexError:
             if isinstance(index, slice):
-                i: int = index.stop
+                i = index.stop
             else:
                 i = index
             self.extend([deepcopy(self._default) for _ in range((i - len(self) + 1))])
