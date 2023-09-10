@@ -209,7 +209,7 @@ class Dock(QWidget):
 
         :return:
         """
-        print(f"Update to ASCII Requested")
+        print("Update to ASCII Requested")
         print(self.img_label)
 
         # # Get the current pixmap and scale it

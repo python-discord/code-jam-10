@@ -39,7 +39,7 @@ class Level:
             return Path(image_dir_path, "number_hidden_image.png")
         if self.level_number == 4:
             return Path(image_dir_path, "desert.jpg")
-            
+
             # input_img, coordinates = prepare_input(Path(image_dir_path, "desert.jpg"))
             # output_img_path = Path(image_dir_path, "ascii_output.png")
             # ascii_file_path = Path(image_dir_path, "ascii.txt")

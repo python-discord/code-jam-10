@@ -1,5 +1,7 @@
-from PyQt6.QtCore import QPointF, QRectF, Qt, pyqtSignal
-from PyQt6.QtGui import QBrush, QColor, QPixmap
+from typing import Any
+
+from PyQt6.QtCore import QPointF, QRectF, QSize, Qt, pyqtSignal
+from PyQt6.QtGui import QMouseEvent, QPixmap, QWheelEvent
 from PyQt6.QtWidgets import (
     QFrame, QGraphicsPixmapItem, QGraphicsScene, QGraphicsView
 )
@@ -7,9 +9,10 @@ from PyQt6.QtWidgets import (
 
 class ImageViewer(QGraphicsView):
     """ImageViewer"""
+
     imageClicked = pyqtSignal(QPointF)
 
-    def __init__(self, parent, qsize):
+    def __init__(self, parent: QGraphicsView, qsize: QSize):
         super(ImageViewer, self).__init__(parent)
         self._qsize = qsize
         self._zoom = 0
@@ -24,7 +27,7 @@ class ImageViewer(QGraphicsView):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setFrameShape(QFrame.Shape.NoFrame)
 
-    def fitInView(self, scale: bool = True, **kwargs):
+    def fitInView(self, scale: bool = True, **kwargs: Any) -> None:
         """
         Overrides fitInView of the QGraphicsView superclass
 
@@ -42,7 +45,7 @@ class ImageViewer(QGraphicsView):
                 self.scale(factor, factor)
             self._zoom = 0
 
-    def wheelEvent(self, event):
+    def wheelEvent(self, event: QWheelEvent) -> None:
         """
         Overrides wheelEvent of the QGraphicsView superclass
 
@@ -63,7 +66,7 @@ class ImageViewer(QGraphicsView):
             else:
                 self._zoom = 0
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QMouseEvent) -> None:
         """
         Overrides mousePressEvent of the QGraphicsView superclass
 
@@ -75,7 +78,7 @@ class ImageViewer(QGraphicsView):
 
         super(ImageViewer, self).mousePressEvent(event)
 
-    def set_image(self, pixmap=None):
+    def set_image(self, pixmap: QPixmap = None) -> None:
         """
         Initialize image to the ImageViewer
 
