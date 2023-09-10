@@ -21,6 +21,7 @@ class GUI(Tk):
         # Creates the window
         super().__init__()
         self.title("The Neverending Loops")
+        self.iconbitmap("images\\logo.ico")
         self.sw, self.sh = self.winfo_screenwidth(), self.winfo_screenheight()
         self.minsize(width=int(self.sw * 0.45), height=int(self.sh * 0.45))
 
