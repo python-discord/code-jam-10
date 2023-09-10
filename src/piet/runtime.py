@@ -206,6 +206,7 @@ class PietRuntime:
     @pass_on_empty_stack
     def p_output_num(self):
         self.output.write(str(self.stack.pop()).encode())
+        self.output.flush()
 
     def p_output_char(self):
         try:
@@ -213,3 +214,4 @@ class PietRuntime:
         except IndexError:
             char = 0
         self.output.write(chr(char).encode())
+        self.output.flush()
