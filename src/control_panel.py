@@ -7,6 +7,8 @@ from PyQt6.QtWidgets import (
     QVBoxLayout, QWidget
 )
 
+from src.utils.q_custom_slider import QCustomSlider
+
 
 class NoDragSlider(QSlider):
     """QSlider subclass to disable dragging."""
@@ -61,21 +63,15 @@ class ControlPanel(QWidget):
         layout.addWidget(title_box)
 
         for info in widget_info.get('sliders', []):
-            label, slider_range, orientation, disable_mouse_drag = info
+            label, tickMarkLabels, slider_range, orientation, disable_mouse_drag = info
             layout.addWidget(QLabel(label))
-            if disable_mouse_drag:
-                slider = NoDragSlider(orientation)
+            if tickMarkLabels:
+                slider = QCustomSlider(0, 20, 1, orientation, labels=tickMarkLabels, suppress_mouse_move= disable_mouse_drag)
             else:
-                slider = QSlider(orientation)
-            slider.setMinimum(0)
-            slider.setMaximum(20)
-            slider.setTickInterval(1)
-            slider.setSingleStep(1)  # arrow-key step-size
-            slider.setPageStep(1)  # mouse-wheel/page-key step-size
-            slider.setTickPosition(QSlider.TickPosition.TicksBelow)
-            slider.valueChanged.connect(lambda value, lbl=label: self.forward_signal(lbl, value))
+                slider = QCustomSlider(0, 20, 1, orientation)
+            slider.sl.valueChanged.connect(lambda value, lbl=label: self.forward_signal(lbl, value))
             slider_frame = self.style_slider(slider, slider_range, orientation == Qt.Orientation.Horizontal)
-            slider_frame.setMaximumHeight(45)
+            slider_frame.setMaximumHeight(60)
             layout.addWidget(slider_frame)
 
         # Adding dropdowns
@@ -160,7 +156,7 @@ class ControlPanel(QWidget):
         return title_box
 
     @staticmethod
-    def style_slider(slider: QSlider, range_value: tuple, horizontal: bool) -> QFrame:
+    def style_slider(slider: QCustomSlider, range_value: tuple, horizontal: bool) -> QFrame:
         """
         Style PyQt6 sliders for consistency
 

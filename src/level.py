@@ -1,3 +1,5 @@
+import random
+import string
 from pathlib import Path
 from typing import Dict, List, Tuple, cast
 
@@ -46,7 +48,7 @@ class Level:
             ascii_to_img(ascii_file_path, coordinates, input_img.size, output_img_path)
             return output_img_path
         if self.level_number == 5:
-            return Path(image_dir_path, "img2.jpg")
+            return Path(image_dir_path, "snakepuzzle.jpg")
         return Path(image_dir_path, "default.png")
 
     def get_secret_answer(self) -> str:
@@ -86,8 +88,8 @@ class Level:
                         "Ishihara",
                         {
                             "sliders": [
-                                ("A", (0, 100), Qt.Orientation.Horizontal, True),
-                                ("B", (0, 100), Qt.Orientation.Horizontal, True),
+                                ("A", [], (0, 100), Qt.Orientation.Horizontal, True),
+                                ("B", [], (0, 100), Qt.Orientation.Horizontal, True),
                             ],
                             "dropdowns": [],
                             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
@@ -120,6 +122,7 @@ class Level:
                             "sliders": [
                                 (
                                     "Exposure",
+                                    [],
                                     ("Image 1", "Image 2"),
                                     Qt.Orientation.Horizontal,
                                     False,
@@ -202,29 +205,39 @@ class Level:
                             "sliders": [
                                 (
                                     "horizontal wave",
+                                    ['T', 'J', 'P', 'D', 'M', 'Z', 'E', 'C', 'L', 'A', 'V', 'X', 'W', 'H', 'K', 'N', 'B', 'Y', 'S', 'Q', 'O'],
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
                                     False,
                                 ),
                                 (
                                     "vertical wave",
+                                    ['T', 'J', 'P', 'D', 'M', 'Z', 'E', 'C', 'L', 'A', 'V', 'X', 'W', 'H', 'K', 'N', 'B', 'Y', 'S', 'Q', 'O'],
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
                                     False,
                                 ),
                                 (
                                     "vertical spike",
+                                    ['T', 'J', 'P', 'D', 'M', 'Z', 'E', 'C', 'L', 'A', 'V', 'X', 'W', 'H', 'K', 'N', 'B', 'Y', 'S', 'Q', 'O'],
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
                                     False,
                                 ),
                                 (
                                     "horizontal spike",
+                                    ['T', 'J', 'P', 'D', 'M', 'Z', 'E', 'C', 'L', 'A', 'V', 'X', 'W', 'H', 'K', 'N', 'B', 'Y', 'S', 'Q', 'O'],
                                     (0, 100),
                                     Qt.Orientation.Horizontal,
                                     False,
                                 ),
-                                ("explode", (0, 100), Qt.Orientation.Horizontal, False),
+                                (
+                                    "explode",
+                                    ['T', 'J', 'P', 'D', 'M', 'Z', 'E', 'C', 'L', 'A', 'V', 'X', 'W', 'H', 'K', 'N', 'B', 'Y', 'S', 'Q', 'O'],
+                                    (0, 100),
+                                    Qt.Orientation.Horizontal,
+                                    False
+                                ),
                             ],
                             "dropdowns": [],
                             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
@@ -245,7 +258,7 @@ class Level:
                         "second_image": None,
                         "secret_code": "Turbo secret",
                         "MotionTransformer": MotionTransformer(
-                            Image.open(image_dir_path / "img2.jpg")
+                            Image.open(image_dir_path / "snakepuzzle.jpg")
                         ),
                     },
                 ),

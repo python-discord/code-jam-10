@@ -12,6 +12,7 @@ def apply_motion(args: dict) -> QPixmap:
     """
     mt: MotionTransformer = args["MotionTransformer"]
     try:
+        print(args)
         image = mt.calculate_output(
             (
                 args.get("horizontal wave", 0) * 5 / 100,
