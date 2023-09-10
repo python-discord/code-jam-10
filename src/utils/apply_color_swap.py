@@ -3,18 +3,20 @@ from PIL import Image
 from PyQt6.QtGui import QImage, QPixmap
 
 from lib.pixelate_and_swap.pixelate_and_swap import swap_colors
-from src.Utils.apply_double_exposure import LRUCachePIL
+from src.utils.apply_double_exposure import LRUCachePIL
 
 _image_cache = LRUCachePIL(capacity=10)  # Cache capacity of 10 images
 
 
-def apply_color_swap(image: tuple, first_color: str, second_color: str) -> QPixmap:
+def apply_color_swap(image: tuple, first_color: str, second_color: str, w: int, h: int) -> QPixmap:
     """
     Apply color swap to an image
 
     :param image: Path to image
     :param first_color:
     :param second_color:
+    :param w: width of the image label
+    :param h: height of the image label
     :return: QPixmap
     """
     colors = {
@@ -43,6 +45,5 @@ def apply_color_swap(image: tuple, first_color: str, second_color: str) -> QPixm
     data = swapped_image.tobytes("raw", "BGRA")
     qim = QImage(data, swapped_image.size[0], swapped_image.size[1], QImage.Format.Format_ARGB32)
     pixmap = QPixmap.fromImage(qim)
-    pixmap = pixmap.scaled(450, 450)
-
+    pixmap = pixmap.scaled(w, h)
     return pixmap

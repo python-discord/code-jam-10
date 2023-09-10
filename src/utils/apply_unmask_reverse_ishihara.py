@@ -2,7 +2,7 @@ import cv2
 from PyQt6.QtGui import QImage, QPixmap
 
 from lib.reverse_ishihara.reverse_ishihara import unmask_reverse_ishihara
-from src.Utils.lru_cache_cv2 import LRUCacheCV2
+from src.utils.lru_cache_cv2 import LRUCacheCV2
 
 # Create a cache for storing OpenCV images:
 _image_cache_cv2 = LRUCacheCV2(capacity=10)  # Cache capacity of 10 images
@@ -49,7 +49,7 @@ def apply_unmask_reverse_ishihara(args: dict) -> QPixmap:
 
         # Convert the QImage to QPixmap
         pixmap = QPixmap.fromImage(q_image)
-        resized_pixmap = pixmap.scaled(450, 450)
+        resized_pixmap = pixmap.scaled(args["image_label_w"], args["image_label_h"])
 
         return resized_pixmap
     except Exception as e:

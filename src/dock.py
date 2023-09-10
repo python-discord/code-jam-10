@@ -27,8 +27,7 @@ class Dock(QWidget):
         self.filters = []
         self.args_cache: Dict[str, int | str] = {}
 
-        for _, filter_item, args in self.level.filters:
-            control_panel = filter_item
+        for _, control_panel, args in self.level.filters:
             control_panel.sliderValueChanged.connect(
                 lambda label, value, cp=control_panel: self.update_args_and_image(
                     cp.title,
@@ -171,6 +170,9 @@ class Dock(QWidget):
         args_to_pass["second_image"] = args["second_image"]
         args_to_pass["image_to_edit"] = str(self.level.get_image_source())
         args_to_pass["MotionTransformer"] = args["MotionTransformer"]
+        size = self.img_label.size()
+        args_to_pass["image_label_w"] = size.width()
+        args_to_pass["image_label_h"] = size.height()
 
         new_image = apply_filter(filter_title, args_to_pass)
         self.update_image(new_image)
@@ -183,6 +185,9 @@ class Dock(QWidget):
 
         args_to_pass = self.args_cache
         args_to_pass["image_to_edit"] = str(self.level.get_image_source())
+        size = self.img_label.size()
+        args_to_pass["image_label_w"] = size.width()
+        args_to_pass["image_label_h"] = size.height()
 
         new_image = apply_filter(filter_title, args_to_pass)
         self.update_image(new_image)
@@ -195,12 +200,3 @@ class Dock(QWidget):
         :return:
         """
         self.img_label.setPixmap(image)
-
-    def update_args_cache(self, args: dict) -> None:
-        """
-        Update the args cache
-
-        :param args:
-        :return:
-        """
-        self.args_cache = args

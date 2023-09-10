@@ -93,9 +93,9 @@ class ControlPanel(QWidget):
             self.combo_boxes.append((combo_box1, combo_box2))
 
         # Adding buttons
-        for _ in widget_info.get('buttons', []):
+        for button_text in widget_info.get('buttons', []):
             button = QPushButton()
-            button.setText("swap")
+            button.setText(button_text)
 
             # Use default arguments in the lambda to capture the current values of combo_box1 and combo_box2
             # Assuming one button per pair of dropdowns.

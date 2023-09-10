@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import (
-    QFrame, QGridLayout, QHBoxLayout, QLabel, QMainWindow, QMessageBox,
-    QStackedLayout, QWidget
+    QApplication, QFrame, QGridLayout, QHBoxLayout, QLabel, QMainWindow,
+    QMessageBox, QStackedLayout, QWidget
 )
 
 from src.dock import Dock
@@ -17,6 +17,7 @@ class Window(QMainWindow):
     def __init__(self, level: Level) -> None:
         super().__init__()
         self.level = level
+        self.screen_size = QApplication.primaryScreen().size()
         self._init_ui()
 
     def _init_ui(self) -> None:
@@ -30,8 +31,6 @@ class Window(QMainWindow):
 
         widget = QWidget()
         widget.setLayout(layout)
-        widget.setMinimumSize(850, 650)
-        widget.setMaximumHeight(450)
         self.setCentralWidget(widget)
 
     def _create_main_layout(self) -> QGridLayout:
@@ -62,15 +61,25 @@ class Window(QMainWindow):
             "border-radius: 6px; "
             "background-color: '#e4e0e0'; }"
         )
-        frame.setMinimumSize(450, 450)
 
         layout = QHBoxLayout(frame)
-        img = QPixmap(str(self.level.img_source)).scaled(450, 450)
+        img = QPixmap(str(self.level.img_source))
+
+        # Define max image size constraints (70% of height and 60% of width of the user's primary screen size)
+        max_height = self.screen_size.height() * 0.7
+        max_width = self.screen_size.width() * 0.6
+
+        # Calculate the scaling factors for width and height
+        img_size = img.size()
+        width_scale = max_width / img_size.width()
+        height_scale = max_height / img_size.height()
+        scale_factor = min(width_scale, height_scale)
+        scaled_img = img.scaled(QSize(int(img_size.width() * scale_factor), int(img_size.height() * scale_factor)))
 
         # Convert img_label to an instance variable
         self.img_label = QLabel(self)
-        self.img_label.setFixedSize(450, 450)
-        self.img_label.setPixmap(img)
+        self.img_label.setPixmap(scaled_img)
+        self.img_label.setScaledContents(True)  # Removes the discrepancy between true image size and QLabel size
 
         layout.addWidget(self.img_label)
         layout.addLayout(self._create_tabbed_controls())
@@ -82,7 +91,8 @@ class Window(QMainWindow):
         layout = QStackedLayout()
 
         for filter_item in self.level.filters:
-            layout.addWidget(filter_item[1])
+            if filter_item[1] is not None:
+                layout.addWidget(filter_item[1])
 
         return layout
 
@@ -104,12 +114,4 @@ class Window(QMainWindow):
             msg_box.exec()
 
             self.level.level_up()
-            self.update_image_label()
             self._init_ui()
-
-    def update_image_label(self) -> None:
-        """Update the image label with the new image"""
-        img = QPixmap(str(self.level.img_source)).scaled(450, 450)
-        self.img_label.setPixmap(
-            img.scaled(450, 450, Qt.AspectRatioMode.KeepAspectRatio)
-        )

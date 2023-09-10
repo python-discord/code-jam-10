@@ -25,7 +25,7 @@ def apply_motion(args: dict) -> QPixmap:
         data = image.tobytes("raw", "BGRA")
         qim = QImage(data, image.size[0], image.size[1], QImage.Format.Format_ARGB32)
         pixmap = QPixmap.fromImage(qim)
-        pixmap = pixmap.scaled(450, 450)
+        pixmap = pixmap.scaled(args["image_label_w"], args["image_label_h"])
         return pixmap
     except Exception as e:
         print(e)

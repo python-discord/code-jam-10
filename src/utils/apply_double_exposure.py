@@ -1,24 +1,23 @@
-import io
-
 import numpy as np
 from PIL import Image
-from PyQt6.QtCore import QBuffer
 from PyQt6.QtGui import QImage, QPixmap
 
 from lib.double_exposure.double_exposure import double_exposure
-from src.Utils.lru_cache_pil import LRUCachePIL
+from src.utils.lru_cache_pil import LRUCachePIL
 
 # Create a cache for storing images:
 _image_cache = LRUCachePIL(capacity=10)  # Cache capacity of 10 images
 
 
-def apply_double_exposure(img1: tuple, img2: tuple, slider_value: int) -> QPixmap:
+def apply_double_exposure(img1: tuple, img2: tuple, slider_value: int, w: int, h: int) -> QPixmap:
     """
     Apply double exposure to an image
 
     :param img1:
     :param img2:
     :param slider_value:
+    :param w: width of the image label
+    :param h: height of the image label
     :return:
     """
     img1_path = str(img1)
@@ -34,7 +33,7 @@ def apply_double_exposure(img1: tuple, img2: tuple, slider_value: int) -> QPixma
     img2 = _img
 
     # Convert slider value to float between 0 and 1
-    adjusted_slider_value = float(slider_value*5) / 100
+    adjusted_slider_value = float(slider_value * 5) / 100
 
     # Apply double exposure
     blended_image = double_exposure(img1, img2, adjusted_slider_value)
@@ -45,14 +44,5 @@ def apply_double_exposure(img1: tuple, img2: tuple, slider_value: int) -> QPixma
     bytesPerLine = 3 * width
     qimage = QImage(image_np.data, width, height, bytesPerLine, QImage.Format.Format_RGB888)
     pixmap = QPixmap.fromImage(qimage)
-
+    pixmap = pixmap.scaled(w, h)
     return pixmap
-
-
-def qimage_to_pil_image(qimage: QImage) -> Image:
-    """Converts a PyQt QImage to a PIL Image."""
-    buffer = QBuffer()
-    buffer.open(QBuffer.OpenModeFlag.ReadWrite)
-    qimage.save(buffer, "PNG")
-    pil_im = Image.open(io.BytesIO(bytes(buffer.data())))
-    return pil_im

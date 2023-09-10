@@ -4,10 +4,10 @@ from PyQt6.QtWidgets import (
     QFrame, QHBoxLayout, QLabel, QSlider, QVBoxLayout, QWidget
 )
 
-from src.Utils.apply_color_swap import apply_color_swap
-from src.Utils.apply_double_exposure import apply_double_exposure
-from src.Utils.apply_motions import apply_motion
-from src.Utils.apply_unmask_reverse_ishihara import (
+from src.utils.apply_color_swap import apply_color_swap
+from src.utils.apply_double_exposure import apply_double_exposure
+from src.utils.apply_motions import apply_motion
+from src.utils.apply_unmask_reverse_ishihara import (
     apply_unmask_reverse_ishihara
 )
 
@@ -142,12 +142,13 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
             if key == "second_image":
                 args_for_filter["second_image"] = value
 
-        new_img = apply_double_exposure(
+        return apply_double_exposure(
             args_for_filter["image_to_edit"],
             args_for_filter["second_image"],
             args_for_filter["Exposure"],
+            args["image_label_w"],
+            args["image_label_h"],
         )
-        return new_img
     if filter_name == "Ishihara":
         args_for_filter = {}
         for key, value in args.items():
@@ -157,17 +158,21 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
                 args_for_filter["B"] = value
             if key == "image_to_edit":
                 args_for_filter["image_to_edit"] = value
-        new_img = apply_unmask_reverse_ishihara(args_for_filter)
-        return new_img
+            if key == "image_label_w":
+                args_for_filter["image_label_w"] = value
+            if key == "image_label_h":
+                args_for_filter["image_label_h"] = value
+        return apply_unmask_reverse_ishihara(
+            args_for_filter
+        )
     if filter_name == "Color Swap":
-        args_for_filter = {}
-
-        new_img = apply_color_swap(
+        return apply_color_swap(
             args.get("image_to_edit", 0),
             args.get("first_color", 0),
             args.get("second_color", 0),
+            args["image_label_w"],
+            args["image_label_h"]
         )
-        return new_img
     if filter_name == "Motion":
         args_for_filter = {}
         for key, value in args.items():
@@ -178,8 +183,9 @@ def apply_filter(filter_name: str, args: dict) -> QPixmap:
                 "horizontal spike",
                 "vertical spike",
                 "explode",
+                "image_label_w",
+                "image_label_h"
             ):
                 args_for_filter[key] = value
-        new_img = apply_motion(args_for_filter)
-        return new_img
+        return apply_motion(args_for_filter)
     return QPixmap()

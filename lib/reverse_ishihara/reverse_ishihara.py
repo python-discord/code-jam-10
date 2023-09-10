@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from src.Utils.lru_cache_pil import LRUCachePIL
+from src.utils.lru_cache_pil import LRUCachePIL
 
 # Global cache object with, for example, a capacity of 10 images
 image_cache = LRUCachePIL(10)
