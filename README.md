@@ -5,11 +5,11 @@ Python Discord Code Jam Repository For The Neverending Loops
 ## Table of Contents
 
 1. [About The Project](#about-the-project)
-    - [Made With](#made-with)
-    - [Features](#features)
+   - [Made With](#made-with)
+   - [Features](#features)
 2. [Getting Started](#getting-started)
-    - [Requirements](#requirements)
-    - [Installation](#installation)
+   - [Requirements](#requirements)
+   - [Installation](#installation)
 3. [Screenshots](#screenshots)
 4. [License](#license)
 5. [Contributors](#contributors)
@@ -18,18 +18,21 @@ Python Discord Code Jam Repository For The Neverending Loops
 
 ### Made With
 
-This project was made with Python’s PIL library for image processing and numpy for image manipulation.
+This Python Project is made using:
+- [Python 3](https://www.python.org/downloads/)
+- [Pillow](https://pypi.org/project/Pillow/)
+- [NumPy](https://pypi.org/project/numpy/)
+- Love
 
 ### Features
 
 - Typing Colors
 
-    Typing Colors is a
+  Typing Colors is a
 
 - Steganography
 
-    We also have a steganography
-
+  We also have a steganography
 
 ## Getting Started
 
