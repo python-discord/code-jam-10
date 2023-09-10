@@ -165,7 +165,7 @@ class Level:
             ],
             [
                 (
-                    Path(icons_dir_path, "rishihara.png"),
+                    Path(icons_dir_path, "motion_icon.png"),
                     ControlPanel(
                         "Motion",
                         {
