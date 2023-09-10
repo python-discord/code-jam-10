@@ -228,7 +228,8 @@ class Level:
                             ],
                             "dropdowns": [],
                             "description": "Your task: to undo the distortions and reveal the hidden image beneath. "
-                                           "With each adjustment, the chaos unravels, and the true form emerges from the digital haze. "
+                                           "With each adjustment, the chaos unravels, and the true form emerges from "
+                                           "the digital haze. "
                                            "It's a journey from obscurity to clarity, "
                                            "where the final picture holds secrets yet to be uncovered. "
                                            "The distorted image yearns for your touch, inviting you "
@@ -238,7 +239,9 @@ class Level:
                     {
                         "second_image": None,
                         "secret_code": "codes",
-                        "MotionTransformer": MotionTransformer(Image.open(image_dir_path / "snake.jpg"),"codes"),
+                        "MotionTransformer": MotionTransformer(
+                            Image.open(image_dir_path / "snake.jpg"),
+                            "codes"),
                     },
                 ),
             ],
