@@ -154,7 +154,7 @@ class GUI(Tk):
 
     def check_key(self, encrypt: bool, mode: int = 0):
         """Opens the encrypt/decrypt page"""
-        if self._valid_key():
+        if self._valid_key(encrypt):
             self.key_method.configure(bg=DARK_GRAY, fg=WHITE)
             self.error.configure(text="")
             if encrypt:
@@ -183,9 +183,7 @@ class GUI(Tk):
 
     def decrypt(self):
         """Opens the decryption page with the secret key"""
-        filename = fd.askopenfilename(
-            title="Select Image", filetypes=[("PNG", "*.png")]
-        )
+        filename = fd.askopenfilename(title="Select Image", filetypes=[("PNG", "*.png")])
         if not filename:
             return
         try:
@@ -214,9 +212,7 @@ class GUI(Tk):
 
     def switch_steganography(self):
         """Switches to encrypt steganography"""
-        filename = fd.askopenfilename(
-            title="Select Image", filetypes=[("PNG", "*.png")]
-        )
+        filename = fd.askopenfilename(title="Select Image", filetypes=[("PNG", "*.png")])
         if not filename:
             return
 
