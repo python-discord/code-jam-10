@@ -16,7 +16,6 @@ class SteganographyWin(Frame):
         # Image and backend
         self.image = Image.open(filename)
         self.steganography = ExistingImage(self.image, root.key)
-        self.aspect_ratio = self.image.width / self.image.height
         self.file = None
         # create the window
         super().__init__(root, bg=DARK_GRAY)
@@ -44,8 +43,8 @@ class SteganographyWin(Frame):
         self.key.set(f"Secret Key: {root.key}")
         self.info = StringVar()
         self.info.set("0 characters")
-        self.text.pack(side="left", expand=True, fill="both", anchor="w")
-        self.canvas.pack(side="right", anchor="e")
+        self.text.pack(side="left", expand=True, fill='both', anchor='w')
+        self.canvas.pack(side="right", anchor='e')
         self.mainframe.grid(row=0, column=0, columnspan=2, sticky="nsew")
         Label(self, textvariable=self.key, bg=DARK_GRAY, fg="white").grid(
             row=1, column=0, sticky="w"
@@ -63,12 +62,12 @@ class SteganographyWin(Frame):
 
     def updatecanvas(self, event=None):
         """Updates the image to fit window size"""
-        if self.aspect_ratio < 1:  # tall image, use width
-            sf = max(1, self.grid_bbox(1, 0)[2] // self.image.width)
-        else:  # opposite
-            sf = max(1, self.grid_bbox(1, 0)[3] // self.image.height)
-        w, h = int(self.image.width * sf), int(self.image.height * sf)
-        img = ImageTk.PhotoImage(self.image.resize((w, h), Image.BOX))
+        w, h = self.mainframe.winfo_width() // 2, self.mainframe.winfo_height()
+        if w*h < 100:  # not rendered yet
+            w, h = 100, 100
+        thumbnail = self.image.copy()
+        thumbnail.thumbnail((w, h))
+        img = ImageTk.PhotoImage(thumbnail, Image.BOX)
         self.canvas.configure(image=img, width=w, height=h)
         self.canvas.image = img
 

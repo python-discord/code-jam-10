@@ -7,39 +7,40 @@ BRIGHT_RED = "#ff0000"
 PRINTABLE = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\t"
 
 
-def loading_animation(root, after, *args):
+def loading_animation(root):
     """Animates the loading screen"""
-
-    def drawtext(text):
+    def drawtext(text, red=192):
         """Draws the text"""
-
-        def dropletter(letter, n, after_drop, *after_args):
+        def dropletter(letter, n=0):
             """Animates a single letter"""
-            if n > 30:
-                after_drop(*after_args)
+            if n == 30:  # animation done
                 return
-            canvas.scale(letter, 790 - 55 * len(text), 240, 0.9, 0.9)
-            root.after(10, lambda: dropletter(letter, n + 1, after_drop, *after_args))
+            if n == 10:  # start next letter
+                drawtext(text[1:], red+3)  # generate nice spectrum
+            canvas.scale(letter, letterx, centery, .9, .9)  # move towards given position
+            root.after(10,
+                       lambda: dropletter(letter, n+1))  # continue animation
 
         if not text:  # animation complete
-            root.after(1000, lambda: after(*args))
+            root.after(1500,  # create main window
+                       lambda: root.callback(root.create_main_window))
             return
-        if text[0] == " ":  # skip spaces
-            drawtext(text[1:])
+        if text[0] == ' ':  # skip spaces
+            drawtext(text[1:], red)
             return
         # render next letter
+        letterx = 770 - 36*len(text)  # calculate letter position
         dropletter(
-            canvas.create_text(
-                400, 0, text=text[0], fill="white", font=("Cascadia Mono", 66)
-            ),
-            0,
-            lambda: drawtext(text[1:]),
+            canvas.create_text(378, -42, text=text[0],  # start letter at y-42
+                               fill='#%02x66ff' % red,  # convert to hex
+                               font=("Cascadia Mono", 42)),
         )
 
-    canvas = Canvas(root, bg=DARK_GRAY)
-    canvas.pack(fill="both", expand=True)
-    # drawtext("Pixel Studios")
-    drawtext(" ")
+    centery = root.winfo_height() // 2
+    canvas = Canvas(root, bg=DARK_GRAY, width=756, height=centery+25,
+                    bd=0, highlightthickness=0, relief='ridge')
+    canvas.place(relx=.5, rely=0, anchor='n')
+    drawtext('The Neverending Loops')
 
 
 def center(root: Tk, WIN_W: int, WIN_H: int):

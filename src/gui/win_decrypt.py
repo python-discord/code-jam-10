@@ -22,7 +22,7 @@ class DecryptWin(Frame):
         else:
             self.mode = "Steganography"
             self.image = fromarray(object.input_image)
-            self.aspect_ratio = self.image.width / self.image.height
+        self.object = object
         # create window
         super().__init__(root, bg=DARK_GRAY)
         dynamic_menu_bar(root, self)
@@ -55,8 +55,8 @@ class DecryptWin(Frame):
         self.info.set(
             f"{len(decoded_text)} characters   |   {self.image.width}px x {self.image.height}px"
         )
-        self.canvas.pack(side="left", fill="both", anchor="w")
         self.text.pack(side="right", expand=True, fill="both", anchor="ne")
+        self.canvas.pack(side="left", anchor="w")
         self.mainframe.grid(row=0, column=0, columnspan=2, sticky="nsew")
 
         self.key_status = Label(self, textvariable=self.key, bg=DARK_GRAY, fg="white")
@@ -82,16 +82,16 @@ class DecryptWin(Frame):
 
     def updatecanvas(self, event=None):
         """Updates the canvas to fill the screen"""
-        if self.mode == "Typing Colors":
-            sf = max(1, (self.grid_bbox(0, 0)[3]) // self.ar_height)
-            w, h = int(self.ar_width * sf), int(self.ar_height * sf)
-        else:
-            if self.aspect_ratio < 1:  # tall image, use width
-                sf = max(1, self.grid_bbox(0, 0)[2] // self.image.width)
-            else:  # opposite
-                sf = max(1, self.grid_bbox(0, 0)[3] // self.image.height)
-            w, h = int(self.image.width * sf), int(self.image.height * sf)
-        img = ImageTk.PhotoImage(self.image.resize((w, h), BOX))
+        w, h = self.mainframe.winfo_width() // 2, self.mainframe.winfo_height()
+        if w*h < 100:  # not rendered yet
+            w, h = 100, 100
+        if self.mode == 'Steganograpy':
+            new = self.image.copy()
+            new.thumbnail((w, h), BOX)
+            img = ImageTk.PhotoImage(new)
+        else:  # image smaller than win
+            sf = max(1, (self.grid_bbox(0, 0)[3]) // self.object.ar_height)
+            img = self.object.img_scaled(int(sf), self.root.winfo_width())
         self.canvas.configure(image=img, width=w, height=h)
         self.canvas.image = img
 

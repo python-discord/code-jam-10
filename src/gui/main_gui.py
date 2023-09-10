@@ -35,25 +35,12 @@ class GUI(Tk):
         self.title("Pixel Studios")
 
         # GET THE CURRENT SCREEN SIZE AND SET MIN SIZE accordingly
-        self.minsize(width=720, height=480)
-        # sw = self.winfo_screenwidth()
-        # sh = self.winfo_screenheight()
-        # # 1920 * 1080
-        # # 1280 * 720
-
-        # if sh >= 1080:
-        #     w = int(sw // 1.5)
-        #     h = int(sh // 1.5)
-        #     self.minsize(width=w, height=h)
-        #     WIN_W, WIN_H = (w, h)
-        # else:
-        #     # self.minsize(width=sw, height=sh)
-        #     WIN_W, WIN_H = (800, 500)
-        # self.maxsize(width=666, height=666)
+        self.sw, self.sh = self.winfo_screenwidth(), self.winfo_screenheight()
+        self.minsize(width=int(self.sw*.45), height=int(self.sh*.45))
 
         self.geometry(f"{WIN_W}x{WIN_H}")
         center(self, WIN_W, WIN_H)
-        loading_animation(self, lambda: self.callback(self.create_main_window))
+        loading_animation(self)
         self.configure(background=DARK_GRAY)
         self.mainloop()
 
