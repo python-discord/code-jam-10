@@ -4,3 +4,4 @@ numpy~=1.25.2
 Pillow~=10.0.0
 PySimpleGUI==4.60.5
 google-cloud-vision==3.4.4
+rich~=13.5.2

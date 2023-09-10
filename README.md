@@ -44,7 +44,13 @@ $ python3 -m app cli <options> <args>
 
 #### Example CLI
 ```shell
+# watermark
 python3 -m app cli watermark encode "secret message" data/image.jpg data/encoded_image.png
 python3 -m app cli watermark decode data/encoded_image.png
 secret message
+
+# obfuscate
+python3 -m app cli obfuscate data/image.jpg data/output.jpg --regex "\d+" --mode blur
+python3 -m app cli obfuscate data/image.jpg data/output.jpg "hide this text" "other text" --mode blur
+python3 -m app cli obfuscate data/image.jpg data/output.jpg "hide this text" "other text" --mode colour --colour red
 ```
