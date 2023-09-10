@@ -1,8 +1,5 @@
-import io
-
 import numpy as np
 from PIL import Image
-from PyQt6.QtCore import QBuffer
 from PyQt6.QtGui import QImage, QPixmap
 
 from lib.double_exposure.double_exposure import double_exposure
