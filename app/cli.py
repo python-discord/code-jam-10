@@ -1,12 +1,22 @@
 import click
 
+from .ui import main as ui_main
 
-@click.command()
-def main():
-    """Main entry point to the cli"""
-    # TODO: implement cli
+
+@click.group(invoke_without_command=False)
+@click.pass_context
+def main(ctx):
+    """Main entry point to application"""
     pass
 
 
-if __name__ == "__main__":
-    main()
+@main.command()
+def ui():
+    """Main entry point to the ui"""
+    ui_main()
+
+
+@main.command()
+def cli():
+    """Main entry point to the cli"""
+    print("cli")
