@@ -8,7 +8,7 @@ from gui.modules import *
 class Palette:
     """Pallete object to map chars to colours"""
 
-    palette = {" ": (0, 0, 0, 0), (0, 0, 0, 0): " "}
+    palette = {" ": (0, 0, 0, 0)}
 
     def __init__(self, key: str):
         """Maps all characters to colours using the key"""
@@ -24,7 +24,6 @@ class Palette:
             )
             color = (r, g, b, 255 - a)
             self.palette[char] = color
-            self.palette[color] = char
 
     def _generate_key(self, key):
         """Generates an int key from the string"""

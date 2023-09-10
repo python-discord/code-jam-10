@@ -139,7 +139,7 @@ class TypingColors:
     def force_update(self):
         """Re-draws the entire canvas"""
         text = self.text
-        self.text = ''
+        self.text = ""
         self.update(text)
 
     def img_scaled(self, scale_factor=10, max_width: int = 0):
@@ -148,7 +148,9 @@ class TypingColors:
             scale_factor = 10
         size = (int(self.ar_width * scale_factor), int(self.ar_height * scale_factor))
         if max_width:
-            if size[0] > max_width:  # Don't allow image to take more than 60% of the window width
+            if (
+                size[0] > max_width
+            ):  # Don't allow image to take more than 60% of the window width
                 size[0] = max_width
         return ImageTk.PhotoImage(self.canvas.resize(size, Image.BOX))
 
@@ -156,7 +158,6 @@ class TypingColors:
         """Export to png"""
         self.canvas.load()[-1, -1] = (8, 8, 8, 8)
         self.canvas.save(filename)
-        # self.canvas.save(filename, format="PNG")
 
     def decode(self):
         """Decoder method"""
@@ -166,17 +167,15 @@ class TypingColors:
         # get the text
         chararr = np.zeros(self.imgarr.shape[0], dtype=str)
         for key, val in self.palette.palette.items():
-            if isinstance(key, tuple):
-                r, g, b, a = key
-                cond = (
-                    (self.imgarr[:, 0] == r)
-                    & (self.imgarr[:, 1] == g)
-                    & (self.imgarr[:, 2] == b)
-                    & (self.imgarr[:, 3] == a)
-                )
-                chararr[cond.nonzero()[0]] = val
+            r, g, b, a = val
+            cond = (
+                (self.imgarr[:, 0] == r)
+                & (self.imgarr[:, 1] == g)
+                & (self.imgarr[:, 2] == b)
+                & (self.imgarr[:, 3] == a)
+            )
+            chararr[cond.nonzero()[0]] = key
         if (chararr == "").any():
-            # print(chararr)
             raise KeyError
         decoded_text = "".join(chararr).rstrip()
         # split into rows and turning spaces to newlines
@@ -189,6 +188,5 @@ class TypingColors:
                 for line in decoded_chunks
             ]
         )
-        # print(decoded_text)
         self.update(decoded_text)
         return decoded_text

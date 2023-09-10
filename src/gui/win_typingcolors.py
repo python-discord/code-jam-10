@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import filedialog as fd
 
 from backend.typingcolors import TypingColors
-from gui.modules import *
+from gui.modules import TYPINGCOLSCOL, dynamic_menu_bar, key_popup
 
 
 class TypingColorsWin(Frame):
@@ -12,7 +12,7 @@ class TypingColorsWin(Frame):
         """Creates the layout"""
         # create the window
         self.root = root
-        super().__init__(root, bg=DARK_GRAY)
+        super().__init__(root, bg=TYPINGCOLSCOL)
         dynamic_menu_bar(root, self)
         root.title("New File - Typing Colors")
         self.columnconfigure(0, weight=1)
@@ -25,21 +25,20 @@ class TypingColorsWin(Frame):
         self.typingColors.set_key(root.key)
         self.file = None  # open files
         # split layout
-        self.mainframe = Frame(self, bg=DARK_GRAY)
+        self.mainframe = Frame(self, bg=TYPINGCOLSCOL)
         self.text = Text(
             self.mainframe,
             width=30,
             height=16,
-            bg=DARK_GRAY,
+            bg=TYPINGCOLSCOL,
             fg="white",
             font=("Consolas", 14),
         )
-        # TODO: CHANGE THE DEFAULT TEXT
-        self.text.insert(END, "Edit me !")
+        self.text.insert(END, "Edit me!")
         self.canvas = Label(
             self.mainframe,
             image=self.typingColors.img_scaled(0.6 * self.root.winfo_width()),
-            bg=DARK_GRAY,
+            bg=TYPINGCOLSCOL,
         )
         self.key = StringVar()
         self.key.set(f"Secret Key: {root.key} | (Click to Copy)")
@@ -50,11 +49,13 @@ class TypingColorsWin(Frame):
         self.canvas.pack(side="right", fill="both", anchor="e")
         self.mainframe.grid(row=0, column=0, columnspan=2, sticky="nsew")
 
-        self.key_status = Label(self, textvariable=self.key, bg=DARK_GRAY, fg="white")
+        self.key_status = Label(
+            self, textvariable=self.key, bg=TYPINGCOLSCOL, fg="white"
+        )
         self.key_status.grid(row=1, column=0, sticky="w")
         self.key_status.bind("<Button-1>", self.copy_key_to_clipboard)
 
-        Label(self, textvariable=self.info, bg=DARK_GRAY, fg="white").grid(
+        Label(self, textvariable=self.info, bg=TYPINGCOLSCOL, fg="white").grid(
             row=1, column=1, sticky="e"
         )
         # start the loop

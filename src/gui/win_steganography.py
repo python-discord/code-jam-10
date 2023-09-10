@@ -4,7 +4,7 @@ from tkinter import filedialog as fd
 from PIL import Image, ImageTk
 
 from backend.steganography import ExistingImage
-from gui.modules import DARK_GRAY, dynamic_menu_bar, key_popup
+from gui.modules import STEGCOL, dynamic_menu_bar, key_popup
 
 
 class SteganographyWin(Frame):
@@ -18,7 +18,7 @@ class SteganographyWin(Frame):
         self.steganography = ExistingImage(self.image, root.key)
         self.file = None
         # create the window
-        super().__init__(root, bg=DARK_GRAY)
+        super().__init__(root, bg=STEGCOL)
         dynamic_menu_bar(root, self)
         root.title("New File - Steganography")
         self.columnconfigure(0, weight=1)
@@ -27,17 +27,17 @@ class SteganographyWin(Frame):
         self.grid_rowconfigure(1, weight=0, minsize=25)
         root.bind("<Configure>", self.updatecanvas)
         # split layout
-        self.mainframe = Frame(self, bg=DARK_GRAY)
+        self.mainframe = Frame(self, bg=STEGCOL)
         self.text = Text(
             self.mainframe,
             width=30,
             height=16,
-            bg=DARK_GRAY,
+            bg=STEGCOL,
             fg="white",
             font=("Consolas", 14),
         )
         self.canvas = Label(
-            self.mainframe, image=ImageTk.PhotoImage(self.image), bg=DARK_GRAY
+            self.mainframe, image=ImageTk.PhotoImage(self.image), bg=STEGCOL
         )
         self.key = StringVar()
         self.key.set(f"Secret Key: {root.key} | (Click to Copy)")
@@ -48,11 +48,11 @@ class SteganographyWin(Frame):
         self.canvas.pack(side="right", anchor="e")
         self.mainframe.grid(row=0, column=0, columnspan=2, sticky="nsew")
 
-        self.key_status = Label(self, textvariable=self.key, bg=DARK_GRAY, fg="white")
+        self.key_status = Label(self, textvariable=self.key, bg=STEGCOL, fg="white")
         self.key_status.grid(row=1, column=0, sticky="w")
         self.key_status.bind("<Button-1>", self.copy_key_to_clipboard)
 
-        Label(self, textvariable=self.info, bg=DARK_GRAY, fg="white").grid(
+        Label(self, textvariable=self.info, bg=STEGCOL, fg="white").grid(
             row=1, column=1, sticky="e"
         )
         self._updateinfo()
@@ -70,7 +70,7 @@ class SteganographyWin(Frame):
 
     def _updateinfo(self):
         """Updates text length"""
-        textlen = len(self.text.get(1.0, "end"))
+        textlen = len(self.text.get(1.0, "end")) - 1
         self.info.set(f"{textlen} characters")
         self.after(10, self._updateinfo)
 

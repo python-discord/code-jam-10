@@ -79,7 +79,6 @@ class ExistingImage:
                         if key == binary_data[-len_key:]:
                             binary_data = binary_data.replace(key, "")
                             return binary_data
-            print("invalid image")
 
         binary_data = __get_binary_from_img(image, key, n_bits)
 

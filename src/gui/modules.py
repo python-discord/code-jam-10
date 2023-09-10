@@ -1,7 +1,7 @@
 from tkinter import *
 
-DARK_GRAY, GRAY = "#222831", "#393E46"
-AQUA, WHITE = "#00ADB5", "#EEEEEE"
+DARK_GRAY, GRAY, WHITE = "#222831", "#393E46", "#EEEEEE"
+TYPINGCOLSCOL, STEGCOL, DECRYPTCOL = "#001C30", "#272D35", "#0C1E35"
 RED, GREEN = "#cd0000", "#1BAA4A"
 BRIGHT_RED = "#ff0000"
 PRINTABLE = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\t"
@@ -17,7 +17,7 @@ def loading_animation(root):
             """Animates a single letter"""
             if n == 30:  # animation done
                 return
-            if n == 10:  # start next letter
+            if n == 4:  # start next letter
                 drawtext(text[1:], red + 3)  # generate nice spectrum
             canvas.scale(
                 letter, letterx, centery, 0.9, 0.9
@@ -70,11 +70,7 @@ def center(root: Tk, WIN_W: int, WIN_H: int):
 
 
 def dynamic_menu_bar(root: Tk, win: classmethod):
-    """Packs the menubar for the application"""
-    """
-        root = Tk root object
-        win = The class method to be called
-    """
+    """Create the menubar for the window"""
     layouts = {
         "Import": {"command": win.open, "accelerator": "Ctrl+O", "state": "normal"},
         "Export": {"command": win.export, "accelerator": "Ctrl+I", "state": "normal"},
@@ -158,17 +154,16 @@ def dynamic_menu_bar(root: Tk, win: classmethod):
     root.configure(background=DARK_GRAY, menu=menubar)
 
 
-def key_popup(root, after_exec):
+def key_popup(root, after_exec, empty_key=True):
     """Opens up an edit key window"""
 
-    def enter_key():
-        if not root._valid_key():
+    def enter_key(e=None):
+        if not root._valid_key(empty_key=empty_key):
             return
         after_exec()
         root.popup.destroy()
 
     root.popup = Toplevel(root, bg=DARK_GRAY)
-    # TODO: CHANGE TITLE
     root.popup.title("Enter New Key")
 
     # Centering the popup in the center of the window
@@ -189,7 +184,7 @@ def key_popup(root, after_exec):
         textvariable=root.key_method_text,
     )
     root.key_method.pack(pady=30)
-    root.popup.bind("<Return>", lambda e: enter_key())
+    root.popup.bind("<Return>", enter_key)
 
     root.error = Label(
         root.popup,

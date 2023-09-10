@@ -1,7 +1,7 @@
-from pathlib import Path
 from random import choices
 from tkinter import *
 from tkinter import filedialog as fd
+from tkinter import messagebox
 
 from backend import utils
 from backend.typingcolors import TypingColors
@@ -11,7 +11,6 @@ from gui.win_steganography import SteganographyWin
 from gui.win_typingcolors import TypingColorsWin
 
 WIN_W, WIN_H = (800, 500)
-IMGS = Path("assets") / "imgs"
 
 
 class GUI(Tk):
@@ -21,28 +20,20 @@ class GUI(Tk):
         """Initializes variables and window"""
         # Creates the window
         super().__init__()
+        self.title("The Neverending Loops")
+        self.sw, self.sh = self.winfo_screenwidth(), self.winfo_screenheight()
+        self.minsize(width=int(self.sw * 0.45), height=int(self.sh * 0.45))
+
+        self.geometry(f"{WIN_W}x{WIN_H}")
+        center(self, WIN_W, WIN_H)
+        loading_animation(self)
+        self.configure(background=DARK_GRAY)
 
     def callback(self, callback: callable, *args):
         """Callback a function while destroying existing widgets"""
         for widget in self.winfo_children():
             widget.destroy()
         callback(*args)
-
-    # function to create the place to write text to create image
-
-    def loading_screen(self):
-        """The starting page for the application"""
-        self.title("Pixel Studios")
-
-        # GET THE CURRENT SCREEN SIZE AND SET MIN SIZE accordingly
-        self.sw, self.sh = self.winfo_screenwidth(), self.winfo_screenheight()
-        self.minsize(width=int(self.sw*.45), height=int(self.sh*.45))
-
-        self.geometry(f"{WIN_W}x{WIN_H}")
-        center(self, WIN_W, WIN_H)
-        loading_animation(self)
-        self.configure(background=DARK_GRAY)
-        self.mainloop()
 
     def create_main_window(self):
         """Creates The Main Window Page for the application"""
@@ -138,14 +129,19 @@ class GUI(Tk):
         )
         decrypt.grid(row=0, column=10, padx=10, pady=10)
         buttons.pack()
-        # buttons.place(relx=0.5, rely=0.5, anchor="center")
         self.mainloop()
 
-    def _valid_key(self):
+    def _valid_key(self, empty_key=True):
         """Checks if key is valid"""
         self.key = self.key_method_text.get()
         if len(self.key) == 0:
-            return True
+            if empty_key:
+                self.key = "".join(choices(PRINTABLE.replace("\t", ""), k=16))
+                return True
+            else:
+                self.key_method.configure(bg=RED, fg=WHITE)
+                self.error.configure(text="Key cannot be empty")
+                return False
         elif not (4 <= len(self.key) <= 24):
             self.key_method.configure(bg=RED, fg=WHITE)
             self.error.configure(text="Key must be between 4 and 24 characters long")
@@ -164,7 +160,7 @@ class GUI(Tk):
             if encrypt:
                 self.encrypt(mode)
             elif len(self.key) > 0:  # checks if key is not empty for decryption
-                self.decrypt(self.key)
+                self.decrypt()
             else:
                 self.key_method.configure(bg=RED, fg=WHITE)
                 self.error.configure(text="Invalid secret key")
@@ -185,16 +181,18 @@ class GUI(Tk):
         else:
             self.switch_steganography()
 
-    def decrypt(self, key: str = None):
+    def decrypt(self):
         """Opens the decryption page with the secret key"""
-        filename = fd.askopenfilename(title="Select Image", filetypes=[("PNG", "*.png")])
+        filename = fd.askopenfilename(
+            title="Select Image", filetypes=[("PNG", "*.png")]
+        )
         if not filename:
             return
         try:
-            object, decoded_text = utils.decrypt(filename, key)
+            object, decoded_text = utils.decrypt(filename, self.key)
         except Exception:  # invalid decryption key
             self.key_method.configure(bg=RED, fg=WHITE)
-            self.error.configure(text="Invalid secret key")
+            messagebox.showinfo("Decryption Failed", "Invalid secret key!")
             return
 
         def create_win():
@@ -216,7 +214,9 @@ class GUI(Tk):
 
     def switch_steganography(self):
         """Switches to encrypt steganography"""
-        filename = fd.askopenfilename(title="Select Image", filetypes=[("PNG", "*.png")])
+        filename = fd.askopenfilename(
+            title="Select Image", filetypes=[("PNG", "*.png")]
+        )
         if not filename:
             return
 
@@ -228,4 +228,4 @@ class GUI(Tk):
 
     def switch_decrypt(self):
         """Switches to decrypt mode"""
-        key_popup(self, after_exec=lambda: self.decrypt(self.key))
+        key_popup(self, after_exec=self.decrypt, empty_key=False)
