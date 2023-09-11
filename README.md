@@ -1,5 +1,7 @@
 # Digital Shadows
 
+![radio room](radio_room.png)
+
 **Digital Shadows** transports players into the enthralling depths of the digital realm, bridging the gap
 between the online world and palpable real-world locations, ranging from underground hacker dens and
 abandoned warehouses to fortified safe houses.
