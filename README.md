@@ -5,7 +5,7 @@ Our loop-less (incomparable) repository for the [10th Python Discord Code Jam](h
 <details>
 <summary>Table of Contents</summary>
 
-1. [About The Project](about-the-project)
+1. [About The Project](#about-the-project)
     - [What We Made](#what-we-made)
     - [Made With](#made-with)
     - [Project Structure](#project-structure)
