@@ -6,9 +6,13 @@ This year, the theme was "Secret codes". Submissions also had to incorporate ima
 
 Find out more about the competition [here](https://www.pythondiscord.com/events/code-jams/10/).
 
-# Our Entry
+# Our Purpose
 
-We have made a program with two image manipulation tools which relate to encoding data or hiding secret codes.
+After our discussion, we decide to made a image manipulation tool which can encoding data or hiding secret codes into selected image, and obfuscate selected text inside the image, so that certain message will become a secret.
+
+The tool can work as CLI for different platform, and we also provide a GUI version so that normal users are easy to use.
+
+Our tools include two modes: watermarking and obfuscator.
 
 ## 1. Watermarking
 
@@ -85,6 +89,7 @@ python3 -m app cli obfuscate data/image.jpg data/output.jpg "hide this text" "ot
 Unfortunately, not everything always works properly. Here are the issues we're aware of and any potential workarounds:
 
 - Watermarking does not work properly in the GUI. Please use the CLI instead.
+- Some known issue also reveal that for some edge cases such as using pure white image, our tools may not work properly.
 
 # The Team
 
