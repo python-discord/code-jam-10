@@ -36,16 +36,16 @@ Here's some pictures of it working:
 
 ## Obfuscator
 
-Original Image:
+### Original Image
 ![Original image](https://cdn.discordapp.com/attachments/1145778261549404243/1151922040547319868/res.jpg)
 
-Obfuscated
+### Obfuscated
 ![Obfuscated](https://cdn.discordapp.com/attachments/1145778261549404243/1151922113100398592/image.png)
 
-Obfuscated (with a regex)
+### Obfuscated (with a regex)
 ![Obfuscated Regex](https://cdn.discordapp.com/attachments/1145778261549404243/1151922321834115202/image.png)
 
-Obfuscated (blur instead of black box)
+### Obfuscated (blur instead of black box)
 ![Obfuscated Blur](https://cdn.discordapp.com/attachments/1145778261549404243/1151922555549138974/image.png)
 
 # Setup
