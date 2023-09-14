@@ -56,6 +56,28 @@ Before you begin, ensure you have met the following requirements:
     ```bash
     python main.py
     ```
+## Selecting Specific Levels
+
+### Level 1 - Ishihara Test
+    ```bash
+    python main.py
+    ```
+### Level 2 - Double Exposure
+    ```bash
+    python main.py 2
+    ```
+### Level 3 - Color Swap
+    ```bash
+    python main.py 3
+    ```
+### Level 4 - Hidden in ASCII
+    ```bash
+    python main.py 4
+    ```
+### Level 5 - Motion
+    ```bash
+    python main.py 5
+    ```
 ## Contributing to the Project
 1. Fork the project
 2. Create a new branch (git checkout -b feature/YourFeature).
