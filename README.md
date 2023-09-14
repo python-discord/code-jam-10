@@ -261,3 +261,9 @@ The keys are hidden in plain sight.
 </details>
 
 ![secret.png](demo/secret.png)
+
+### walrus.png
+
+This one was manually created using an image editor to look like something, run it to see what it does!
+
+![walrus.png](demo/walrus.png)
