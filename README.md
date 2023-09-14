@@ -10,7 +10,7 @@ Find out more about the competition [here](https://www.pythondiscord.com/events/
 
 After our discussion, we decide to made a image manipulation tool which can encoding data or hiding secret codes into selected image, and obfuscate selected text inside the image, so that certain message will become a secret.
 
-The tool can work as CLI for different platform, and we also provide a GUI version so that normal users are easy to use.
+This is primarily intended as a command line tool to quickly get things done however we have also made a UI so that it's nice and easy to use for new users. Both interfaces have exactly the same functionality, and each have their strengths and weaknesses so use whichever you prefer.
 
 Our tools include two modes: watermarking and obfuscator.
 
@@ -47,6 +47,10 @@ Here's some pictures of it working:
 
 ### Obfuscated (blur instead of black box)
 ![Obfuscated Blur](https://cdn.discordapp.com/attachments/1145778261549404243/1151922555549138974/image.png)
+
+## Watermarking
+
+![Watermarking](https://cdn.discordapp.com/attachments/1145778261549404243/1151925218227539980/Screenshot_2023-09-14_175629.png)
 
 # Setup
 
@@ -107,7 +111,7 @@ python3 -m app cli obfuscate data/image.jpg data/output.jpg "hide this text" "ot
 Unfortunately, not everything always works properly. Here are the issues we're aware of and any potential workarounds:
 
 - Watermarking does not work properly in the GUI. Please use the CLI instead.
-- Some known issue also reveal that for some edge cases such as using pure white image, our tools may not work properly.
+- Some unusual images can cause it to malfunction.
 
 # The Team
 
