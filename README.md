@@ -50,7 +50,7 @@ Here's some pictures of it working:
 
 ## Watermarking
 
-![Watermarking](https://cdn.discordapp.com/attachments/1145778261549404243/1151925218227539980/Screenshot_2023-09-14_175629.png)
+![Watermarking](https://cdn.discordapp.com/attachments/1145778261549404243/1151925841807286272/Screenshot_2023-09-14_175629.png)
 
 # Setup
 
