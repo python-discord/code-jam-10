@@ -1,0 +1,113 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pydis-jam23"
+version = "0.1.0"
+description = "The Readable Regexes' submission for the Python Discord 2023 Code Jam."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Artemis", email = "me@arty.li" },
+  { name = "Falkan", email = "falkanson@gmail.com"},
+  { name = "MrBud", email = "solocyberengineer@gmail.com"},
+  { name = "Pigeon", email = "pigeon43.stuff@gmail.com" },
+  { name = "Shneor E.", email = "770elmo@gmail.com" },
+]
+dependencies = [
+  "numpy~=1.25.1",
+  "Pillow~=10.0.0",
+  "Flask~=2.3.3",
+]
+
+[[tool.hatch.envs.all.matrix]]
+python = ["3.11"]
+
+[tool.hatch.envs.default]
+python = "3.11"
+dependencies = [
+  "black~=23.7.0",
+  "ruff~=0.0.286",
+  "pre-commit~=3.3.3",
+  "pytest~=7.4.0",
+  "coverage~=7.3.0",
+]
+
+[tool.hatch.envs.default.scripts]
+hooks = "pre-commit install"
+lint = [
+  "ruff {args:.}",
+  "black --check --diff {args:.}",
+]
+fmt = [
+  "black {args:.}",
+  "ruff --fix {args:.}",
+  "lint",
+]
+main = "python -m src.pydis_jam23 {args}"
+test = "coverage run -m pytest"
+
+[tool.black]
+target-version = ["py311"]
+line-length = 120
+skip-string-normalization = true
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+select = [
+  "A",
+  "ARG",
+  "B",
+  "C",
+  "DTZ",
+  "E",
+  "EM",
+  "F",
+  "FBT",
+  "I",
+  "ICN",
+  "ISC",
+  "N",
+  "PLC",
+  "PLE",
+  "PLR",
+  "PLW",
+  "Q",
+  "RUF",
+  "S",
+  "TID",
+  "UP",
+  "W",
+  "YTT",
+]
+ignore = [
+  # Allow non-abstract empty methods in abstract base classes
+  "B027",
+  # Allow boolean positional values in function calls, like `dict.get(... True)`
+  "FBT003",
+  # Ignore checks for possible passwords
+  "S105", "S106", "S107",
+  # Ignore complexity
+  "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",
+  # Allow magic numbers
+  "PLR2004",
+  # Allow positional boolean args
+  "FBT001",
+]
+unfixable = [
+  # Don't touch unused imports
+  "F401",
+]
+
+[tool.ruff.per-file-ignores]
+"tests/**/*.py" = [
+  "S101",  # allow `assert` in tests
+  "F811",  # raised when importing fixtures
+]
+
+[tool.ruff.isort]
+known-first-party = ["src"]
