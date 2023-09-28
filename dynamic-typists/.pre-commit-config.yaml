@@ -1,0 +1,35 @@
+## Pre-commit setup
+# See https://github.com/python-discord/code-jam-template/tree/main#pre-commit-run-linting-before-committing
+
+# Make sure to edit the `additional_dependencies` list if you want to add plugins
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.5.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+
+  - repo: https://github.com/psf/black
+    rev: 23.7.0
+    hooks:
+      - id: black
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.0.286
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+
+  - repo: local
+    hooks:
+      - id: unittest
+        name: Run unit tests
+        entry: python -m unittest discover -p "test__*.py"
+        pass_filenames: false
+        language: system
+        types: [python]
