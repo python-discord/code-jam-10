@@ -1,0 +1,44 @@
+[tool.poetry]
+name = "pic-crypt"
+version = "0.1.0"
+description = ""
+authors = [
+    "nozwock",
+    "realstealthninja",
+    "SimonMeersschaut",
+    "Sapient44",
+    "Nhsdkk",
+]
+license = "MIT"
+packages = [{ include = "pic_crypt" }]
+
+[tool.poetry.scripts]
+pic-crypt = 'pic_crypt.cli:app'
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.12"
+typer = "^0.9.0"
+numpy = "^1.25.2"
+bitarray = "^2.8.1"
+flask = "^2.3.3"
+cloup = "^3.0.1"
+argon2-cffi = "^23.1.0"
+cryptography = "^41.0.3"
+pillow = "^10.0.0"
+opencv-python = "^4.8.0.76"
+
+[tool.poetry.group.dev.dependencies]
+# Base tools
+flake8 = "^6.1.0"
+isort = "^5.12.0"
+pre-commit = "^3.3.3"
+black = "^23.7.0"
+mypy = "^1.5.1"
+
+# Flake8 plugins, see https://github.com/python-discord/code-jam-template/tree/main#plugin-list
+flake8-docstrings = "~1.7.0"
+ipykernel = "^6.25.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
